@@ -4,7 +4,7 @@
     use GuzzleHttp\Client;
     
     $headers = [
-            'authToken' => 'Dp5aFQ3HMMz6ARRYQlKGxoeOuG8X7l2N6toEx5o0i7nx31z3Vzq-Oq3DdXYYG6hzY8aFY0lnQGpInF0gIYsSRAQyIIlwYKGdw7uUU4XEyGBfCNO7MCmhS37rsOrWncnKUB0tB6HUgp-QiMcI0wxh2w',
+            'authToken' => 'YOUR-INCREDIBLY-API-TOKEN',
             'Content-Type' => 'application/json'
     ];
     $method = 'GET';
