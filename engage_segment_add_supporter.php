@@ -11,7 +11,7 @@
     $supporterIds = [
         "VERY-LONG-SUPPORTER-ID-1",
         "VERY-LONG-SUPPORTER-ID-2"
-    ]
+    ];
     // Payload matches the `curl` bash script.
     $payload = [
         'payload' => [
