@@ -4,7 +4,7 @@
     use GuzzleHttp\Client;
     
     $headers = [
-        'authToken' => 'TK0Tmikz1dJktd_imu_G-GHhr8shpiF3TgX0ZWHDST6cQIbofxfvh2Y8rPMmGJ_MVPBbqhlN72UwKa9nhgDiz2czB6rx97kt-HhaSGpCQ4Iy07e8Gmoxmb3qSeWPULVyXcolboVtb9Q0kZFlLui2oQ',
+        'authToken' => 'YOUR-INCREDIBLY-LONG-AUTH-TOKEN-HERE',
         'Content-Type' => 'application/json'
     ];
     // Payload matches the `curl` bash script.
