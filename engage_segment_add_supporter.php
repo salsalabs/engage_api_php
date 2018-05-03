@@ -4,7 +4,7 @@
     use GuzzleHttp\Client;
     
     $headers = [
-        'authToken' => 'YOUR-INCREDIBLY-LONG-API-TOKEN',
+        'authToken' => 'YOUR-INCREDIBLY-LONG-AUTH-TOKEN-HERE',
         'Content-Type' => 'application/json'
     ];
     $segmentId = 'VERY-LONG-SEGMENT-ID';

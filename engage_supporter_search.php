@@ -12,8 +12,8 @@
         'payload' => [
         	'count' => 10,
         	'offset' => 0,
-        	'identifiers' => ["buttered@popcorn.bizi"],
-        	'identifierType' => 'EMAIL_ADDRESS'
+        	'identifiers' => ["46b1eb74-fe78-459e-a35c-ac4010d7554f"],
+        	'identifierType' => 'SUPPORTER_IDS'
         ]
     ];
     $method = 'POST';
