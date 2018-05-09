@@ -5,19 +5,30 @@
     use Symfony\Component\Yaml\Yaml;
 
     function initialize() {
-        // Read the contents of params.yaml.  That will supply the Engage
-        // token for access and runtime parameters.
-        $cred =  Yaml::parseFile('./params.yaml');
+        // Read the contents of params-supporter-search.yaml.
+        // Example contents:
+        /*         
+            # Using this kind of search.
+            identifierType: EMAIL_ADDRESS
+            # Looking for these supporters.
+            identifiers: 
+            - aleonard@salsalabs.com
+            - barbie@doll.biz
+            - totally@bogus.biz
+            # Engage API token.
+            token: Your-incredibly-long-Engage-token-here
+        */
+        $cred =  Yaml::parseFile('./params-supporter-search.yaml');
         if  (FALSE == array_key_exists('token', $cred)) {
-            throw new Exception("File params.yaml must contain an Engage token.");
+            throw new Exception("File params-supporter-search.yaml must contain an Engage token.");
         }
         return $cred;
     }
 
-    // This is the task.  Uses the contents of params.yaml to find some
+    // This is the task.  Uses the contents of params-supporter-search.yaml to find some
     // supporters.
     //
-    // @param array  $cred  Contents of params.yaml
+    // @param array  $cred  Contents of params-supporter-search.yaml
     //
     function run($cred) {
         $headers = [
