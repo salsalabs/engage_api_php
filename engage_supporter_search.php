@@ -62,7 +62,7 @@
         foreach ( $data -> payload -> supporters as $s) {
             $c = $s -> contacts[0];
             $id = $s -> supporterId;
-            if (strlen($id) == 0) {
+            if ($s -> result == 'NOT_FOUND') {
                 $id = $s -> result;
             }
             printf("%s %-20s %-20s %-25s %s\n",
