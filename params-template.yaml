@@ -1,4 +1,10 @@
-
-# Engage API token.
-token: wBTvk4rH5auTh4up8nOaVCcJBYWT3jr2Wk7QnlcOc4Qa7dvkgaDBGK6pP3hUaneP_aw0vGveE3XqDEfXSBIsQy7slH24kQ_SZVlojNYkNrg
-# Put any runtime data that you need here.  See any YAML spec for details.
+# Example params.yaml. Search for supporter emails.
+# App will use this kind of search.
+identifierType: EMAIL_ADDRESS
+# App will be looking for these supporters.
+identifiers: 
+  - aleonard@salsalabs.com
+  - barbie@doll.biz
+  - totally@bogus.biz
+# App will use this Engage API token.
+token: Incredibly-long-Engage-API-token-goes-here
