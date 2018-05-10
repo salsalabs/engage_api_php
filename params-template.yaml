@@ -1,4 +1,9 @@
-# Example params.yaml. Search for supporter emails.
+# Use this as a template for creating parameter files.
+# Parameter files are used to provide the Engage API token
+# and runtime data to the example apps.  Except for `token`,
+# all of the data is app-specific.
+#
+# Here's an example of the YAML file for supporter_search.php.
 # App will use this kind of search.
 identifierType: EMAIL_ADDRESS
 # App will be looking for these supporters.
