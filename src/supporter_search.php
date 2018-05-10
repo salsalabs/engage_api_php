@@ -5,7 +5,7 @@
     use Symfony\Component\Yaml\Yaml;
 
     function initialize() {
-        // Read the contents of params-supporter-search.yaml.
+        // Read the contents of params/supporter-add.yamlporter-search.yaml.
         // Example contents:
         /*         
             # Using this kind of search.
@@ -18,17 +18,17 @@
             # Engage API token.
             token: Your-incredibly-long-Engage-token-here
         */
-        $cred =  Yaml::parseFile('./params-supporter-search.yaml');
+        $cred =  Yaml::parseFile('./params/supporter-search.yaml');
         if  (FALSE == array_key_exists('token', $cred)) {
-            throw new Exception("File params-supporter-search.yaml must contain an Engage token.");
+            throw new Exception("File params/supporter-add.yamlporter-search.yaml must contain an Engage token.");
         }
         return $cred;
     }
 
-    // This is the task.  Uses the contents of params-supporter-search.yaml to find some
+    // This is the task.  Uses the contents of params/supporter-add.yamlporter-search.yaml to find some
     // supporters.
     //
-    // @param array  $cred  Contents of params-supporter-search.yaml
+    // @param array  $cred  Contents of params/supporter-add.yamlporter-search.yaml
     //
     function run($cred) {
         $headers = [

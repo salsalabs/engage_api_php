@@ -1,2 +1,4 @@
-params*.yaml
+# Ignore the working parameters directory.
+params
+# Ingore the vendor directory that composer uses.
 vendor
