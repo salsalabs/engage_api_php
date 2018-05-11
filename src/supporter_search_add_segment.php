@@ -11,16 +11,16 @@
     /*         
         identifierType: EMAIL_ADDRESS
         identifiers: 
-            - aleonard@salsalabs.com
+            - someone@whatever.biz
         token: Your-incredibly-long-Engage-token-here
         segmentId:
             - An-incredibly-long-segment-id
     */
     function initialize() {
-        // Read the contents of params/supporter-search.yaml.
-        $cred =  Yaml::parseFile('./params/supporter-search-add-segment.yaml');
+        $filename = './params/supporter-search-add-segment.yaml';
+        $cred =  Yaml::parseFile($filename);
         if  (FALSE == array_key_exists('token', $cred)) {
-            throw new Exception("File params/supporter-add.yamlporter-search.yaml must contain an Engage token.");
+            throw new Exception("File " . $filename . " must contain an Engage token.");
         }
         return $cred;
     }
@@ -101,12 +101,12 @@
             'json'     => $payload
         ]);
         $data = json_decode($response -> getBody());
-        echo json_encode($data, JSON_PRETTY_PRINT);
+        //echo json_encode($data, JSON_PRETTY_PRINT);
 
         // The first record is the one for the segment ID.
         // If it's not found, then we stop here.
         $segment = $data -> payload -> segments[0];
-        var_dump("Segment data is ", $segment);
+        //var_dump("Segment data is ", $segment);
         if ($segment -> result != "FOUND") {
             var_dump ("Sorry, can't find segment for segmentId." . $payload["identifiers"] . "\n");
             return NULL;
@@ -162,14 +162,14 @@
             echo ("Sorry, can't find supporter for ID.\n");
             exit();
         };
-        var_dump("Supporter data is ", $supporter);
+        // var_dump("Supporter data is ", $supporter);
 
         $segment = getSegment($cred);
         if (is_null($segment)) {
             echo ("Sorry, can't find segment for ID.\n");
             exit();
         };
-        var_dump("Segment data is ", $segment);
+        // var_dump("Segment data is ", $segment);
 
         register($cred, $supporter, $segment);
     }

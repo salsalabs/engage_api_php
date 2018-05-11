@@ -18,9 +18,10 @@
             # Engage API token.
             token: Your-incredibly-long-Engage-token-here
         */
-        $cred =  Yaml::parseFile('./params/supporter-search.yaml');
+        $filename = './params/supporter-search.yaml';
+        $cred =  Yaml::parseFile($filename);
         if  (FALSE == array_key_exists('token', $cred)) {
-            throw new Exception("File params/supporter-add.yamlporter-search.yaml must contain an Engage token.");
+            throw new Exception("File " . $filename . " must contain an Engage token.");
         }
         return $cred;
     }
