@@ -45,6 +45,8 @@ Apps that use the Engage APIs need an [Engage API Token](https://help.salsalabs.
 
 These apps most generally use a YAML file to hold the API token and any runtime parmaeters. View the `params-template.yaml` file for an example of providing the API token and runtime parameters.
 
+By convention, YAML configuraton files are stored in a local directory named `params`.  You should *_never_, _ever_* check in a configuratoin YAML file. Anywhere.
+
 # License
 
 Read the `LICENSE` file.
