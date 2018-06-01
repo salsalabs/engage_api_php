@@ -21,7 +21,7 @@ These expamples depend upon these PHP packages.
 ```bash
 composer
 ```
-and tap the enter key.  You should see some feed back like this:
+You should see some feed back like this:
 
 ```bash
 Loading composer repositories with package information
@@ -41,10 +41,9 @@ Generating autoload files
 
 # Runtime configuration
 
-These example apps will need an [Engage API Token](https://help.salsalabs.com/hc/en-us/articles/224470007-Getting-Started#acquiring-a-token).  They may also need some other runtime parameters.
+Apps that use the Engage APIs need an [Engage API Token](https://help.salsalabs.com/hc/en-us/articles/224470007-Getting-Started#acquiring-a-token).  They may also need optional parameters.
 
-These apps most generally use a YAML file to hold the API token and any runtime parmaeters. Here's an example of a minimum YAML file.
-View the `params-template.yaml` file for an example of providing the API token and runtime parameters.
+These apps most generally use a YAML file to hold the API token and any runtime parmaeters. View the `params-template.yaml` file for an example of providing the API token and runtime parameters.
 
 # License
 
@@ -52,8 +51,9 @@ Read the `LICENSE` file.
 
 # Questions? Issues?
 
-Use the [Issues](https://github.com/salsalabs/engage_api_php/issues) link.  Don't waste your time by 
-contacting Salsa Support, K?
+Use the [Issues](https://github.com/salsalabs/engage_api_php/issues) link.  Salsalabs does not provide 
+support for these examples.  Contacting Salsa Support will be a waste of your time.
+
 
 
 
