@@ -28,26 +28,20 @@ composer upgrade
 ```
 # Logging in to the API
 
-The apps in this repository use `credentials.yaml` to provide the parameters for gaining access to the Salsa Engage API.
+The apps in this repository use YAML-formatted file(s) to provide the parameters for gaining access to the Salsa Engage API.
 
-* API URL
-* email
-* password
+Specifically, each app will read a app-specific YAML file from the 
+`params` directory.  That file will provide both the Engage API token
+and any runtime parameters that the app needs.
 
-Here is a sample credentials.yaml that you can use.
-```
-api_host: https://wfc2.wiredforchange.com
-email: aleonard@salsalabs.com
-password: a-really-long-and-complicated-password
-whatever: 123456
-```
-# Usage
+**The `params` directory _should never be checked in_**.  It contains files that
+themselves contain credentials.  Checking in the dir will leave your
+Engage API token out where bad guys can get to it.
 
-Make sure that the contents of `credentials.yaml` are correct, then type
+You can see a sample parameter YAML file by viewing the file
+`params-template.yaml`.
 
-`php any_php_filename.php`
-
-# Licencse
+# License
 
 Please read the LICENSE file.
 

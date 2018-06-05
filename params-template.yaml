@@ -9,7 +9,7 @@ identifierType: EMAIL_ADDRESS
 # App will be looking for these supporters.
 identifiers: 
   - aleonard@salsalabs.com
-  - barbie@doll.biz
+  - cannonball@red.biz
   - totally@bogus.biz
 # App will use this Engage API token.
 token: Incredibly-long-Engage-API-token-goes-here
