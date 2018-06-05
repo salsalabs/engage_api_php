@@ -1,1 +1,6 @@
-composer.*
+composer*
+
+# Files provided by composer.
+vendor*
+vendor/*
+vendor/*/*
