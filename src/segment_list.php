@@ -21,15 +21,15 @@
     }
 
     // Retrieve the Engage info for the segment ID.
-    function get_segments($cred) {
+    function get_segments($cred, $offset, $count) {
         $headers = [
             'authToken' => $cred['token'],
             'Content-Type' => 'application/json'
         ];
         $payload = [
             'payload' => [
-                'offset' => 0,
-                'count' => 20,
+                'offset' => $offset,
+                'count' => $count,
                 'includeMemberCounts' => 'true'
             ]
         ];
@@ -61,13 +61,27 @@
 
     function main() {
         $cred = initialize();
-        $segments = get_segments($cred);
-        foreach ($segments as $s) {
-            fprintf(STDOUT, "%-38s %-30s %-7s %6d \n",
-                $s->segmentId,
-                $s->name,
-                $s->type,
-                $s->totalMembers);
+        $offset = 0;
+        $count = 20;
+        while ($count > 0) {
+            $segments = get_segments($cred, $offset, $count);
+            if (is_null($segments)) {
+                $count = 0;
+            } else {
+                $i = 0;
+                foreach ($segments as $s) {
+                    $i++;
+                    fprintf(STDOUT, "[%3d:%2d] %-38s %-60s %-7s %6d \n",
+                        $offset,
+                        $i,
+                        $s->segmentId,
+                        $s->name,
+                        $s->type,
+                        $s->totalMembers);
+                }
+                $count = $i;
+            }
+            $offset += $count;
         }
     }
 
