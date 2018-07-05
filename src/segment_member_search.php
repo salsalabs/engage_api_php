@@ -21,6 +21,9 @@
         if  (FALSE == array_key_exists('segment-id', $cred)) {
         throw new Exception("File " . $filename . " must contain segment ID.");
         }
+        if  (FALSE == array_key_exists('uri', $cred)) {
+            $cred["uri"] = "https://api.salsalabs.org";
+        }
         return $cred;
     }
 
@@ -38,7 +41,7 @@
             ]
         ];
         $method = 'POST';
-        $uri = 'https://api.salsalabs.org';
+        $uri = $cred["uri"];
         $command = '/api/integration/ext/v1/segments/search';
         $client = new GuzzleHttp\Client([
             'base_uri' => $uri,
@@ -79,7 +82,7 @@
             ]
         ];
         $method = 'POST';
-        $uri = 'https://api.salsalabs.org';
+        $uri = $cred["uri"];
         $client = new GuzzleHttp\Client([
             'base_uri' => $uri,
             'headers'  => $headers
@@ -101,8 +104,10 @@
         $cred = initialize();
         $segment = get_segment($cred);
         if (!is_null($segment)) {
-            echo "\nSearching \n".$segment -> segmentId . ": " . $segment -> name . "\n\n";
+            // echo json_encode($segment, JSON_PRETTY_PRINT) . "\n";
+            echo "\nSearching \n".$segment -> segmentId . ": " . $segment -> name . " for " . $segment-> totalMembers . " supporters\n\n";
             $r = search($cred);
+            //echo json_encode($r, JSON_PRETTY_PRINT) . "\n";
             $c = (int)$r -> payload->count;
             if ($c > 0) {
                 $s = $r -> payload -> supporters;
