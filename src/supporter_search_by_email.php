@@ -24,7 +24,7 @@
         'authToken' => $cred['token'],
         'Content-Type' => 'application/json'
     ];
-    // Payload matches the `curl` bash script.
+
     $payload = [ 'payload' => [
         	'count' => 10,
         	'offset' => 0,

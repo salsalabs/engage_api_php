@@ -22,7 +22,6 @@ function main()
         'authToken' => $cred["token"],
         'Content-Type' => 'application/json',
     ];
-    // Payload matches the `curl` bash script.
 
     $payload = [
         'payload' => [

@@ -7,7 +7,6 @@
         'authToken' => 'YOUR-INCREDIBLY-LONG-AUTH-TOKEN-HERE',
         'Content-Type' => 'application/json'
     ];
-    // Payload matches the `curl` bash script.
  
     $payload = [
         'payload' => [
