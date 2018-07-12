@@ -4,7 +4,7 @@
     use GuzzleHttp\Client;
     use Symfony\Component\Yaml\Yaml;
 
-    // App to look up a supporter by email.  If the supproter exists
+    // App to look up a supporter by email.  If the supporter exists
     // then the supporter is added to a segment.  The YAML file contains
     // information about the supporter and segment.
     // Example contents:
@@ -26,7 +26,7 @@
     }
 
     // Return the supporter record for the first (and typically only)
-    // supproterID in the `identifers` field in the credentials.
+    // supporterID in the `identifers` field in the credentials.
     //
     // @param array  $cred  Contents of params/supporter-add.yamlporter-search.yaml
     //

@@ -4,10 +4,8 @@
     use GuzzleHttp\Client;
     use Symfony\Component\Yaml\Yaml;
 
-    // App to look up a supporter by email.  If the supproter exists
-    // then the supporter is added to a segment.  The YAML file contains
-    // information about the supporter and segment.
-    // Example contents:
+    // App to look up a supporter by email.  
+    // Example contents of YAM file.
     /*         
         identifiers: 
             - whatever@domain.com
