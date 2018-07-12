@@ -108,6 +108,10 @@
                     $cf -> value = $cf -> value . ", " .$cred["value"];
                 }
             }
+            // *** Trigger an error by submitting an invalid value ot the T Shirt Size. ***//
+            if ($cf -> fieldId == "d87d48c8-7b5e-49e6-8340-e2ee493d8515") {
+                $cf -> value = "XXXXXXL";
+            }
         };
 
         $payload = [
@@ -115,7 +119,6 @@
                 'supporters' => [ $supporter ]
             ]
         ];
-
 
         // echo "\nUpdate Payload:\n";
         // var_dump($payload);
@@ -135,9 +138,16 @@
         $data = json_decode($response -> getBody());
 
         //echo "\nUpdate response:\n";
-        //var_dump($data);
+        //var_dump($data->payload);
         //echo "\n";
-    }           
+
+        echo "\nError analysis:\n";
+        foreach ($data->payload->supporters[0]->customFieldValues as $cf) {
+            if (!is_null($cf->errors)) {
+                echo(sprintf("\t%s %s %s = \"%s\" *** %s ***\n", $cf->fieldId, $cf->name,$cf->type, $cf->value, $cf->errors[0]->message));
+            }
+        }
+}           
     
     
     // Main app.  Does the work.
