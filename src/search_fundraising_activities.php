@@ -4,8 +4,9 @@
     use GuzzleHttp\Client;
     use Symfony\Component\Yaml\Yaml;
     
-    // App to search for donations in a date range for a particular
-    // donation page.
+    // App to
+    // * search for donations in a date range, or
+    // * search for donations for a list of activity IDs.
 
     // Config is a YAML file. The Engage API call expects either a 
     // date range (modifiedFrom and/or modifiedTo) or a list of 
@@ -26,13 +27,13 @@
 
     This is a sample of the output:
 
-    Activity ID                          Transaction ID                       Transaction Date         Type      Amount
-    04afe721-ac62-4b2e-aa66-bc6cba7fac71 6f150ba4-f5ad-45cf-a7c6-a6c599a68be0 2018-07-20T02:36:10.002Z CHARGE    50.00
-    17fd2a78-4ff6-4f3a-b2b1-278355716eff 2a48a1cd-3906-46da-bf4f-255e7d338b65 2018-07-15T16:50:54.143Z CHARGE    50.00
-    3a05282d-c648-4c9f-a880-574211b019d6 614e1ea2-9de3-4e9e-b089-b5db0e149463 2018-07-20T02:28:37.025Z CHARGE   100.00
-    48b25138-a021-4eff-89d2-7161d1caed29 6f4e7bed-d504-4507-88a7-73d8ed0bdcf0 2018-07-20T02:23:58.640Z CHARGE    50.00
-    54ecf33b-b7f7-4d83-85d8-eb9ffac97a66 ed3a8e28-7f99-484c-9642-9af68e31a856 2018-07-27T14:38:20.666Z CHARGE    25.00
-                                                                                                       Total    275.00
+    Activity ID                          Transaction ID                       Transaction Date         Type          Amount
+    04afe721-ac62-4b2e-aa66-bc6cba7fac71 6f150ba4-f5ad-45cf-a7c6-a6c599a68be0 2018-07-20T02:36:10.002Z CHARGE        50.00
+    17fd2a78-4ff6-4f3a-b2b1-278355716eff 2a48a1cd-3906-46da-bf4f-255e7d338b65 2018-07-15T16:50:54.143Z CHARGE        50.00
+    3a05282d-c648-4c9f-a880-574211b019d6 614e1ea2-9de3-4e9e-b089-b5db0e149463 2018-07-20T02:28:37.025Z CHARGE       100.00
+    48b25138-a021-4eff-89d2-7161d1caed29 6f4e7bed-d504-4507-88a7-73d8ed0bdcf0 2018-07-20T02:23:58.640Z CHARGE        50.00
+    54ecf33b-b7f7-4d83-85d8-eb9ffac97a66 ed3a8e28-7f99-484c-9642-9af68e31a856 2018-07-27T14:38:20.666Z CHARGE        25.00
+                                                                                                       Total        275.00
 
     */
 
