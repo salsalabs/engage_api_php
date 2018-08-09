@@ -88,25 +88,25 @@
             # echo json_encode($data, JSON_PRETTY_PRINT)."\n";
 
             $total = 0.00;
-            printf("\n    %-36s %-36s %-24s %-7s %7s\n", "Activity ID", "Transaction ID", "Transaction Date", "Type", "Amount");
+            printf("\n    %-36s %-36s %-24s %-11s %7s\n", "Activity ID", "Transaction ID", "Transaction Date", "Type", "Amount");
             foreach ( $data -> payload -> activities as $s) {
                 $aid = $s -> activityId;
                 $afn = $s -> activityFormName;
                 $ad = $s -> acivityDate;
                 foreach ($s -> transactions as $t) {
                     $tt = $t -> type;
-                    if ($tt == "CHARGE") {
+                    #if ($tt == "CHARGE") {
                         $tid = $t -> transactionId;
                         $td = $t -> date;
                         $ta = $t -> amount;
                         $ta = floatval($ta);
                         $ta = number_format($ta, 2, ".", ",");
-                        printf("    %-36s %-36s %-24s %-7s %7.2f\n", $aid, $tid, $td, $tt, $ta);
+                        printf("    %-36s %-36s %-24s %-11s %7.2f\n", $aid, $tid, $td, $tt, $ta);
                         $total = $total + $ta;
-                    }
+                    #}
                 }
             }
-            printf("    %-36s %-36s %-24s %-7s %7.2f\n\n", "", "", "", "Total", $total);
+            printf("    %-36s %-36s %-24s %-11s %7.2f\n\n", "", "", "", "Total", $total);
         } catch (Exception $e) {
             echo 'Caught exception: ', $e->getMessage(), "\n";
             // var_dump($e);
