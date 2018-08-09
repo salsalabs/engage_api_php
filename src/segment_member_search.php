@@ -67,7 +67,7 @@
 
     }
     // Search for members in a group. Not paginating in this app.
-    function search($cred, $offset) {
+    function search($cred, $offset, $count) {
         $headers = [
             'authToken' => $cred['token'],
             'Content-Type' => 'application/json'
@@ -76,7 +76,7 @@
         echo "command is ".$command."\n";
         $payload = [
             'payload' => [
-                'count' => 20,
+                'count' => $count,
                 'offset' => $offset,
                 'segmentId' => $cred['segment-id']
             ]
@@ -105,26 +105,30 @@
         $segment = get_segment($cred);
         if (!is_null($segment)) {
             // echo json_encode($segment, JSON_PRETTY_PRINT) . "\n";
-            echo "\nSearching \n".$segment -> segmentId . ": " . $segment -> name . " for " . $segment-> totalMembers . " supporters\n\n";
+           fprintf(STDOUT, "\nSearching %s: %s for %d supporters.\n\n",
+                $segment -> segmentId,
+                $segment -> name,
+                $segment-> totalMembers);
+            $offset = 0;
             $count = 20;
-            if ($offset + $count > $segment -> totalMembers) {
-                $count = $segment -> totalMembers % 20;
-            }
+
             for ($offset = 0; $offset <= $segment-> totalMembers; $offset += $count) {
+                if ($offset + $count > $segment -> totalMembers) {
+                    $count = $segment -> totalMembers % 20;
+                }
                 fprintf(STDOUT, "Offset/count: %6d/%2d\n", $offset, $count);
-                $offset = 0;
                 $r = search($cred, $offset, $count);
                 //echo json_encode($r, JSON_PRETTY_PRINT) . "\n";
                 $c = (int)$r -> payload->count;
+                fprintf(STDOUT, "Offset/count/actual: %6d/%2d/%2d\n", $offset, $count, $c);
                 if ($c > 0) {
                     $s = $r -> payload -> supporters;
                     foreach ($s as $a) {
                         echo sprintf("%-42s  %-40s %s\n", $a->supporterId, ($a->firstName . " " . $a->lastName), $a->contacts[0]->value);
                     }
                 } else {
-                    echo "Sorry, didn't find any supporters...\n";
+                    echo "End of supporters...\n";
                 }
-                $offset = $offset + $count;
                 echo "\n\n";
             }
         }
