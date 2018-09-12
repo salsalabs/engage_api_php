@@ -3,13 +3,13 @@
     require 'vendor/autoload.php';
     use GuzzleHttp\Client;
     use Symfony\Component\Yaml\Yaml;
-    
+
     // App to
     // * search for donations in a date range, or
     // * search for donations for a list of activity IDs.
 
-    // Config is a YAML file. The Engage API call expects either a 
-    // date range (modifiedFrom and/or modifiedTo) or a list of 
+    // Config is a YAML file. The Engage API call expects either a
+    // date range (modifiedFrom and/or modifiedTo) or a list of
     // activityIds.  This sameple is equipped with both.  See the
     // payload comment to learn now to use both types of requests.
     /*
@@ -46,7 +46,7 @@
         }
         return $cred;
     }
-    
+
     function main()
     {
         $cred = initialize();
@@ -54,7 +54,7 @@
             'authToken' => $cred["token"],
             'Content-Type' => 'application/json',
         ];
-    
+
         # This payload defaults to finding donations between two dates.
         # To see donations for a set of activity IDs
         #  * comment out modifiedFrom
@@ -80,7 +80,7 @@
             'base_uri' => $uri,
             'headers' => $headers,
         ]);
-    
+
         try {
             $response = $client->request($method, $command, [
                 'json' => $payload,
@@ -91,6 +91,7 @@
             $total = 0.00;
             printf("\n    %-36s %-36s %-24s %-11s %7s\n", "Activity ID", "Transaction ID", "Transaction Date", "Type", "Amount");
             foreach ( $data -> payload -> activities as $s) {
+              echo json_encode($s, JSON_PRETTY_PRINT)."\n";
                 $aid = $s -> activityId;
                 $afn = $s -> activityFormName;
                 $ad = $s -> acivityDate;
@@ -113,6 +114,5 @@
             // var_dump($e);
         }
     }
-    
+
     main();
-    
