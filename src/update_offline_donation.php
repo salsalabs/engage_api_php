@@ -22,7 +22,7 @@
     // Retrieve the runtime parameters and validate them.
     function initialize()
     {
-        $filename = './params/add_offline_donation.yaml';
+        $filename = './params/update_offline_donation.yaml';
         $cred =  Yaml::parseFile($filename);
         if (false == array_key_exists('token', $cred)) {
             throw new Exception("File " . $filename . " must contain an Engage token.");
@@ -50,9 +50,11 @@
                         "amount" => "55.00",
                         "appeal" => "AGL",
                         "campaign" => "Canadian",
-                        "date" => "2018-12-22T03:25:26Z",
+                        // This is the updated date.  NOTE the three digits after the dot.
+                        "date" => "2018-12-22T22:25:26.000Z",
                         "deductibleAmount" => "0.00",
                         "fund" => "Fund 1",
+                        // The gateway transaction key must exist.
                         "gatewayTransactionId" => "52353964189",
                         "type" => "CHARGE",
                         "supporter" => [
