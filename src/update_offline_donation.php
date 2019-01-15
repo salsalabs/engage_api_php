@@ -5,7 +5,7 @@
     use Symfony\Component\Yaml\Yaml;
 
     // App to
-    // * add a single donation to Engage
+    // * update a single donation to Engage
     // * observe that the results show an invalid date.
     //
     // Usage:
@@ -38,11 +38,13 @@
         if (false == array_key_exists('login', $options)) {
             throw new Exception("You must provide a parameter file with --login!");
         }
-        var_dump($options);
         $filename = $options['login'];
         $cred =  Yaml::parseFile($filename);
         if (false == array_key_exists('token', $cred)) {
             throw new Exception("File " . $filename . " must contain an Engage token.");
+        }
+        if (false == array_key_exists('host', $cred)) {
+            throw new Exception("File " . $filename . " must contain an Engage host.");
         }
         return $cred;
     }
