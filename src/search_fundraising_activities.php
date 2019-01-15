@@ -38,13 +38,43 @@
     */
 
     // Retrieve the runtime parameters and validate them.
-    function initialize() {
-        $filename = './params/search-fundraising-activities.yaml';
-        $cred =  Yaml::parseFile($filename);
-        if  (FALSE == array_key_exists('token', $cred)) {
-            throw new Exception("File " . $filename . " must contain an Engage token.");
+    function initialize()
+    {
+        $shortopts = "";
+        $longopts = array(
+            "login:"
+        );
+        $options = getopt($shortopts, $longopts);
+        if (false == array_key_exists('login', $options)) {
+            exit("\nYou must provide a parameter file with --login!\n");
         }
+        $filename = $options['login'];
+        $cred =  Yaml::parseFile($filename);
+        validateCredentials($cred, $filename);
         return $cred;
+    }
+
+    // Validate the contents of the provided credential file.
+    // All fields are required.  Exits on errors.
+    function validateCredentials($cred, $filename) {
+        $errors = false;
+        $fields = array(
+            "token",
+            "host",
+            "identifierType",
+            "modifiedFrom",
+            "modifiedTo",
+            "activityIds"
+        );
+        foreach ($fields as $f) {
+            if (false == array_key_exists($f, $cred)) {
+                printf("Error: %s must contain a %s.\n", $filename, $f);
+                $errors = true;
+            }
+        }
+        if ($errors) {
+            exit("Too many errors, terminating.\n");
+        }
     }
 
     function main()
@@ -66,15 +96,14 @@
                 'type' => $cred["identifierType"],
                 'modifiedFrom' => $cred["modifiedFrom"],
                 'modifiedTo' => $cred["modifiedTo"],
-                #'activityIds' => $cred["activityIds"],
+                'activityIds' => $cred["activityIds"],
                 'count' => 10,
                 'offset' => 0,
             ],
         ];
 
         $method = 'POST';
-        $uri = 'https://hq.uat.igniteaction.net';
-        $uri = 'https://api.salsalabs.org';
+        $uri = 'https://' . $cred['host'];
         $command = '/api/integration/ext/v1/activities/search';
         $client = new GuzzleHttp\Client([
             'base_uri' => $uri,
@@ -91,10 +120,10 @@
             $total = 0.00;
             printf("\n    %-36s %-36s %-24s %-11s %7s\n", "Activity ID", "Transaction ID", "Transaction Date", "Type", "Amount");
             foreach ( $data -> payload -> activities as $s) {
-              echo json_encode($s, JSON_PRETTY_PRINT)."\n";
+                #echo json_encode($s, JSON_PRETTY_PRINT)."\n";
                 $aid = $s -> activityId;
                 $afn = $s -> activityFormName;
-                $ad = $s -> acivityDate;
+                $ad = $s -> activityDate;
                 foreach ($s -> transactions as $t) {
                     $tt = $t -> type;
                     #if ($tt == "CHARGE") {

@@ -22,17 +22,31 @@
         );
         $options = getopt($shortopts, $longopts);
         if (false == array_key_exists('login', $options)) {
-            throw new Exception("You must provide a parameter file with --login!");
+            exit("\nYou must provide a parameter file with --login!\n");
         }
         $filename = $options['login'];
-        $cred =  Yaml::parseFile($filename);
-        if (false == array_key_exists('token', $cred)) {
-            throw new Exception("File " . $filename . " must contain an Engage token.");
-        }
-        if (false == array_key_exists('host', $cred)) {
-            throw new Exception("File " . $filename . " must contain an Engage host.");
-        }
+        $cred = Yaml::parseFile($filename);
+        validateCredentials($cred, $filename);
         return $cred;
+    }
+
+    // Validate the contents of the provided credential file.
+    // All fields are required.  Exits on errors.
+    function validateCredentials($cred, $filename) {
+        $errors = false;
+        $fields = array(
+            "token",
+            "host",
+        );
+        foreach ($fields as $f) {
+            if (false == array_key_exists($f, $cred)) {
+                printf("Error: %s must contain a %s.\n", $filename, $f);
+                $errors = true;
+            }
+        }
+        if ($errors) {
+            exit("Too many errors, terminating.\n");
+        }
     }
 
     // Mainline that does the work.
