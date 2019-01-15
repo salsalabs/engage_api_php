@@ -4,28 +4,47 @@
     use GuzzleHttp\Client;
     use Symfony\Component\Yaml\Yaml;
 
-    // App to
+   // App to
     // * add a single donation to Engage
     // * observe that the results show an invalid date.
+    //
+    // Usage:
+    //     php update_offline_donation.php --login config
+    //
+    // Where:
+    //     config is a YAML file.
 
-    // Config is a YAML file. The Engage API call expects either a
-    // date range (modifiedFrom and/or modifiedTo) or a list of
-    // activityIds.  This sameple is equipped with both.  See the
-    // payload comment to learn now to use both types of requests.
     /*
-    token:          "your-incredibly-long-token"
+    // Config file sample for Salsa's production server:
 
-    This is a sample of the output:
+    token: "your-incredibly-long-token"
+    host:  api.salsalabs.org
+
+    // Config file sample for Salsa's internal server:
+
+    token: "your-incredibly-long-token"
+    host:  hq.uat.igniteaction.net
 
     */
 
     // Retrieve the runtime parameters and validate them.
     function initialize()
     {
-        $filename = './params/add_offline_donation.yaml';
+        $shortopts = "";
+        $longopts = array(
+            "login:"
+        );
+        $options = getopt($shortopts, $longopts);
+        if (false == array_key_exists('login', $options)) {
+            throw new Exception("You must provide a parameter file with --login!");
+        }
+        $filename = $options['login'];
         $cred =  Yaml::parseFile($filename);
         if (false == array_key_exists('token', $cred)) {
             throw new Exception("File " . $filename . " must contain an Engage token.");
+        }
+        if (false == array_key_exists('host', $cred)) {
+            throw new Exception("File " . $filename . " must contain an Engage host.");
         }
         return $cred;
     }
