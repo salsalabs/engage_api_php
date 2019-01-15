@@ -16,11 +16,36 @@
         segmentId:
             - An-incredibly-long-segment-id
     */
-    function initialize() {
-        $filename = './params/supporter-search-add-segment.yaml';
+
+    // Retrieve the runtime parameters and validate them.
+    function initialize()
+    {
+        $shortopts = "";
+        $longopts = array(
+            "login:"
+        );
+        $options = getopt($shortopts, $longopts);
+        if (false == array_key_exists('login', $options)) {
+            exit("\nYou must provide a parameter file with --login!\n");
+        }
+        $filename = $options['login'];
         $cred =  Yaml::parseFile($filename);
-        if  (FALSE == array_key_exists('token', $cred)) {
-            throw new Exception("File " . $filename . " must contain an Engage token.");
+
+        $errors = false;
+        $fields = array(
+            "token",
+            "identifierType",
+            "identifiers",
+            "segmentId"
+        );
+        foreach ($fields as $f) {
+            if (false == array_key_exists($f, $cred)) {
+                printf("Error: %s must contain a %s.\n", $filename, $f);
+                $errors = true;
+            }
+        }
+        if ($errors) {
+            exit("Too many errors, terminating.\n");
         }
         return $cred;
     }
@@ -47,8 +72,7 @@
             ]
         ];
         $method = 'POST';
-        $uri = 'https://api.salsalabs.org';
-        $uri = 'https://hq.uat.igniteaction.net';
+        $uri = 'https://' . $cred['host'];
         $command = '/api/integration/ext/v1/supporters/search';
         $client = new GuzzleHttp\Client([
             'base_uri' => $uri,
@@ -84,14 +108,15 @@
             'payload' => [
                 'count' => 10,
                 'offset' => 0,
-                'identifiers' => $cred['segmentId'],
+                'identifiers' => [
+                    $cred['segmentId']
+                ],
                 'identifierType' => 'SEGMENT_ID'
             ]
         ];
-        //var_dump("Payload is ", $payload);
+        var_dump("Segment payload is ", $payload);
         $method = 'POST';
-        $uri = 'https://api.salsalabs.org';
-        $uri = 'https://hq.uat.igniteaction.net';
+        $uri = 'https://' . $cred['host'];
         $command = '/api/integration/ext/v1/segments/search';
         $client = new GuzzleHttp\Client([
             'base_uri' => $uri,
@@ -101,7 +126,7 @@
             'json'     => $payload
         ]);
         $data = json_decode($response -> getBody());
-        //echo json_encode($data, JSON_PRETTY_PRINT);
+        echo json_encode($data, JSON_PRETTY_PRINT);
 
         // The first record is the one for the segment ID.
         // If it's not found, then we stop here.
@@ -137,8 +162,7 @@
         ];
         //var_dump("Payload is ", $payload);
         $method = 'PUT';
-        $uri = 'https://api.salsalabs.org';
-        $uri = 'https://hq.uat.igniteaction.net';
+        $uri = 'https://' . $cred['host'];
         $command = '/api/integration/ext/v1/segments/members';
         $client = new GuzzleHttp\Client([
             'base_uri' => $uri,
@@ -166,7 +190,7 @@
 
         $segment = getSegment($cred);
         if (is_null($segment)) {
-            echo ("Sorry, can't find segment for ID.\n");
+            printf("Sorry, can't find segment for ID %s.\n", $cred['segmentId']);
             exit();
         };
         // var_dump("Segment data is ", $segment);
