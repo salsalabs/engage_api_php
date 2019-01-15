@@ -128,9 +128,7 @@
             'payload' => [
                 'count' => 10,
                 'offset' => 0,
-                'identifiers' => [
-                    $cred['segmentId']
-                ],
+                'identifiers' => $cred['segmentId'],
                 'identifierType' => 'SEGMENT_ID'
             ]
         ];
