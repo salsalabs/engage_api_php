@@ -65,13 +65,11 @@
             'base_uri' => $uri,
             'headers'  => $headers
         ]);
-        $offset = 0;
     
         // Do until end of data or utter boredom.  Read 20 records
         // from the current offset.
         do {
             try {
-                printf("Reading from offset %d\n", $offset);
                 $response = $client->request($method, $command, [
                     'json'     => $payload
                 ]);
@@ -94,8 +92,8 @@
                     }
                 }
                 $count = count($data -> payload -> supporters);
-                printf("Reading from offset %d returned %d records\n", $offset, $count);
-                $payload['payload']["offset"]++;
+                printf("Reading from offset %d returned %d records\n", $payload['payload']['offset'], $count);
+                $payload['payload']["offset"] += $count;
             } catch (Exception $e) {
                 echo 'Caught exception: ',  $e->getMessage(), "\n";
                 break;
