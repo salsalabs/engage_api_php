@@ -36,15 +36,15 @@
         );
         $options = getopt($shortopts, $longopts);
         if (false == array_key_exists('login', $options)) {
-            throw new Exception("You must provide a parameter file with --login!");
+            exit("\nYou must provide a parameter file with --login!\n");
         }
         $filename = $options['login'];
         $cred =  Yaml::parseFile($filename);
         if (false == array_key_exists('token', $cred)) {
-            throw new Exception("File " . $filename . " must contain an Engage token.");
+            exit("File " . $filename . " must contain an Engage token.\n");
         }
         if (false == array_key_exists('host', $cred)) {
-            throw new Exception("File " . $filename . " must contain an Engage host.");
+            exit("File " . $filename . " must contain an Engage host.\n");
         }
         return $cred;
     }
