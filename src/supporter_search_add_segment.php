@@ -30,10 +30,31 @@
         }
         $filename = $options['login'];
         $cred =  Yaml::parseFile($filename);
+        validateCredentials($cred, $filename);
+        return $cred;
+    }
 
+    // Validate the contents of the provided credential file.
+    // All fields are required.  Exits on errors.
+    function validateCredentials($cred, $filename) {
         $errors = false;
         $fields = array(
             "token",
+            "host",
+        );
+        foreach ($fields as $f) {
+            if (false == array_key_exists($f, $cred)) {
+                printf("Error: %s must contain a %s.\n", $filename, $f);
+                $errors = true;
+            }
+        }
+        if ($errors) {
+            exit("Too many errors, terminating.\n");
+        }
+        $errors = false;
+        $fields = array(
+            "token",
+            "host",
             "identifierType",
             "identifiers",
             "segmentId"
@@ -47,7 +68,6 @@
         if ($errors) {
             exit("Too many errors, terminating.\n");
         }
-        return $cred;
     }
 
     // Return the supporter record for the first (and typically only)
