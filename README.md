@@ -27,7 +27,7 @@ composer require symfony/yaml
 composer upgrade
 ```
 
-#License
+# License
 
 Please read the LICENSE file.
 
