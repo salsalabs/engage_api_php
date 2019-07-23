@@ -7,5 +7,11 @@ vendor/*/*
 =======
 # Ignore the working parameters directory.
 params
-# Ingore the vendor directory that composer uses.
+# Ignore the vendor directory that composer uses.
 vendor
+
+# No data files.
+*.csv
+*.yaml
+*.txt
+*.bash
