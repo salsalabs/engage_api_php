@@ -198,13 +198,18 @@
                 "Has Goal",
                 "Goal Amount");
             $meta = fetchMetadata($cred, $r->id);
-            printf("%-24s %-36s %-20s %-10s %10d %10d\n",
+            printf("%-24s %-36s %-20s %-10s",
                 $r->type,
                 $r->id,
                 $r->name,
-                $meta->status,
+                $meta->status);
+            if ($r->type == "P2P_EVENT") {
+                 printf("%10d %10d\n",
                 $meta->hasEventLevelFundraisingGoal,
                 $meta->eventLevelFundraisingGoalValue);
+            } else {
+                printf("%-10s %-10s\n", "N/A", "N/A");
+            }
 
             $fundraisers = fetchFundRaisers($cred, $meta->id);
             if (empty($fundraisers)) {
