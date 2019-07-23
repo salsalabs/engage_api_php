@@ -27,8 +27,7 @@
         $errors = false;
         $fields = array(
             "devToken",
-            "devHost",
-            "eventTypes",
+            "devHost"
         );
         foreach ($fields as $f) {
             if (false == array_key_exists($f, $cred)) {
@@ -43,7 +42,6 @@
 
     // Use the provided credentials to locate all events matching 'eventType'.
     // See: https://help.salsalabs.com/hc/en-us/articles/360001206693-Activity-Form-List
-    // Returns an array of forms that match `eventTypes` in $cred.
     function fetchForms($cred) {
         //var_dump($cred);
         $headers = [
@@ -54,7 +52,7 @@
         $uri = $cred["devHost"];
         $command = '/api/developer/ext/v1/activities';
         $params = [
-            'types' => $cred["eventTypes"],
+            'types' => "P2P_EVENT",
             'sortField' => "name",
             'sortOrder' => "ASCENDING",
             'count' => 25,
@@ -128,6 +126,8 @@
     // Fetch fundraisers for an activity form.
     // See: https://help.salsalabs.com/hc/en-us/articles/360001206753-Activity-Form-Summary-Fundraisers
     // Returns an array of fundraisers.
+    // Note: "Fundraiser" only applies to P2P forms. Calling this for any other
+    // form type doesn't make sense.
     function fetchFundraisers($cred, $id) {
         //var_dump($cred);
         $headers = [
@@ -198,18 +198,13 @@
                 "Has Goal",
                 "Goal Amount");
             $meta = fetchMetadata($cred, $r->id);
-            printf("%-24s %-36s %-20s %-10s",
+            printf("%-24s %-36s %-20s %-10s %10d %10d\n",
                 $r->type,
                 $r->id,
                 $r->name,
-                $meta->status);
-            if ($r->type == "P2P_EVENT") {
-                 printf("%10d %10d\n",
+                $meta->status,
                 $meta->hasEventLevelFundraisingGoal,
                 $meta->eventLevelFundraisingGoalValue);
-            } else {
-                printf("%-10s %-10s\n", "N/A", "N/A");
-            }
 
             $fundraisers = fetchFundRaisers($cred, $meta->id);
             if (empty($fundraisers)) {
