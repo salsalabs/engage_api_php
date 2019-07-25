@@ -23,7 +23,13 @@ host: https://api.salsalabs.org
 // * token: The API token to use to access Engage
 // * supporterID: Show a list of groups for this supporter
 // * host: API host.  Parameterized to allow accounts from internal Engage servers.
-
+//
+// Sample output.
+//
+// Supporter with key 060a0fdf-2bc2-4145-9dd0-3e103ac36707 belongs to 3 groups:
+//     * 79ebfbd8-0382-4f5f-80ad-971a85de6b06 Has Never Made a Donation
+//     * 28b496fd-f6bb-4eb2-a180-3cc5d92470c2 Has Never Signed a Petition
+//     * b9582c12-17d7-4563-8aeb-3c7d1f81bc73 Created in CRM
 
 // Standard application entry point.
 function main()
