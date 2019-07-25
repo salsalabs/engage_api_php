@@ -25,6 +25,24 @@ host: https://api.salsalabs.org
 // * host: API host.  Parameterized to allow accounts from internal Engage servers.
 
 
+// Standard application entry point.
+function main()
+{
+    $cred = initialize();
+    $metrics = getMetrics($cred);
+    $groups = getGroups($cred, $metrics);
+    $count = count($groups);
+    if ($count == 0) {
+        printf("\nSupporter with key %s does snot belong to any groups\n", $cred["supporterID"]);
+    }
+    else {
+        printf("\nSupporter with key %s belongs to %d groups:\n", $cred["supporterID"], $count);
+        foreach ($groups as $r) {
+            printf("    * %s (%-7s) %s\n", $r->segmentId, $r->type, $r->name);
+        }
+    }
+ }
+
 // Retrieve the runtime parameters and validate them.
 function initialize()
 {
@@ -83,6 +101,7 @@ function getMetrics($cred) {
 }
 
 // Headers used by all API calls.
+
 function getHeaders($cred) {
     $headers = [
         'authToken' => $cred['token'],
@@ -93,6 +112,8 @@ function getHeaders($cred) {
 
 // Retrieve all groups, then return a list of groups that contain
 // the supporter of interest.
+// See: https://help.salsalabs.com/hc/en-us/articles/224531528-Engage-API-Segment-Data#searching-for-segments
+
 function getGroups($cred, $metrics)
 {
     $payload = [
@@ -138,6 +159,7 @@ function getGroups($cred, $metrics)
 
 // Return true if a segment (group) has a supporter.
 // See https://help.salsalabs.com/hc/en-us/articles/224531528-Engage-API-Segment-Data#searching-for-supporters-assigned-to-a-segment
+
 function containsSupporter($cred, $metrics, $group, $supporterID) {
     $payload = [
         'payload' => [
@@ -159,30 +181,8 @@ function containsSupporter($cred, $metrics, $group, $supporterID) {
         'json' => $payload,
     ]);
     $data = json_decode($response->getBody());
-    //printf("\nSupporter search\n%s\n", json_encode($data, JSON_PRETTY_PRINT));
     return $data->payload->supporters[0]->result == "FOUND";
 }
-
-// Standard application entry point.
-function main()
-{
-    $cred = initialize();
-    // printf("\nInput\n%s\n", json_encode($cred, JSON_PRETTY_PRINT));
-    $metrics = getMetrics($cred);
-    // printf("\nMetrics\n%s\n", json_encode($metrics, JSON_PRETTY_PRINT));
-    $groups = getGroups($cred, $metrics);
-    //printf("\nGroups\n%s\n", json_encode($groups, JSON_PRETTY_PRINT));
-    $count = count($groups);
-    if ($count == 0) {
-        printf("\nSupporter with key %s does snot belong to any groups\n", $cred["supporterID"]);
-    }
-    else {
-        printf("\nSupporter with key %s belongs to %d groups:\n", $cred["supporterID"], $count);
-        foreach ($groups as $r) {
-            printf("    * %s (%-7s) %s\n", $r->segmentId, $r->type, $r->name);
-        }
-    }
- }
 
 main()
 
