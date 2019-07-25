@@ -179,7 +179,7 @@ function main()
     else {
         printf("\nSupporter with key %s belongs to %d groups:\n", $cred["supporterID"], $count);
         foreach ($groups as $r) {
-            printf("    * %s %s\n", $r->segmentId, $r->name);
+            printf("    * %s (%-7s) %s\n", $r->segmentId, $r->type, $r->name);
         }
     }
  }
