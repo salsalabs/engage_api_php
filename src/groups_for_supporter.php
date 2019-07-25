@@ -91,8 +91,8 @@ function getHeaders($cred) {
     return $headers;
 }
 
-// Retrieve all of the groups (segments in Engage).  Returns an array
-// of segment records.  Errors are fatal.
+// Retrieve all groups, then return a list of groups that contain
+// the supporter of interest.
 function getGroups($cred, $metrics)
 {
     $payload = [
@@ -122,7 +122,9 @@ function getGroups($cred, $metrics)
             $count = $p->count;
             if ($count > 0) {
                 foreach ($p->segments as $r) {
-                    array_push($groups, $r);
+                    if (containsSupporter($cred, $metrics, $r, $cred["supporterID"])) {
+                        array_push($groups, $r);
+                    }
                 }
                 $payload["payload"]["offset"] = $payload["payload"]["offset"] + $count;
             }
@@ -157,21 +159,8 @@ function containsSupporter($cred, $metrics, $group, $supporterID) {
         'json' => $payload,
     ]);
     $data = json_decode($response->getBody());
-    printf("\nSupporter search\n%s\n", json_encode($data, JSON_PRETTY_PRINT));
+    //printf("\nSupporter search\n%s\n", json_encode($data, JSON_PRETTY_PRINT));
     return $data->payload->supporters[0]->result == "FOUND";
-}
-
-// Filter the list of groups to return the ones that contain the supporter
-// with the provided ID.
-function filterGroups($cred, $metrics, $groups, $supporterID) {
-    $filtered = array();
-    foreach ($groups as $r) {
-        $match = containsSupporter($cred, $metrics, $r, $supporterID);
-        if ($match) {
-            array_push($filtered, $r);
-        }
-    }
-    return $filtered;
 }
 
 // Standard application entry point.
@@ -183,15 +172,13 @@ function main()
     // printf("\nMetrics\n%s\n", json_encode($metrics, JSON_PRETTY_PRINT));
     $groups = getGroups($cred, $metrics);
     //printf("\nGroups\n%s\n", json_encode($groups, JSON_PRETTY_PRINT));
-    $matches = filterGroups($cred, $metrics, $groups, $cred["supporterID"]);
-    //printf("\nMatches\n%s\n", json_encode($matches, JSON_PRETTY_PRINT));
-    $count = count($matches);
+    $count = count($groups);
     if ($count == 0) {
-        printf("Supporter with key %s does snot belong to any groups\n", $cred["supporterID"]);
+        printf("\nSupporter with key %s does snot belong to any groups\n", $cred["supporterID"]);
     }
     else {
-        printf("Supporter with key %s belongs to %d groups:\n", $cred["supporterID"], $count);
-        foreach ($matches as $r) {
+        printf("\nSupporter with key %s belongs to %d groups:\n", $cred["supporterID"], $count);
+        foreach ($groups as $r) {
             printf("    * %s %s\n", $r->segmentId, $r->name);
         }
     }
