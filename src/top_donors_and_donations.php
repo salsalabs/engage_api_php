@@ -300,39 +300,60 @@
                     $activityTotalDollars);
 
                 printf("\nDonor details\n");
-                printf("%-30s %-10s %-10s\n",
+                printf("%-30s %-5s %10s\n",
                     "Donor",
                     "Count",
                     "Total");
                 $keys = array_keys($donors);
                 sort($keys);
+                $t = 0.0;
                 foreach ($keys as $fullName) {
                     $a = $donors[$fullName];
                     $total = 0.0;
                     foreach ($a as $donation) {
                         $total = $total + $donation->totalReceivedAmount;
                     }
+                    $t = $t + $total;
                     $donorAmounts[$fullName] = $total;
-                    printf("%-30s %10d %10.2f\n",
+                    printf("%-30s %5d %10.2f\n",
                         $fullName,
                         count($a),
                         $total);
                 }
+                printf("%-30s %-5s %10s\n",
+                    str_repeat('-', 30),
+                    str_repeat('-', 5),
+                    str_repeat('-', 10));
+                printf("%-30s %-5s %10.2f\n",
+                    "Total Donations",
+                    str_repeat(' ', 5),
+                    $t);
 
                 print("\nDonors ranked by total contribution\n");
-                printf("%-30s %-10s\n",
+                printf("%-30s %-5s %10s\n",
                     "Donor",
+                    "Count",
                     "Total");
                 arsort($donorAmounts);
+                $t = 0.0;
                 $keys = array_keys($donorAmounts);
                 foreach ($keys as $fullName) {
                     $count = count($donors[$fullName]);
                     $total = $donorAmounts[$fullName];
-                    printf("%-30s %10d %10.2f\n",
+                    printf("%-30s %5d %10.2f\n",
                         $fullName,
                         count($a),
                         $total);
+                    $t = $t + $total;
                 }
+            printf("%-30s %-5s %10s\n",
+                str_repeat('-', 30),
+                str_repeat('-', 5),
+                str_repeat('-', 10));
+            printf("%-30s %-5s %10.2f\n",
+                "Total Donations",
+                str_repeat(' ', 5),
+                $t);
             }
         }
     }
