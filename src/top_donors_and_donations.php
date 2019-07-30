@@ -229,8 +229,14 @@
     // Ubiquitous, reliable main function.
     function main() {
         $cred = initialize();
+        // -----------------------------------------------------------
+        // Enumerate fundraising forms.
+        // -----------------------------------------------------------
         $forms = fetchForms($cred);
-        printf("\nEvent Summary\n\n");
+        // -----------------------------------------------------------
+        // Summarize fundraising forms.
+        // -----------------------------------------------------------
+        printf("\nFundraising Summary\n\n");
         printf("\n%-24s %-36s %s\n",
             "Type",
             "ID",
@@ -241,10 +247,18 @@
                 $r->id,
                 $r->name);
         }
-
+        // -----------------------------------------------------------
+        // Do for all fundraising forms...
+        // -----------------------------------------------------------
         foreach ($forms as $r) {
+            // -----------------------------------------------------------
+            // Enumerate activities.  Since we retrieved fundraising
+            // forms, the activities will be donations.
+            // -----------------------------------------------------------
             $activities = fetchActivities($cred, $r->id);
-            //var_dump($activities);
+            // -----------------------------------------------------------
+            // Donation detail, no particular order.
+            // -----------------------------------------------------------
             if (empty($activities)) {
                 printf("\nNo activities...\n");
             } else {
@@ -282,6 +296,57 @@
                     array_push($donations, $d);
                     $activityTotalDollars = $activityTotalDollars + $d->totalReceivedAmount;
                 }
+                // -----------------------------------------------------------
+                // Donation detail, grand total.
+                // -----------------------------------------------------------
+                printf("%-36s %-20s %-36s %-20s %-16s %-24s %-10s\n",
+                    str_repeat('-', 36),
+                    str_repeat('-', 20),
+                    str_repeat('-', 36),
+                    str_repeat('-', 20),
+                    str_repeat('-', 16),
+                    str_repeat('-', 24),
+                    str_repeat('-', 10));
+                    printf("%-36s %-20s %-36s %-20s %-16s %-24s %10.2f\n",
+                    "Activity Total Dollars",
+                    str_repeat(' ', 20),
+                    str_repeat(' ', 36),
+                    str_repeat(' ', 20),
+                    str_repeat('', 16),
+                    str_repeat(' ', 24),
+                    $activityTotalDollars);
+                // -----------------------------------------------------------
+                // Donation details in most recent order.
+                // -----------------------------------------------------------
+                printf("\nMost recent donations\n");
+                usort($activities, function ($item1, $item2) {
+                    return $item1->totalReceivedAmount <=> $item2->totalReceivedAmount;
+                });
+                printf("%-36s %-20s %-36s %-20s %-16s %-24s %-10s\n",
+                    "ActivityID",
+                    "Form Name",
+                    "Donor",
+                    "Activity Type",
+                    "Donation Type",
+                    "Date",
+                    "Amount");
+                foreach ($activities as $d) {
+                    $s = fetchSupporter($cred, $d->supporterId);
+                    $fullName = getFullName($s);
+
+                    printf("%-36s %-20s %-36s %-20s %-16s %-24s %10.2f\n",
+                        $d->activityId,
+                        $d->activityFormName,
+                        $fullName,
+                        $d->activityType,
+                        $d->donationType,
+                        $d->activityDate,
+                        $d->totalReceivedAmount);
+                    $activityTotalDollars = $activityTotalDollars + $d->totalReceivedAmount;
+                }
+                // -----------------------------------------------------------
+                // Most recent donations, grand total.
+                // -----------------------------------------------------------
                 printf("%-36s %-20s %-36s %-20s %-16s %-24s %-10s\n",
                     str_repeat('-', 36),
                     str_repeat('-', 20),
@@ -299,6 +364,9 @@
                     str_repeat(' ', 24),
                     $activityTotalDollars);
 
+                // -----------------------------------------------------------
+                // Donor detail, no particular order.
+                // -----------------------------------------------------------
                 printf("\nDonor details\n");
                 printf("%-30s %-5s %10s\n",
                     "Donor",
@@ -307,28 +375,35 @@
                 $keys = array_keys($donors);
                 sort($keys);
                 $t = 0.0;
+                $c = 0;
                 foreach ($keys as $fullName) {
                     $a = $donors[$fullName];
                     $total = 0.0;
                     foreach ($a as $donation) {
                         $total = $total + $donation->totalReceivedAmount;
                     }
-                    $t = $t + $total;
-                    $donorAmounts[$fullName] = $total;
                     printf("%-30s %5d %10.2f\n",
                         $fullName,
                         count($a),
                         $total);
+                        $donorAmounts[$fullName] = $total;
+                        $t = $t + $total;
+                        $c = $c + count($a);
                 }
+                // -----------------------------------------------------------
+                // Donor detail, grand tootals.
+                // -----------------------------------------------------------
                 printf("%-30s %-5s %10s\n",
                     str_repeat('-', 30),
                     str_repeat('-', 5),
                     str_repeat('-', 10));
-                printf("%-30s %-5s %10.2f\n",
+                printf("%-30s %5d %10.2f\n",
                     "Total Donations",
-                    str_repeat(' ', 5),
+                    $c,
                     $t);
-
+                // -----------------------------------------------------------
+                // Top donors by donation amount.
+                // -----------------------------------------------------------
                 print("\nDonors ranked by total contribution\n");
                 printf("%-30s %-5s %10s\n",
                     "Donor",
@@ -336,6 +411,7 @@
                     "Total");
                 arsort($donorAmounts);
                 $t = 0.0;
+                $c = 0;
                 $keys = array_keys($donorAmounts);
                 foreach ($keys as $fullName) {
                     $count = count($donors[$fullName]);
@@ -345,15 +421,19 @@
                         count($a),
                         $total);
                     $t = $t + $total;
+                    $c = $c + count($a);
                 }
-            printf("%-30s %-5s %10s\n",
-                str_repeat('-', 30),
-                str_repeat('-', 5),
-                str_repeat('-', 10));
-            printf("%-30s %-5s %10.2f\n",
-                "Total Donations",
-                str_repeat(' ', 5),
-                $t);
+                // -----------------------------------------------------------
+                // Top donors, grand totals.
+                // -----------------------------------------------------------
+                printf("%-30s %-5s %10s\n",
+                    str_repeat('-', 30),
+                    str_repeat('-', 5),
+                    str_repeat('-', 10));
+                printf("%-30s %5d %10.2f\n",
+                    "Total Donations",
+                    $c,
+                    $t);
             }
         }
     }
