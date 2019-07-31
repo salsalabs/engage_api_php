@@ -5,8 +5,8 @@ vendor*
 vendor/*
 vendor/*/*
 =======
-# Ignore the working parameters directory.
-params
+# Ignore the login directory.
+logins
 # Ignore the vendor directory that composer uses.
 vendor
 
