@@ -13,6 +13,8 @@
         lastName:  a name
         email: an email address
     */
+    // Output is the payload and the result, both in JSON. 
+
     // Retrieve the runtime parameters and validate them.
     function initialize()
     {
@@ -62,9 +64,10 @@
             'Content-Type' => 'application/json'
         ];
 
-        // The payload contains the restrictions.  Note that 20 records per read
-        // is the current max.  Yep, that's not very many and this app runs Really
-        // slowly.
+        // The payload contains the information to add to Engage.  Note that the
+        // contents are retrieved from the parameter file.   This is a test of
+        // what's legit for first- and lastnames, so that's all that's in the 
+        // parameters.
         $payload = [ 'payload' => [
                 'supporters' => [
                     [
@@ -83,9 +86,12 @@
         $method = 'PUT';
         $uri = $cred['host'];
         $command = '/api/integration/ext/v1/supporters';
+
+        // Show the payload.
         $t = json_encode($payload, JSON_PRETTY_PRINT);
         printf("\nPayload\n%s\n", $t);
 
+        // Make the call to Engage.
         $client = new GuzzleHttp\Client([
             'base_uri' => $uri,
             'headers'  => $headers
@@ -96,6 +102,8 @@
             ]);
 
             $data = json_decode($response -> getBody());
+
+            // Show the results.
             $t = json_encode($data, JSON_PRETTY_PRINT);
             printf("\nResult\n%s\n", $t);
         } catch (Exception $e) {
