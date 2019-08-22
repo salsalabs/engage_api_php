@@ -78,7 +78,7 @@
             ]
         ];
         $method = 'POST';
-        $uri = 'https://' . $cred['host'];
+        $uri = $cred['host'];
         $command = '/api/integration/ext/v1/supporters/search';
         $client = new GuzzleHttp\Client([
             'base_uri' => $uri,
@@ -118,9 +118,11 @@
                 'identifierType' => 'SEGMENT_ID'
             ]
         ];
-        var_dump("Segment payload is ", $payload);
+        $text = $text = json_encode($payload, JSON_PRETTY_PRINT);
+        printf("\nPayload\n%s\n", $text);
+
         $method = 'POST';
-        $uri = 'https://' . $cred['host'];
+        $uri = $cred['host'];
         $command = '/api/integration/ext/v1/segments/search';
         $client = new GuzzleHttp\Client([
             'base_uri' => $uri,
@@ -164,9 +166,9 @@
                 ]
             ]
         ];
-        //var_dump("Payload is ", $payload);
+
         $method = 'PUT';
-        $uri = 'https://' . $cred['host'];
+        $uri = $cred['host'];
         $command = '/api/integration/ext/v1/segments/members';
         $client = new GuzzleHttp\Client([
             'base_uri' => $uri,
