@@ -83,7 +83,6 @@ function main()
         printf("Results for %d supporters\n", count($data->payload->supporters));
         //printf("Results:\n%s\n", json_encode($data, JSON_PRETTY_PRINT));
         foreach ($data->payload->supporters as $s) {
-        //printf("Results:\n%s\n", json_encode($s, JSON_PRETTY_PRINT));
         $cf = $s->customFieldValues;
         printf("\n%-20s %-40s\n", "supporterId", $s->supporterId);
         printf("%-20s %-40s\n", "firstName", $s->firstName);
@@ -91,11 +90,15 @@ function main()
     if (count($cf) == 0) {
                 printf("*** no custom fields ***\n", $s->supporterId);
             } else {
+                if (count($cf) > 1) {
+                    printf("Suporter record:\n%s\n", json_encode($s, JSON_PRETTY_PRINT));
+                }
+
                 printf("%-20s %-40s\n", "externalSystemId", $s->externalSystemId);
                 printf("*** %d custom fields\n", count($cf));
-                printf("\n%-40s %-30s %-10s %-10s\n", "fieldID", "name", "value", "type");
+                printf("\n%-40s %-24s %-8s %-8s\n", "fieldID", "name", "value", "type");
                 foreach ($cf as $f) {
-                    printf("%-40s %-30s %-10s %-10s\n",
+                    printf("%-40s %-24s %-8s %-8s\n",
                         $f->fieldId,
                         $f->name,
                         $f->value,
