@@ -42,7 +42,7 @@ function validateCredentials($cred, $filename)
     );
     foreach ($fields as $f) {
         if (false == array_key_exists($f, $cred)) {
-            printf("Error: %s must contain a %s.\n", $filename, $f);
+            printf("Error: %s must contain '%s'\n", $filename, $f);
             $errors = true;
         }
     }
@@ -67,7 +67,7 @@ function main()
     ],
     ];
     $method = 'POST';
-    $uri = 'https://' . $cred['host'];
+    $uri = $cred['host'];
     $command = '/api/integration/ext/v1/supporters/search';
 
     $client = new GuzzleHttp\Client([
@@ -81,7 +81,7 @@ function main()
 
         $data = json_decode($response->getBody());
         printf("Results for %d supporters\n", count($data->payload->supporters));
-        //echo json_encode($data, JSON_PRETTY_PRINT);
+        printf("Results:\n%s\n", json_encode($data, JSON_PRETTY_PRINT));
         foreach ($data->payload->supporters as $s) {
             $c = $s->contacts[0];
             printf("%-40s %s\n",
