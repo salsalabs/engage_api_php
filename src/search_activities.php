@@ -56,8 +56,7 @@ function main()
         ],
     ];
     $method = 'POST';
-    $uri = 'https://api.salsalabs.org';
-    $uri = 'https://hq.uat.igniteaction.net';
+    $uri = $cred["host"];
     $command = '/api/integration/ext/v1/activities/search';
     $client = new GuzzleHttp\Client([
         'base_uri' => $uri,
