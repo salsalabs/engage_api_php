@@ -77,7 +77,7 @@
         $uri = $cred["devHost"];
         $command = '/api/developer/ext/v1/activities';
         $params = [
-            'types' => "P2P_EVENT",
+            'types' => "P2P_EVENT,TICKETED_EVENT",
             'sortField' => "name",
             'sortOrder' => "ASCENDING",
             'status' => "PUBLISHED",
