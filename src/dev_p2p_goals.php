@@ -15,7 +15,9 @@
     intHost: "https://api.salsalabs.org"
     devToken: your-web-developer-api-token-here
     devHost: "https://dev-api.salsalabs.org"
+    summary: true
     */
+    // Use true in summary to just see the activity summary.  Use false for detailed report.
     // No need to put quotes around the API keys.  Fields "intHost" and "devHost"
     //are there to accomodate Engage clients that use sandbox accounts.
 
@@ -49,7 +51,8 @@
             "devToken",
             "devHost",
             "intToken",
-            "intHost"
+            "intHost",
+            "summary"
         );
         foreach ($fields as $f) {
             if (false == array_key_exists($f, $cred)) {
@@ -74,9 +77,10 @@
         $uri = $cred["devHost"];
         $command = '/api/developer/ext/v1/activities';
         $params = [
-            'types' => "P2P_EVENT,",
+            'types' => "P2P_EVENT",
             'sortField' => "name",
             'sortOrder' => "ASCENDING",
+            'status' => "PUBLISHED",
             'count' => 25,
             'offset' => 0
         ];
@@ -260,7 +264,6 @@
             'payload' => [
                 "offset" => 0,
                 "count" => 20,
-                "type" => "P2P_EVENT",
                 'activityFormIds' => [$id]
             ],
         ];
@@ -310,114 +313,123 @@
             "Type",
             "ID",
             "Name");
-        foreach ($forms as $r) {
-            printf("%-24s %-36s %s\n",
+        foreach ($forms as $key=>$r) {
+            printf("%-2d %-24s %-36s %s\n",
+                ($key + 1),
                 $r->type,
                 $r->id,
                 $r->name);
         }
-        printf("\nEvent MetaData\n\n");
-        foreach ($forms as $r) {
-            printf("\n%-24s %-36s %-20s %-10s %-10s %-10s\n",
-                "Type",
-                "ID",
-                "Name",
-                "Status",
-                "Has Goal",
-                "Goal Amount");
-            $meta = fetchMetadata($cred, $r->id);
-            printf("%-24s %-36s %-20s %-10s %10d %10d\n",
-                $r->type,
-                $r->id,
-                $r->name,
-                $meta->status,
-                $meta->hasEventLevelFundraisingGoal,
-                $meta->eventLevelFundraisingGoalValue);
-
-            $fundraisers = fetchFundRaisers($cred, $meta->id);
-            if (empty($fundraisers)) {
-                printf("\nNo fundraisers...\n");
-            } else {
-                printf("\nFundraisers\n");
-                printf("%-20s %-20s %-10s %-10s %-10s %-20s\n",
-                    "First Name",
-                    "Last Name",
-                    "Goal",
-                    "Count",
-                    "Current",
-                    "Most Recent");
-                foreach ($fundraisers as $fr) {
-                    printf("%-20s %-20s %10d %10d %10d %20s\n",
-                        $fr->firstName,
-                        $fr->lastName,
-                        $fr->fundraiserGoal,
-                        $fr->totalDonationsCount,
-                        $fr->totalDonationsAmount,
-                        $fr->lastTransactionDate);
+        if (!$cred['summary']) {
+            printf("\nEvent MetaData\n\n");
+            foreach ($forms as $r) {
+                if (!$cred["summary"]) {
+                    printf("\n%-24s %-36s %-20s %-10s %-10s %-10s\n",
+                        "Type",
+                        "ID",
+                        "Name",
+                        "Status",
+                        "Has Goal",
+                        "Goal Amount");
                 }
-            }
+                $meta = fetchMetadata($cred, $r->id);
 
-            $registrations = fetchRegistrations($cred, $meta->id);
-            //var_dump($registrations);
-            if (empty($registrations)) {
-                printf("\nNo registrations...\n");
-            } else {
-                printf("\nRegistrations\n");
-                printf("%-20s %-20s %-10s %-10s %-10s %-20s\n",
-                    "First Name",
-                    "Last Name",
-                    "Goal",
-                    "Count",
-                    "Current",
-                    "Most Recent");
-                foreach ($registrations as $fr) {
-                    //var_dump($fr);
-                    printf("%-20s %-20s %10d %10d %10d %20s\n",
-                        $fr->firstName,
-                        $fr->lastName,
-                        $fr->fundraiserGoal,
-                        $fr->totalDonationsCount,
-                        $fr->totalDonationsAmount,
-                        "N/A");
-                }
-            }
+                $goal = empty($meta->hasEventLevelFundraisingGoal) ? "--" : $meta->hasEventLevelFundraisingGoal;
+                $goalValue = empty($meta->hasEventLevelFundraisingGoalValue) ? "--" : $meta->hasEventLevelFundraisingGoal;
+                $status = empty($meta->status) ? "--" : $meta->status;
+                printf("%-24s %-36s %-70s %-10s %10s %10d\n",
+                    $r->type,
+                    $r->id,
+                    $r->name,
+                    $status,
+                    $goal,
+                    $goalValue);
 
-            $activities = fetchActivities($cred, $meta->id);
-            //var_dump($activities);
-            if (empty($activities)) {
-                printf("\nNo activities...\n");
-            } else {
-                printf("\nActivities\n");
-                printf("%-36s %-20s %-36s %-20s %-16s %-10s\n",
-                    "ActivityID",
-                    "Form Name",
-                    "Form ID",
-                    "Type",
-                    "Activity Result",
-                    "Amount");
-                foreach ($activities as $d) {
-                    $amount = NULL;
-                    switch($d->activityResult) {
-                        case "DONATION_ONLY":
-                            $amount = $d->transactions[0]->amount;
-                            break;
-                        case "TICKETS_ONLY":
-                            $amount = $d->tickets[0]->ticketCost;
-                        default:
-                            $amount = "N/A";
+                $fundraisers = fetchFundRaisers($cred, $meta->id);
+                if (empty($fundraisers)) {
+                    printf("\nNo fundraisers...\n");
+                } else {
+                    printf("\nFundraisers\n");
+                    printf("%-20s %-20s %-10s %-10s %-10s %-20s\n",
+                        "First Name",
+                        "Last Name",
+                        "Goal",
+                        "Count",
+                        "Current",
+                        "Most Recent");
+                    foreach ($fundraisers as $fr) {
+                        printf("%-20s %-20s %10d %10d %10d %20s\n",
+                            $fr->firstName,
+                            $fr->lastName,
+                            $fr->fundraiserGoal,
+                            $fr->totalDonationsCount,
+                            $fr->totalDonationsAmount,
+                            $fr->lastTransactionDate);
                     }
-                    printf("%-36s %-20s %-36s %-20s %-16s %10d\n",
-                        $d->activityId,
-                        $d->activityFormName,
-                        $d->activityFormId,
-                        $d->activityType,
-                        $d->activityResult,
-                        $amount);
+                }
+
+                $registrations = fetchRegistrations($cred, $meta->id);
+                //var_dump($registrations);
+                if (empty($registrations)) {
+                    printf("\nNo registrations...\n");
+                } else {
+                    printf("\nRegistrations\n");
+                    printf("%-20s %-20s %-10s %-10s %-10s %-20s\n",
+                        "First Name",
+                        "Last Name",
+                        "Goal",
+                        "Count",
+                        "Current",
+                        "Most Recent");
+                    foreach ($registrations as $fr) {
+                        //var_dump($fr);
+                        printf("%-20s %-20s %10d %10d %10d %20s\n",
+                            $fr->firstName,
+                            $fr->lastName,
+                            $fr->fundraiserGoal,
+                            $fr->totalDonationsCount,
+                            $fr->totalDonationsAmount,
+                            "N/A");
+                    }
+                }
+
+                $activities = fetchActivities($cred, $meta->id);
+                //var_dump($activities);
+                if (empty($activities)) {
+                    printf("\nNo activities...\n");
+                } else {
+                    printf("\nActivities\n");
+                    printf("%-36s %-20s %-36s %-20s %-16s %-10s\n",
+                        "ActivityID",
+                        "Form Name",
+                        "Form ID",
+                        "Type",
+                        "Activity Result",
+                        "Amount");
+                    foreach ($activities as $d) {
+                        $amount = NULL;
+                        $result = empty($d->activityResult) ? "" : $d->activityResult;
+                        switch($result) {
+                            case "DONATION_ONLY":
+                                $amount = $d->transactions[0]->amount;
+                                break;
+                            case "TICKETS_ONLY":
+                                $amount = $d->tickets[0]->ticketCost;
+                            default:
+                                $amount = "N/A";
+                        }
+                        printf("%-36s %-20s %-36s %-20s %-16s %10d\n",
+                            $d->activityId,
+                            $d->activityFormName,
+                            $d->activityFormId,
+                            $d->activityType,
+                            $result,
+                            $amount);
+                    }
                 }
             }
         }
     }
-
     main()
 
 ?>
