@@ -4,9 +4,6 @@
     // Web Developer API to retrieve activity-related information.  Uses the
     // Integration API to retrieve activities.
     //
-    // Note: deprecated in favor of "dev_activities_and_details.php".  Please
-    // use that instead if you are starting a new project.
-    //
     // This application requires a configuration file.
     //
     // Usage: php src/dev_p2p_goals.php --login CONFIGURATION_FILE.yaml.
