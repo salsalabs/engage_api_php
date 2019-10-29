@@ -90,7 +90,6 @@ function getSegments($cred, $offset, $count)
 
 // Retrieve the current metrics.
 // See https://help.salsalabs.com/hc/en-us/articles/224531208-General-Use
-
 function getMetrics($cred) {
     $headers = [
         'authToken' => $cred['token'],
@@ -120,7 +119,7 @@ function main()
         } else {
             $i = 0;
             foreach ($segments as $s) {
-                fprintf(STDOUT, "[%3d:%2d] %-38s %-60s %-7s %6d \n",
+                fprintf(STDOUT, "[%3d:%2d] %-38s %-40s %-10s %6d \n",
                     $offset,
                     $i,
                     $s->segmentId,
