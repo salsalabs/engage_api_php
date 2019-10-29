@@ -8,7 +8,7 @@ use Symfony\Component\Yaml\Yaml;
 // Config is a YAML file. Example contents:
 /*
 token: Your-incredibly-long-Engage-token-here
-host: api.salsalabs.org
+host: https://api.salsalabs.org
  */
 
 // Retrieve the runtime parameters and validate them.
@@ -63,7 +63,7 @@ function getSegments($cred, $offset, $count)
         ],
     ];
     $method = 'POST';
-    $uri = 'https://' . $cred['host'];
+    $uri = $cred['host'];
     $command = '/api/integration/ext/v1/segments/search';
     $client = new GuzzleHttp\Client([
         'base_uri' => $uri,
@@ -88,11 +88,31 @@ function getSegments($cred, $offset, $count)
 
 }
 
+// Retrieve the current metrics.
+// See https://help.salsalabs.com/hc/en-us/articles/224531208-General-Use
+
+function getMetrics($cred) {
+    $headers = [
+        'authToken' => $cred['token'],
+        'Content-Type' => 'application/json',
+    ];
+    $method = 'GET';
+    $command = '/api/integration/ext/v1/metrics';
+    $client = new GuzzleHttp\Client([
+        'base_uri' => $cred['host'],
+        'headers'  => $headers
+    ]);
+    $response = $client->request($method, $command);
+    $data = json_decode($response -> getBody());
+    return $data->payload;
+}
+
 function main()
 {
     $cred = initialize();
+    $metrics = getMetrics($cred);
     $offset = 0;
-    $count = 20;
+    $count = $metrics -> maxBatchSize;
     while ($count > 0) {
         $segments = getSegments($cred, $offset, $count);
         if (is_null($segments)) {
@@ -100,7 +120,6 @@ function main()
         } else {
             $i = 0;
             foreach ($segments as $s) {
-                $i++;
                 fprintf(STDOUT, "[%3d:%2d] %-38s %-60s %-7s %6d \n",
                     $offset,
                     $i,
@@ -108,8 +127,9 @@ function main()
                     $s->name,
                     $s->type,
                     $s->totalMembers);
+                $i++;
             }
-            $count = $i;
+            $count = count($segments);
         }
         $offset += $count;
     }
