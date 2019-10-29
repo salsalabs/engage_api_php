@@ -1,6 +1,6 @@
 <?php
 
-    // Program to retrieve what can be retrieves from P2P pages.  Uses the
+    // Program to retrieve what can be retrieved from P2P pages.  Uses the
     // Web Developer API to retrieve activity-related information.  Uses the
     // Integration API to retrieve activities.
     //
