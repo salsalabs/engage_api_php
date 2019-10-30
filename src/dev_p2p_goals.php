@@ -1,11 +1,10 @@
 <?php
 
+    // *** Deprecated in favor of "dev_activities_and_details.php". ***
+    //
     // Program to retrieve what can be retrieves from P2P pages.  Uses the
     // Web Developer API to retrieve activity-related information.  Uses the
     // Integration API to retrieve activities.
-    //
-    // Note: deprecated in favor of "dev_activities_and_details.php".  Please
-    // use that instead if you are starting a new project.
     //
     // This application requires a configuration file.
     //
