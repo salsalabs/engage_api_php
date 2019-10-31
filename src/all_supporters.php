@@ -69,14 +69,10 @@
             ]
         ];
         $method = 'POST';
-
-        // If you are on  an internal (UAT) instance then put the "uat"
-        // URL after the "api.salsalabs.org" URL.
-        $uri = 'https://' . $cred['host'];
         $command = '/api/integration/ext/v1/supporters/search';
 
         $client = new GuzzleHttp\Client([
-            'base_uri' => $uri,
+            'base_uri' => $cred['host'],
             'headers'  => $headers
         ]);
     
