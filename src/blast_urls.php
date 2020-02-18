@@ -2,8 +2,8 @@
     // Uses Composer.
     require 'vendor/autoload.php';
     use GuzzleHttp\Client;
-use Symfony\Component\Console\Descriptor\ApplicationDescription;
-use Symfony\Component\Yaml\Yaml;
+    use Symfony\Component\Console\Descriptor\ApplicationDescription;
+    use Symfony\Component\Yaml\Yaml;
 
     // App to show email blasts.  Note that this example uses the Engage developer API.  
     // See https://help.salsalabs.com/hc/en-us/articles/360001220174-Email-Blasts-List
