@@ -2,7 +2,8 @@
     // Uses Composer.
     require 'vendor/autoload.php';
     use GuzzleHttp\Client;
-    use Symfony\Component\Yaml\Yaml;
+use Symfony\Component\Console\Descriptor\ApplicationDescription;
+use Symfony\Component\Yaml\Yaml;
 
     // App to show email blasts.  Note that this example uses the Engage developer API.  
     // See https://help.salsalabs.com/hc/en-us/articles/360001220174-Email-Blasts-List
@@ -13,9 +14,16 @@
     // Your Engage token is read from a YAML file.  Here's an example:
     /*
     token: Your-incredibly-long-Engage-API-token
-    host: https://dev-api.salsalab..org
+    host: https://dev-api.salsalabs.org
     */
 
+    //Return something for a null variable.
+    function vacant($x) {
+        if (is_null($x)) {
+            return "";
+        }
+        return $x;
+    }
     // Retrieve the runtime parameters and validate them.
     function initialize()
     {
@@ -94,21 +102,39 @@
         do {
             try {
                 $response = $client->request($method, $command, $params);
-
                 $data = json_decode($response -> getBody());
-                //echo json_encode($data, JSON_PRETTY_PRINT);
+                if (false == array_key_exists('results', $data->payload)) {
+                    break;
+                }
                 foreach ( $data -> payload -> results as $b) {
-                    foreach ($b->content as $c) {
-                        printf("%s %s %s %s %s\n",
-                        $b->id,
-                        $b -> name,
-                        $b -> description,
-                        $b -> publishDate,
-                        $c -> pageUrl);
+
+                    //Only interested in completed emails.
+                    if ($b->status == 'COMPLETED') {
+                        //$text = json_encode($b, JSON_PRETTY_PRINT);
+                        //printf("Body JSON: %s\n", $text);
+
+                        // Engage does not provide fields in an object if they do not have values...
+                        $publishDate = (true == array_key_exists('publishDate', $b)) ? $b->publishDate : "";
+                        $scheduleDate = (true == array_key_exists('scheduleDate', $b)) ? $b->scheduleDate : "";
+
+                        foreach ($b->content as $c) {
+                            $webVersionEnabled = (true == array_key_exists('webVersionEnabled', $c)) ? $c->webVersionEnabled : false;
+                            if ($webVersionEnabled) {
+                                // $text = json_encode($c, JSON_PRETTY_PRINT);
+                                // printf("Content JSON: %s\n", $text);
+                                printf("ID: %s\nstatus: %s\npublishDate: %s\nscheduleDate: %s\nsubject: %s\npageTitle: %s\npageUrl: %s\n\n",
+                                    $b->id,
+                                    $b->status,
+                                    $publishDate,
+                                    $scheduleDate,
+                                    $c->subject,
+                                    $c->pageTitle,
+                                    $c->pageUrl);
+                            }
+                        }
                     }
                 }
                 $count = count($data -> payload -> results);
-                printf("Reading from offset %d returned %d records\n", $params['query']['offset'], $count);
                 $params['query']['offset'] += $count;
             } catch (Exception $e) {
                 echo 'Caught exception: ',  $e->getMessage(), "\n";
