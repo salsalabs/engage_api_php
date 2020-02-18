@@ -131,7 +131,6 @@
                                         "Status",
                                         "PublishDate",
                                         "ScheduleDate",
-                                        "Subject",
                                         "PageTitle",
                                         "PageURL"
                                     ];
@@ -143,7 +142,6 @@
                                     $b->status,
                                     $publishDate,
                                     $scheduleDate,
-                                    $c->subject,
                                     $c->pageTitle,
                                     $c->pageUrl
                                 ];
