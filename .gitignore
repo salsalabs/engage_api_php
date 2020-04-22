@@ -4,9 +4,13 @@ composer*
 vendor*
 vendor/*
 vendor/*/*
-=======
+
 # Ignore the login directory.
 logins
+
+# Ignore support_specific dir.
+zd_jira/*
+
 # Ignore the vendor directory that composer uses.
 vendor
 
