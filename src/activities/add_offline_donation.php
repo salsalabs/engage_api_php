@@ -74,6 +74,11 @@
         # This payload contains the donation to import.
         # Some of the settings are specific to a Salsa internal Engage.
         # YMMV.
+        $dt = new DateTime();
+        $dformat = "Y-m-d\TH:i:s.U\Z";
+        $now = $dt->format($dformat);
+        $xactionID = $dt->format("B-U");
+
         $payload = [
             "payload" => [
                 "donations" => [
@@ -83,10 +88,10 @@
                         "amount" => "55.00",
                         "appeal" => "AGL",
                         "campaign" => "Canadian",
-                        "date" => "2018-12-20T03:25:26.687931776Z",
+                        "date" => $now,
                         "deductibleAmount" => "0.00",
                         "fund" => "Fund 1",
-                        "gatewayTransactionId" => "52353964189",
+                        "gatewayTransactionId" => $xactionID,
                         "type" => "CHARGE",
                         "supporter" => [
                             "firstName" => 'Vwmsjjfzfkj',
