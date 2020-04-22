@@ -9,6 +9,7 @@ vendor/*/*
 logins
 
 # Ignore support_specific dir.
+zd_jira*
 zd_jira/*
 
 # Ignore the vendor directory that composer uses.
