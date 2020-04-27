@@ -4,8 +4,14 @@ require 'vendor/autoload.php';
 use GuzzleHttp\Client;
 use Symfony\Component\Yaml\Yaml;
 
-// App to find custom segments, then to create a CSV of the segment
-// and the supporters in the segment.
+// App to find custom segments, then to create a CSV of the segment and the
+// supporters in the segment.  Each line of the CSV contains these fields:
+// * segmentID
+// * SegmentName
+// * supporterID
+// * firstName
+// * lastName
+// * email
 //
 // App requires a YAML config file containing an API token. Example contents:
 /*
@@ -144,15 +150,41 @@ function isCustom($segment) {
     return $segment->type == "CUSTOM";
 }
 
+// Returns true if the provided segment has members.
+function hasMembers($segment) {
+    return $segment->totalMembers > 0;
+}
+
+// Finds an email address for a supporter.  Returns an empty
+// string if an email can't be found.
+function getEmail($supporter) {
+    if (property_exists($supporter, "contacts") && count($supporter->contacts) > 0) {
+        foreach ($supporter->contacts as $contact) {
+            if ($contact -> type == "EMAIL") {
+                return $contact -> value;
+            }
+        }
+    }
+    return "";
+}
 //Format a line for the CSV output.
 function getCSVLine($segment, $supporter) {
-    $email = "Undefined";
+    $email = getEmail($supporter);
+    $firstName = "";
+    if (property_exists($supporter, "firstName")) {
+        $firstName = $supporter->firstName;
+    }
+    $lastName = "";
+    if (property_exists($supporter, "lastName")) {
+        $lastName = $supporter->lastName;
+    }
+
     $a = [
         $segment->segmentId,
-        $segment->line,
+        $segment->name,
         $supporter->supporterId,
-        $supporter->firstName,
-        $supporter->lastName,
+        $firstName,
+        $lastName,
         $email
     ];
     return $a;
@@ -215,12 +247,13 @@ function writeSegments($cred, $metrics, $segments) {
     ];
     fputcsv($handle, $headers);
     foreach ($segments as $segment) {
+        printf("%s...\n", $segment->name);
         $supporters = getSupportersForSegment($cred, $metrics, $segment);
         if ($supporters == null || count($supporters) == 0) {
-            printf("writeSegments: %s, no supporters\n", $segment->name);
+            printf("%s, no supporters\n", $segment->name);
         } else {
+            printf("%s, %d supporters\n", $segment->name, count($supporters));
             foreach ($supporters as $s) {
-                print(var_dump(s));
                 $row = getCSVLine($segment, $s);
                 fputcsv($handle, $row);
             }
@@ -234,7 +267,8 @@ function main()
     $metrics = getMetrics($cred);
     $all = getAllSegments($cred, $metrics);
     $customSegments = array_filter($all, "isCustom");
-    showSegments($customSegments);
+    $customSegments = array_filter($customSegments, "hasMembers");
+    //showSegments($customSegments);
     writeSegments($cred, $metrics, $customSegments);
 }
 
