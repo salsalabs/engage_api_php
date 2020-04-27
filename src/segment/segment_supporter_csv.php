@@ -71,7 +71,7 @@ function getSegments($cred, $offset, $count)
         'base_uri' => $uri,
         'headers' => $headers,
     ]);
-    try {
+   try {
         $response = $client->request($method, $command, [
             'json' => $payload,
         ]);
@@ -83,7 +83,9 @@ function getSegments($cred, $offset, $count)
         }
         return $payload->segments;
     } catch (Exception $e) {
-        echo 'Caught exception: ', $e->getMessage(), "\n";
+        echo 'getSegments: Caught exception: ', $e->getMessage(), "\n";
+        echo 'getSegments, payload is ', json_encode($payload);
+        throw $e;
         // var_dump($e);
         return null;
     }
@@ -93,7 +95,7 @@ function getSegments($cred, $offset, $count)
 // Show an array of segments.
 function showSegments($segments) {
     foreach ($segments as $s) {
-        fprintf(STDOUT, "%-38s %-40s %-10s %6d \n",
+        printf("%-38s %-40s %-10s %6d \n",
             $s->segmentId,
             $s->name,
             $s->type,
@@ -146,9 +148,9 @@ function isCustom($segment) {
 function getCSVLine($segment, $supporter) {
     $email = "Undefined";
     $a = [
-        $segment->id,
+        $segment->segmentId,
         $segment->line,
-        $supporter->id,
+        $supporter->supporterId,
         $supporter->firstName,
         $supporter->lastName,
         $email
@@ -166,7 +168,7 @@ function getSupportersForSegment($cred, $metrics, $segment) {
     ];
     $command = '/api/integration/ext/v1/segments/members/search';
     $method = 'POST';
-    $uri = 'http://' . $cred["host"];
+    $uri = $cred["host"];
     $client = new GuzzleHttp\Client([
         'base_uri' => $uri,
         'headers' => $headers,
@@ -177,7 +179,7 @@ function getSupportersForSegment($cred, $metrics, $segment) {
             'payload' => [
                 'count' => $count,
                 'offset' => $offset,
-                'segmentId' => $segment->ID,
+                'segmentId' => $segment->segmentId,
             ],
         ];
 
@@ -186,25 +188,42 @@ function getSupportersForSegment($cred, $metrics, $segment) {
                 'json' => $payload,
             ]);
             $a = json_decode($response->getBody());
-            $all = array_merge($all, $a);
-            $count = count($a);
+            $supporters = $a->payload->supporters;
+            $all = array_merge($all, $supporters);
+            $count = count($supporters);
             $offset += $count;
         } catch (Exception $e) {
-            echo 'Caught exception: ', $e->getMessage(), "\n";
+            echo 'getSupportersForSegment Caught exception: ', $e->getMessage(), "\n";
+            throw $e;
             // var_dump($e);
             return null;
         }
     }
+    return $all;
 }
 
 // Write segments and supporters to a CSV file.
 function writeSegments($cred, $metrics, $segments) {
     $handle = fopen("segment_supporters.csv", "w");
+    $headers = [
+        "segment_ID",
+        "SegmentName",
+        "supporter_ID",
+        "firstName",
+        "lastName",
+        "Email"
+    ];
+    fputcsv($handle, $headers);
     foreach ($segments as $segment) {
         $supporters = getSupportersForSegment($cred, $metrics, $segment);
-        foreach ($supporters as $s) {
-            $row = getCSVLine($segment, $s);
-            fputcsv($handle, $row);
+        if ($supporters == null || count($supporters) == 0) {
+            printf("writeSegments: %s, no supporters\n", $segment->name);
+        } else {
+            foreach ($supporters as $s) {
+                print(var_dump(s));
+                $row = getCSVLine($segment, $s);
+                fputcsv($handle, $row);
+            }
         }
     }
 }
