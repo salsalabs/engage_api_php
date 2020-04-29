@@ -8,13 +8,12 @@
     // update a custom field with a value.
     // Example contents:
     /*         
-        identifierType: EMAIL_ADDRESS
-        identifiers: 
-            - someone@whatever.biz
+        email: someone@whatever.biz
         token: Your-incredibly-long-Engage-token-here
-        customField: fieldName
-        value: whatever
+        fieldName: custom field name.
+        fieldValue: mew custom field value
     */
+
      // Retrieve the runtime parameters and validate them.
      function initialize()
      {
@@ -39,10 +38,9 @@
          $fields = array(
              "token",
              "host",
-             "firstName",
-             "lastName",
+             "email",
              "fieldName",
-             "FieldValue"
+             "fieldValue"
          );
          foreach ($fields as $f) {
              if (false == array_key_exists($f, $cred)) {
@@ -55,9 +53,7 @@
          }
      }
  
-    // Return the supporter record for the first (and typically only)
-    // supporterID in the `identifers` field in the credentials.
-    //
+    // Return the supporter record for the email in the credentials.
     // @param array  $cred  Contents of YAML credentials file
     //
     function getSupporter($cred) {
@@ -76,6 +72,8 @@
                 'identifierType' => "EMAIL_ADDRESS"
             ]
         ];
+        // printf("Payload:\n%s\n", json_encode($payload, JSON_PRETTY_PRINT));
+
         $method = 'POST';
         $uri = 'https://api.salsalabs.org';
         $uri = 'https://hq.uat.igniteaction.net';
@@ -97,6 +95,24 @@
         return $supporter;
     }
 
+    function seeCustomField($cf) {
+        // Testing may unset some of these fields. These statements provide guard logic.
+        $fieldId = property_exists($cf, 'fieldId') ? $cf->fieldId : "";
+        $name = property_exists($cf, 'name') ? $cf->name : "";
+        $type = property_exists($cf, 'type') ? $cf->type : "";
+        $value = property_exists($cf, 'value') ? $cf->value : "";
+        // printf("\t%s\n", json_encode($cf));
+
+        printf("\t%s %s %s = '%s'\n",
+            $fieldId,
+            $name,
+            $type,
+            $value);
+        if (property_exists($cf, 'errors')) {
+            printf("\t*** %s\n", $cf->errors[0]->message);
+        }
+    }
+
     // Update a custom field using `$cred` as a guide.
     //
     // @param array  $cred
@@ -110,37 +126,17 @@
             'Content-Type' => 'application/json'
         ];
 
-        // You gotta read the fine print in the doc.  Partial updates are *not 
-        // available*.  You have to provide all of the required fields or you'll
-        // get an error like this. 
-        //
-        // [1]=>
-        //   object(stdClass)#42 (4) {
-        //     ["id"]=>
-        //     string(36) "f41e2839-41c1-41d5-a5a3-53a09560098d"
-        //     ["code"]=>
-        //     int(2001)
-        //     ["message"]=>
-        //     string(44) "The field is required and must be filled out"
-        //     ["fieldName"]=>
-        //     string(8) "lastName"
-        //   }
-        //
-        // I got this cutie when I tried to just update the T Shirt Size without
-        // the full supporter record.
-
-        // Search for the custom field and change it's value.
+        // Search for the custom field and change its value.
         
         foreach ($supporter->customFieldValues as $cf) {
-            if ($cf -> fieldId == $cred["customFieldId"]) {
-                if (empty($cred["value"])) {
-                $cf -> value = $cred["value"];
-                } else {
-                    $cf -> value = $cf -> value . ", " .$cred["value"];
-                }
-            }
-           if ($cf -> fieldId == "d87d48c8-7b5e-49e6-8340-e2ee493d8515") {
-                $cf -> value = "XXXXXXL";
+            if ($cf -> name == $cred["fieldName"]) {
+                $cf -> value = $cred["fieldValue"];
+
+                //Unsetting a field removes it from the current object.
+                //Uncomment these to see what happens...
+                //unset($cf->fieldId);
+                //unset($cf->name);
+                //unset($cf->type);
             }
         };
 
@@ -151,7 +147,7 @@
         ];
 
         // echo "\nUpdate Payload:\n";
-        // var_dump($payload);
+        // printf("%s\n", json_encode($payload, JSON_PRETTY_PRINT));
         // echo "\n";
 
         $method = 'PUT';
@@ -167,46 +163,48 @@
         ]);
         $data = json_decode($response -> getBody());
 
-        //echo "\nUpdate response:\n";
-        //var_dump($data->payload);
-        //echo "\n";
+        // echo "\nUpdate response:\n";
+        // printf("%s\n", json_encode($data->payload, JSON_PRETTY_PRINT));
+        // echo "\n";
 
         echo "\nError analysis:\n";
         foreach ($data->payload->supporters[0]->customFieldValues as $cf) {
-            if (!is_null($cf->errors)) {
-                echo(sprintf("\t%s %s %s = \"%s\" *** %s ***\n", $cf->fieldId, $cf->name,$cf->type, $cf->value, $cf->errors[0]->message));
+            if (property_exists($cf, 'errors')) {
+                seeCustomField($cf);
             }
-        }
-}           
+       }
+    }           
     
     
     // Main app.  Does the work.
     function main() {
         $cred = initialize();
         $supporter = getSupporter($cred);
-        //var_dump($supporter);
         if (is_null($supporter)) {
-            echo ("Sorry, can't find supporter for ID.\n");
+            printf("Sorry, can't find supporter for '%s'.\n", $cred["email"]);
             exit();
         };
-        echo(sprintf("Supporter is %s %s %s %s\n",
-        $supporter->firstName,
-        $supporter->middleName,
-        $supporter->lastName,
-        $supporter->suffix
-        ));
+        // printf("Supporter is %s\n", json_encode($supporter, JSON_PRETTY_PRINT));
+
+        // Display the current values, including the one that we want to change.
         echo("\nBefore:\n");
         foreach ($supporter->customFieldValues as $cf) {
-            echo(sprintf("\t%s %s %s = \"%s\"\n", $cf->fieldId, $cf->name,$cf->type, $cf->value));
+            if ($cf->name == $cred["fieldName"]) {
+                $cf->value = $cred["fieldValue"];
+            }
+            seeCustomField($cf);
         }
+
+        // Update to Engage.
         update($cred, $supporter);
 
+        // Show what Engage returns.  Note that custom field values have an 
+        // optional "errors" field that will describe any errors.
         echo("\nAfter:\n");
         $supporter = getSupporter($cred);
         foreach ($supporter->customFieldValues as $cf) {
-            echo(sprintf("\t%s %s %s = \"%s\"\n", $cf->fieldId, $cf->name,$cf->type, $cf->value));
-        }
+            seeCustomField($cf);
+         }
     }
-
     main();
 ?>
