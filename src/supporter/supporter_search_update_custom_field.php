@@ -15,19 +15,50 @@
         customField: fieldName
         value: whatever
     */
-    function initialize() {
-        $filename = './params/supporter-search-update-custom-field.yaml';
-        $cred =  Yaml::parseFile($filename);
-        if  (FALSE == array_key_exists('token', $cred)) {
-            throw new Exception("File " . $filename . " must contain an Engage token.");
-        }
-        return $cred;
-    }
-
+     // Retrieve the runtime parameters and validate them.
+     function initialize()
+     {
+         $shortopts = "";
+         $longopts = array(
+             "login:"
+         );
+         $options = getopt($shortopts, $longopts);
+         if (false == array_key_exists('login', $options)) {
+             exit("\nYou must provide a parameter file with --login!\n");
+         }
+         $filename = $options['login'];
+         $cred = Yaml::parseFile($filename);
+         validateCredentials($cred, $filename);
+         return $cred;
+     }
+ 
+     // Validate the contents of the provided credential file.
+     // All fields are required.  Exits on errors.
+     function validateCredentials($cred, $filename) {
+         $errors = false;
+         $fields = array(
+             "token",
+             "host",
+             "firstName",
+             "lastName",
+             "fieldName",
+             "FieldValue"
+         );
+         foreach ($fields as $f) {
+             if (false == array_key_exists($f, $cred)) {
+                 printf("Error: %s must contain a %s.\n", $filename, $f);
+                 $errors = true;
+             }
+         }
+         if ($errors) {
+             exit("Too many errors, terminating.\n");
+         }
+     }
+ 
     // Return the supporter record for the first (and typically only)
     // supporterID in the `identifers` field in the credentials.
     //
-    // @param array  $cred  Contents of params/supporter-add.yamlporter-search.yaml
+    // @param array  $cred  Contents of YAML credentials file
     //
     function getSupporter($cred) {
         $headers = [
@@ -41,8 +72,8 @@
             'payload' => [
                 'count' => 10,
                 'offset' => 0,
-                'identifiers' => $cred['identifiers'],
-                'identifierType' => $cred['identifierType']
+                'identifiers' => [ $cred['email'] ],
+                'identifierType' => "EMAIL_ADDRESS"
             ]
         ];
         $method = 'POST';
@@ -98,7 +129,7 @@
         // I got this cutie when I tried to just update the T Shirt Size without
         // the full supporter record.
 
-        // Search for the "T Shirt Size" custom field and change it's value.
+        // Search for the custom field and change it's value.
         
         foreach ($supporter->customFieldValues as $cf) {
             if ($cf -> fieldId == $cred["customFieldId"]) {
@@ -108,8 +139,7 @@
                     $cf -> value = $cf -> value . ", " .$cred["value"];
                 }
             }
-            // *** Trigger an error by submitting an invalid value ot the T Shirt Size. ***//
-            if ($cf -> fieldId == "d87d48c8-7b5e-49e6-8340-e2ee493d8515") {
+           if ($cf -> fieldId == "d87d48c8-7b5e-49e6-8340-e2ee493d8515") {
                 $cf -> value = "XXXXXXL";
             }
         };
