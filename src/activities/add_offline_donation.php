@@ -78,6 +78,8 @@
         $dformat = "Y-m-d\TH:i:s.U\Z";
         $now = $dt->format($dformat);
         $xactionID = $dt->format("B-U");
+        $amount = random_int(10, 100);
+        $deductable = random_int(1, 100) / 100.0;
 
         $payload = [
             "payload" => [
@@ -85,11 +87,11 @@
                     [
                         "accountType" => "CREDIT_CARD",
                         "activityFormName" => "Webconnex",
-                        "amount" => "55.00",
+                        "amount" => $amount,
                         "appeal" => "AGL",
                         "campaign" => "Canadian",
                         "date" => $now,
-                        "deductibleAmount" => "0.00",
+                        "deductibleAmount" => $deductable,
                         "fund" => "Fund 1",
                         "gatewayTransactionId" => $xactionID,
                         "type" => "CHARGE",
