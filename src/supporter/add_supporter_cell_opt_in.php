@@ -65,10 +65,7 @@
             'Content-Type' => 'application/json'
         ];
 
-        // The payload contains the information to add to Engage.  Note that the
-        // contents are retrieved from the parameter file.   This is a test of
-        // what's legit for first- and lastnames, so that's all that's in the 
-        // parameters.
+        // The payload contains the supporter to add to Engage. 
         $payload = [ 'payload' => [
                 'supporters' => [
                     [
