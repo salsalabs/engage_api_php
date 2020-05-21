@@ -4,9 +4,8 @@
     use GuzzleHttp\Client;
     use Symfony\Component\Yaml\Yaml;
 
-   // App to
-    // * add a single donation to Engage
-    // * observe that the results show an invalid date.
+    // App to add a single donation to Engage.  Uses dates and
+    // random numbers to pupulate the donation record.
     //
     // Usage:
     //     php update_offline_donation.php --login config
