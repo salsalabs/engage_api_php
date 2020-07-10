@@ -10,9 +10,9 @@ use Symfony\Component\Yaml\Yaml;
 // * First Name
 // * Last Name
 // * Email
-// * Comma-delimited file of grouprs
+// * Comma-delimited file of groups
 //
-// Supproters that are not in groups are not counted.
+// Supporters that are not in groups are not counted.
 //
 // Note: This app provides data that can't be retrieved
 // from CRM. Engage groups do not transfer to CRM, and
@@ -171,7 +171,7 @@ function getGroups($cred, $metrics, $supporterId)
 }
 
 // Run retrieves supporters and groups.  Supporters with groups
-// are written to a CSV file (currently "all_supporter_groups.csv").
+// are written to a tab-delimited file("all_supporter_groups.txt").
 // Supporters without groups are ignored.
 
 function run($cred, $metrics)
