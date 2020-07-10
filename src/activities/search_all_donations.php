@@ -78,7 +78,7 @@
             ],
         ];
         $method = 'POST';
-        $uri = 'https://' . $cred['host'];
+        $uri = $cred['host'];
         $command = '/api/integration/ext/v1/activities/search';
         $client = new GuzzleHttp\Client([
             'base_uri' => $uri,
