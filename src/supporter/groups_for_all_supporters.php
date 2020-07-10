@@ -122,16 +122,18 @@ function getEmail($supporter)
     return "";
 }
 
-// Retrieves groups for a supporter.  Can return an empty list.
+// Retrieves a groups payload for list of supporters.  The
+// whole payload is required because Engage indexes the results
+// using the provided supporterIds.
 // See: https://api.salsalabs.org/help/integration#operation/getGroupsForSupporters
 
-function getGroups($cred, $metrics, $supporterId)
+function getGroupsPayload($cred, $metrics, $supporterIds)
 {
     $payload = [
         'payload' => [
             'offset' => 0,
             'count' => $metrics->maxBatchSize,
-            'identifiers' => [ $supporterId ],
+            'identifiers' => $supporterIds,
             'identifierType' => "SUPPORTER_ID",
             "modifiedFrom" => "2005-05-26T11:49:24.905Z"
         ]
@@ -140,32 +142,15 @@ function getGroups($cred, $metrics, $supporterId)
     $command = '/api/integration/ext/v1/supporters/groups';
     $client = getClient($cred);
 
-    $groups = array();
-    // Note: The count is always 1 when a single suppporter_ID is
-    // provided in the identifiers.  That causes an infinte loop.
-    // Workaround is ignore count in the response payload.
-    $count = $metrics->maxBatchSize;
     try {
         $response = $client->request($method, $command, [
             'json' => $payload,
         ]);
         $data = json_decode($response->getBody());
         $p = $data->payload;
-        $count = $p->count;
-        if ($count > 0) {
-            foreach ($p->results as $r) {
-                if ($r-> result == 'FOUND') {
-                    foreach ($r->segments as $s) {
-                        if ($s->result == 'FOUND') {
-                            array_push($groups, $s->name);
-                        }
-                    }
-                }
-            }
-        }
-        return $groups;
-        } catch (Exception $e) {
-            echo 'getGroups: caught exception: ', $e->getMessage(), "\n";
+        return $p;
+    } catch (Exception $e) {
+        echo 'getGroups: caught exception: ', $e->getMessage(), "\n";
         exit(1);
     }
 }
@@ -199,37 +184,65 @@ function run($cred, $metrics)
 
             $data = json_decode($response -> getBody());
             $count = $data -> payload -> count;
-            foreach ( $data -> payload -> supporters as $s) {
-                $groups = getGroups($cred, $metrics, $s->supporterId);
-                if (count($groups) > 0) {
-                    if ($first) {
-                        $headers = [
-                            "ID",
-                            "FirstName",
-                            "LastName",
-                            "Email",
-                            "Groups"
-                        ];
-                        fputcsv($csv, $headers,$delimiter="\t");
-                        $first = false;
-                   }
-                    $groupString = implode(",", $groups);
-                    $email = getEmail($s);
-                    $line = [
-                        $s->supporterId,
-                        $s->firstName,
-                        $s->lastName,
-                        $email,
-                        $groupString 
-                    ];
-                    fputcsv($csv, $line, $delimiter="\t");
-                }
-                $name = $s->firstName . " " . $s->lastName;
+            $ids = array();
+            $hash = array();
+            foreach ($data ->payload->supporters as $s) {
+                array_push($ids, $s->supporterId);
+                $hash[$s->supporterId] = $s;
             }
+            // Get a payload that contains groups for the
+            // most recent batch of supporters.
+            $p = getGroupsPayload($cred, $metrics, $ids);
+
+            // Iterate through payload results.
+            foreach ($p->results as $r) {
+                if ($r-> result == 'FOUND') {
+                    if (!array_key_exists($r->supporterId, $hash)) {
+                        printf("run: unable to find supporterID %s in the hash\n", $r->supporterID);
+                    } else {
+                        $supporter = $hash[$r->supporterId];
+                        $groups = array();
+                        foreach ($r->segments as $s) {
+                            if ($s->result == 'FOUND') {
+                                array_push($groups, $s->name);
+                            }
+                        }
+                        // printf("run: supporter %s has %d groups\n", $r->supporterId, count($groups));
+                        if (count($groups) > 0) {
+                            if ($first) {
+                                $headers = [
+                                    "ID",
+                                    "FirstName",
+                                    "LastName",
+                                    "Email",
+                                    "Groups"
+                                ];
+                                fputcsv($csv, $headers,$delimiter="\t");
+                                $first = false;
+                            }
+                            $firstName = property_exists($supporter, "firstName") ? $supporter->firstName : "";
+                            $lastName = property_exists($supporter, "lastName") ? $supporter->lastName : "";
+                            $groupString = implode(",", $groups);
+                            $email = getEmail($supporter);
+                            $line = [
+                                $supporter->supporterId,
+                                $firstName,
+                                $lastName,
+                                $email,
+                                $groupString 
+                            ];
+                            fputcsv($csv, $line, $delimiter="\t");
+                        }
+                         printf("%-36s %5d groups\n", $supporter->supporterId, count($groups));
+                    }
+                }   
+            }
+            $payload["payload"]["offset"] = $payload["payload"]["offset"] + $count;
         } catch (Exception $e) {
             echo 'run: caught exception: ', $e->getMessage(), "\n";
             exit(1);
         }
+
     } while ($count > 0);
     // var_dump($e);
     fclose($csv);
