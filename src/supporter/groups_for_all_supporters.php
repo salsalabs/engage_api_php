@@ -9,14 +9,17 @@ use Symfony\Component\Yaml\Yaml;
 // * supporterID
 // * First Name
 // * Last Name
+// * Status (Subscribed, Unsubscribed)
 // * Email
 // * Comma-delimited file of groups
 //
-// Supporters that are not in groups are not counted.
+// Supporters that are not in groups are not used.
+// Supporters whose first email address is not opted-in 
+// (i.e. supporter.contact.status is not "OPT_IN") are not used.
 //
 // Note: This app provides data that can't be retrieved
 // from CRM. Engage groups do not transfer to CRM, and
-// can't be used for reports
+// can't be used for reports.
 //
 // Usage:
 //
@@ -105,7 +108,7 @@ function getClient($cred)
     return $client;
 }
 
-// Finds an email address for a supporter.  Returns an empty
+// Finds the first email address for a supporter.  Returns an empty
 // string if an email can't be found.
 function getEmail($supporter)
 {
@@ -113,6 +116,20 @@ function getEmail($supporter)
         foreach ($supporter->contacts as $contact) {
             if ($contact -> type == "EMAIL") {
                 return $contact -> value;
+            }
+        }
+    }
+    return "";
+}
+
+// Finds the first email status for a supporter.  Returns an empty
+// string if a status can't be found.
+function getStatus($supporter)
+{
+    if (property_exists($supporter, "contacts") && count($supporter->contacts) > 0) {
+        foreach ($supporter->contacts as $contact) {
+            if ($contact -> type == "EMAIL") {
+                return $contact -> status;
             }
         }
     }
@@ -184,20 +201,24 @@ function processGroupsForSupporters($cred, $metrics, $csv, $supporters)
                         array_push($groups, $s->name);
                     }
                 }
-                // printf("run: supporter %s has %d groups\n", $r->supporterId, count($groups));
                 if (count($groups) > 0) {
                     $firstName = property_exists($supporter, "firstName") ? $supporter->firstName : "";
                     $lastName = property_exists($supporter, "lastName") ? $supporter->lastName : "";
-                    $groupString = implode(",", $groups);
                     $email = getEmail($supporter);
-                    $line = [
-                        $supporter->supporterId,
-                        $firstName,
-                        $lastName,
-                        $email,
-                        $groupString 
-                    ];
-                    fputcsv($csv, $line, $delimiter="\t");
+                    $status= getStatus($supporter);
+                    if ($status == "OPT_IN") {
+                        $status = ($status == "OPT_IN") ? "Subscribed" : "Unsubscribed";
+                        $groupString = implode(",", $groups);
+                        $line = [
+                            $supporter->supporterId,
+                            $firstName,
+                            $lastName,
+                            $status,
+                            $email,
+                            $groupString 
+                        ];
+                        fputcsv($csv, $line, $delimiter="\t");
+                    }
                 }
                 printf("%-36s %5d groups\n", $supporter->supporterId, count($groups));
             }
@@ -226,6 +247,7 @@ function run($cred, $metrics)
         "ID",
         "FirstName",
         "LastName",
+        "Status",
         "Email",
         "Groups"
     ];
