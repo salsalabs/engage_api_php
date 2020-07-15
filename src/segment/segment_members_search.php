@@ -4,12 +4,12 @@ require 'vendor/autoload.php';
 use GuzzleHttp\Client;
 use Symfony\Component\Yaml\Yaml;
 
-// App to look up supports in a segment.
+// App to look up supports in a segments.
 // Example contents:
 /*
 token: Your-incredibly-long-Engage-token-here
 host: api.salsalabs.org
-segmentId: An-incredibly-long-segment-id
+segmentId: incredibly-long-segment-id
  */
 
 // Retrieve the runtime parameters and validate them.
@@ -37,6 +37,7 @@ function validateCredentials($cred, $filename)
     $fields = array(
         "token",
         "host",
+        "segmentId"
     );
     foreach ($fields as $f) {
         if (false == array_key_exists($f, $cred)) {
@@ -59,14 +60,14 @@ function getSegment($cred)
     $payload = [
         'payload' => [
             'identifierType' => 'SEGMENT_ID',
-            'identifiers' => $cred['segmentId'],
+            'identifiers' => array($cred['segmentId']),
             'includeMemberCounts' => 'true',
             'offset' => 0,
             'count' => 20,
         ],
     ];
     $method = 'POST';
-    $uri = 'http://' . $cred["host"];
+    $uri = $cred["host"];
     $command = '/api/integration/ext/v1/segments/search';
     $client = new GuzzleHttp\Client([
         'base_uri' => $uri,
@@ -77,7 +78,7 @@ function getSegment($cred)
             'json' => $payload,
         ]);
         $data = json_decode($response->getBody());
-        $payload = $data->payload;
+         $payload = $data->payload;
         $count = $payload->count;
         if ($count == 0) {
             return null;
@@ -103,11 +104,11 @@ function search($cred, $offset, $count)
         'payload' => [
             'count' => $count,
             'offset' => $offset,
-            'segmentId' => $cred['segmentId'][0],
+            'segmentId' => $cred['segmentId'],
         ],
     ];
     $method = 'POST';
-    $uri = 'http://' . $cred["host"];
+    $uri = $cred["host"];
     $client = new GuzzleHttp\Client([
         'base_uri' => $uri,
         'headers' => $headers,
@@ -130,7 +131,7 @@ function main()
     $cred = initialize();
     $segment = getSegment($cred);
     if (!is_null($segment)) {
-        fprintf(STDOUT, "\nSearching %s: %s for %d supporters.\n\n",
+        printf("\nSearching %s: %s for %d supporters.\n\n",
             $segment->segmentId,
             $segment->name,
             $segment->totalMembers);
@@ -141,7 +142,7 @@ function main()
             if ($offset + $count > $segment->totalMembers) {
                 $count = $segment->totalMembers % 20;
             }
-            fprintf(STDOUT, "Offset/count: %6d/%2d\n", $offset, $count);
+            printf("Offset/count: %6d/%2d\n", $offset, $count);
             $r = search($cred, $offset, $count);
             $c = (int) $r->payload->count;
             if ($c > 0) {
