@@ -183,7 +183,9 @@ function processGroupsForSupporters($cred, $metrics, $csv, $supporters)
         array_push($ids, $s->supporterId);
         $hash[$s->supporterId] = $s;
     }
-
+    if (count($ids) == 0) {
+        return;
+    }
     $p = getGroupsPayload($cred, $metrics, $ids);
 
     // Iterate through payload results. Each result item
