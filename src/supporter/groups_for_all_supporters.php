@@ -222,15 +222,15 @@ function run($cred, $metrics)
     $client = getClient($cred);
 
     $csv = fopen("all_supporter_groups.csv", "w");
-        $headers = [
-            "ID",
-            "FirstName",
-            "LastName",
-            "Email",
-            "Groups"
-        ];
-        fputcsv($csv, $headers,$delimiter="\t");
-        $first = false;
+    $headers = [
+        "ID",
+        "FirstName",
+        "LastName",
+        "Email",
+        "Groups"
+    ];
+    fputcsv($csv, $headers,$delimiter="\t");
+    $first = false;
 
     // Do until end of data. Read a number of supporters.
     // Find their groups.  Write to a CSV file.
