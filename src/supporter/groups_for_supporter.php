@@ -39,7 +39,7 @@ function main()
     $groups = getGroups($cred, $metrics);
     $count = count($groups);
     if ($count == 0) {
-        printf("\nSupporter with key %s does snot belong to any groups\n", $cred["supporterID"]);
+        printf("\nSupporter with key %s does not belong to any groups\n", $cred["supporterID"]);
     }
     else {
         printf("\nSupporter with key %s belongs to %d groups:\n", $cred["supporterID"], $count);
