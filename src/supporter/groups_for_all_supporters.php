@@ -81,7 +81,6 @@ function validateCredentials($cred, $filename)
 
 // Retrieve the current metrics.
 // See https://help.salsalabs.com/hc/en-us/articles/224531208-General-Use
-
 function getMetrics($cred)
 {
     $method = 'GET';
@@ -93,7 +92,6 @@ function getMetrics($cred)
 }
 
 // Return a Guzzle client for HTTP operations.
-
 function getClient($cred)
 {
     $headers = [
@@ -109,7 +107,6 @@ function getClient($cred)
 
 // Finds an email address for a supporter.  Returns an empty
 // string if an email can't be found.
-
 function getEmail($supporter)
 {
     if (property_exists($supporter, "contacts") && count($supporter->contacts) > 0) {
@@ -155,6 +152,59 @@ function getGroupsPayload($cred, $metrics, $supporterIds)
     }
 }
 
+// Process groups for a list of supporters.  Writes supproter info
+// and a comma-delimited list of groups to the output file.
+function processGroupsForSupporters($cred, $metrics, $csv, $supporters)
+{
+    // Create list if supporter IDs to send to Engage *and*
+    // a hash of supporter IDs and supporter records. We'll
+    // use the hash to retrieve supporter info after Engage
+    // returns groups.
+    $ids = array();
+    $hash = array();
+    foreach ($supporters as $s) {
+        array_push($ids, $s->supporterId);
+        $hash[$s->supporterId] = $s;
+    }
+
+    $p = getGroupsPayload($cred, $metrics, $ids);
+
+    // Iterate through payload results. Each result item
+    // has a supporter_ID and a list of groups.  We'll use
+    // the supporter_ID to find supporter info in the hash.
+    foreach ($p->results as $r) {
+        if ($r-> result == 'FOUND') {
+            if (!array_key_exists($r->supporterId, $hash)) {
+                printf("run: unable to find supporterID %s in the hash\n", $r->supporterID);
+            } else {
+                $supporter = $hash[$r->supporterId];
+                $groups = array();
+                foreach ($r->segments as $s) {
+                    if ($s->result == 'FOUND') {
+                        array_push($groups, $s->name);
+                    }
+                }
+                // printf("run: supporter %s has %d groups\n", $r->supporterId, count($groups));
+                if (count($groups) > 0) {
+                    $firstName = property_exists($supporter, "firstName") ? $supporter->firstName : "";
+                    $lastName = property_exists($supporter, "lastName") ? $supporter->lastName : "";
+                    $groupString = implode(",", $groups);
+                    $email = getEmail($supporter);
+                    $line = [
+                        $supporter->supporterId,
+                        $firstName,
+                        $lastName,
+                        $email,
+                        $groupString 
+                    ];
+                    fputcsv($csv, $line, $delimiter="\t");
+                }
+                printf("%-36s %5d groups\n", $supporter->supporterId, count($groups));
+            }
+        }   
+    }
+}
+
 // Run retrieves supporters and groups.  Supporters with groups
 // are written to a tab-delimited file("all_supporter_groups.txt").
 // Supporters without groups are ignored.
@@ -172,7 +222,15 @@ function run($cred, $metrics)
     $client = getClient($cred);
 
     $csv = fopen("all_supporter_groups.csv", "w");
-    $first = true;
+        $headers = [
+            "ID",
+            "FirstName",
+            "LastName",
+            "Email",
+            "Groups"
+        ];
+        fputcsv($csv, $headers,$delimiter="\t");
+        $first = false;
 
     // Do until end of data. Read a number of supporters.
     // Find their groups.  Write to a CSV file.
@@ -184,70 +242,16 @@ function run($cred, $metrics)
 
             $data = json_decode($response -> getBody());
             $count = $data -> payload -> count;
-            $ids = array();
-            $hash = array();
-            foreach ($data ->payload->supporters as $s) {
-                array_push($ids, $s->supporterId);
-                $hash[$s->supporterId] = $s;
-            }
-            // Get a payload that contains groups for the
-            // most recent batch of supporters.
-            $p = getGroupsPayload($cred, $metrics, $ids);
-
-            // Iterate through payload results.
-            foreach ($p->results as $r) {
-                if ($r-> result == 'FOUND') {
-                    if (!array_key_exists($r->supporterId, $hash)) {
-                        printf("run: unable to find supporterID %s in the hash\n", $r->supporterID);
-                    } else {
-                        $supporter = $hash[$r->supporterId];
-                        $groups = array();
-                        foreach ($r->segments as $s) {
-                            if ($s->result == 'FOUND') {
-                                array_push($groups, $s->name);
-                            }
-                        }
-                        // printf("run: supporter %s has %d groups\n", $r->supporterId, count($groups));
-                        if (count($groups) > 0) {
-                            if ($first) {
-                                $headers = [
-                                    "ID",
-                                    "FirstName",
-                                    "LastName",
-                                    "Email",
-                                    "Groups"
-                                ];
-                                fputcsv($csv, $headers,$delimiter="\t");
-                                $first = false;
-                            }
-                            $firstName = property_exists($supporter, "firstName") ? $supporter->firstName : "";
-                            $lastName = property_exists($supporter, "lastName") ? $supporter->lastName : "";
-                            $groupString = implode(",", $groups);
-                            $email = getEmail($supporter);
-                            $line = [
-                                $supporter->supporterId,
-                                $firstName,
-                                $lastName,
-                                $email,
-                                $groupString 
-                            ];
-                            fputcsv($csv, $line, $delimiter="\t");
-                        }
-                         printf("%-36s %5d groups\n", $supporter->supporterId, count($groups));
-                    }
-                }   
-            }
+            processGroupsForSupporters($cred, $metrics, $csv, $data ->payload->supporters);
             $payload["payload"]["offset"] = $payload["payload"]["offset"] + $count;
         } catch (Exception $e) {
             echo 'run: caught exception: ', $e->getMessage(), "\n";
             exit(1);
         }
-
     } while ($count > 0);
-    // var_dump($e);
     fclose($csv);
 }
 
-main()
+main();
 
 ?>
