@@ -314,36 +314,40 @@
             "ID",
             "Name");
         foreach ($forms as $key=>$r) {
+            printf("%s\n", json_encode($r, JSON_PRETTY_PRINT));
             printf("%-2d %-24s %-36s %s\n",
                 ($key + 1),
                 $r->type,
                 $r->id,
-                $r->name);
+                 $r->name);
         }
         if (!$cred['summary']) {
             printf("\nEvent MetaData\n\n");
             foreach ($forms as $r) {
                 if (!$cred["summary"]) {
-                    printf("\n%-24s %-36s %-20s %-10s %-10s %-10s\n",
+                    printf("\n%-24s %-36s %-20s %-10s %-10s %-10s %s\n",
                         "Type",
                         "ID",
                         "Name",
                         "Status",
                         "Has Goal",
-                        "Goal Amount");
+                        "Goal Amount",
+                        "PageURL");
                 }
                 $meta = fetchMetadata($cred, $r->id);
 
                 $goal = empty($meta->hasEventLevelFundraisingGoal) ? "--" : $meta->hasEventLevelFundraisingGoal;
                 $goalValue = empty($meta->hasEventLevelFundraisingGoalValue) ? "--" : $meta->hasEventLevelFundraisingGoal;
                 $status = empty($meta->status) ? "--" : $meta->status;
-                printf("%-24s %-36s %-70s %-10s %10s %10d\n",
+                $pageUrl = empty($meta->pageUrl) ? "--" : $meta->pageUrl;
+                printf("%-24s %-36s %-70s %-10s %10s %10d %s\n",
                     $r->type,
                     $r->id,
                     $r->name,
                     $status,
                     $goal,
-                    $goalValue);
+                    $goalValue,
+                    $pageUrl);
 
                 $fundraisers = fetchFundRaisers($cred, $meta->id);
                 if (empty($fundraisers)) {
