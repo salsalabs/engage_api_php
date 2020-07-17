@@ -139,7 +139,7 @@
         }
     }
 
-    // Ubiquitous, reliable main function.
+    // Ubiquitous main function.
     function main() {
         $cred = initialize();
         $forms = fetchForms($cred);

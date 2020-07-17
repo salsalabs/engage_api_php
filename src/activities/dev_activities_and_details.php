@@ -77,10 +77,9 @@
         $uri = $cred["devHost"];
         $command = '/api/developer/ext/v1/activities';
         $params = [
-            'types' => "P2P_EVENT,TICKETED_EVENT",
+            'types' => "P2P_EVENT",
             'sortField' => "name",
             'sortOrder' => "ASCENDING",
-            'status' => "PUBLISHED",
             'count' => 25,
             'offset' => 0
         ];
@@ -95,7 +94,7 @@
         do {
             $queries = http_build_query($params);
             $x = $command . "?" . $queries;
-            // printf("Command: %s\n", $x);
+            printf("Command: %s\n", $x);
             try {
                 $response = $client->request($method, $x);
                 $data = json_decode($response -> getBody());
@@ -111,7 +110,7 @@
                 echo 'Caught exception: ', $e->getMessage(), "\n";
                 return $forms;
             }
-        } while ($count > 0);
+        } while ($count == $params['count']);
         return $forms;
     }
 
@@ -155,7 +154,6 @@
     // Note: "Fundraiser" only applies to P2P forms. Calling this for any other
     // form type doesn't make sense.
     function fetchFundraisers($cred, $id) {
-        //var_dump($cred);
         $headers = [
             'authToken' => $cred["devToken"],
             'Content-Type' => 'application/json',
@@ -204,7 +202,6 @@
     // See: https://help.salsalabs.com/hc/en-us/articles/360001206753-Activity-Form-Summary-Fundraisers
     // Returns an array of registrants.
     function fetchRegistrations($cred, $id) {
-        //var_dump($cred);
         $headers = [
             'authToken' => $cred["devToken"],
             'Content-Type' => 'application/json',
@@ -255,7 +252,6 @@
     // the integration API.  Returns a list of activities.
     // See https://help.salsalabs.com/hc/en-us/articles/224470267-Engage-API-Activity-Data
     function fetchActivities($cred, $id) {
-        //var_dump($cred);
         $headers = [
             'authToken' => $cred["intToken"],
             'Content-Type' => 'application/json',
@@ -304,7 +300,44 @@
         return $forms;
     }
 
-    // Ubiquitous, reliable main function.
+
+    // Fetch teams for a P2P event.
+    // See: https://api.salsalabs.org/help/web-dev#operation/getTeamsSummary
+    // Returns a teams payload.
+    function fetchTeams($cred, $id) {
+        $headers = [
+            'authToken' => $cred["devToken"],
+            'Content-Type' => 'application/json',
+        ];
+        $payload = [
+            'payload' => [
+            ]
+        ];
+        $method = 'GET';
+        $uri = $cred["devHost"];
+        $command = '/api/developer/ext/v1/activities/teams/'.$id;
+        https://api.salsalabs.org/api/developer/ext/v1/activities/teams/{uuid}
+        $client = new GuzzleHttp\Client([
+            'base_uri' => $uri,
+            'headers'  => $headers
+        ]);
+
+        try {
+            printf("getTeams: command is %s\n", $command);
+            $response = $client->request($method, $command, [
+                'json'     => $payload
+            ]);
+            printf("getTeams: body is \n%s\n", json_encode($response->getBody(), JSON_PRETTY_PRINT));
+            $data = json_decode($response -> getBody());
+            return $data->payload;
+        }
+        catch (Exception $e) {
+            echo 'Caught exception: ', $e->getMessage(), "\n";
+            return NULL;
+        }
+    }
+
+    // Ubiquitous main function.
     function main() {
         $cred = initialize();
         $forms = fetchForms($cred);
@@ -315,11 +348,13 @@
             "Name");
         foreach ($forms as $key=>$r) {
             printf("%s\n", json_encode($r, JSON_PRETTY_PRINT));
-            printf("%-2d %-24s %-36s %s\n",
+            printf("%-2d %-9s %-9s %-36s %-52s %s\n",
                 ($key + 1),
                 $r->type,
+                $r->status,
                 $r->id,
-                 $r->name);
+                $r->name,
+                $r->pageUrl);
         }
         if (!$cred['summary']) {
             printf("\nEvent MetaData\n\n");
@@ -335,7 +370,6 @@
                         "PageURL");
                 }
                 $meta = fetchMetadata($cred, $r->id);
-
                 $goal = empty($meta->hasEventLevelFundraisingGoal) ? "--" : $meta->hasEventLevelFundraisingGoal;
                 $goalValue = empty($meta->hasEventLevelFundraisingGoalValue) ? "--" : $meta->hasEventLevelFundraisingGoal;
                 $status = empty($meta->status) ? "--" : $meta->status;
@@ -373,7 +407,6 @@
                 }
 
                 $registrations = fetchRegistrations($cred, $meta->id);
-                //var_dump($registrations);
                 if (empty($registrations)) {
                     printf("\nNo registrations...\n");
                 } else {
@@ -398,7 +431,6 @@
                 }
 
                 $activities = fetchActivities($cred, $meta->id);
-                //var_dump($activities);
                 if (empty($activities)) {
                     printf("\nNo activities...\n");
                 } else {
@@ -429,6 +461,16 @@
                             $d->activityType,
                             $result,
                             $amount);
+                    }
+                }
+
+                if ($r->type == "P2P_EVENT" && $r->status == "PUBLISHED") {
+                    $teams = fetchTeams($cred, $meta->id);
+                    if (empty($teams)) {
+                        printf("\nNo teams...\n");
+                    } else {
+                        printf("\nTeams\n");
+                        printf("\n%s\n", var_dump($teams));
                     }
                 }
             }

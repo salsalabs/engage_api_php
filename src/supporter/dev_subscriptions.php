@@ -158,7 +158,7 @@
             }
         }
     }
-    // Ubiquitous, reliable main function.
+    // Ubiquitous main function.
     function main() {
         $cred = initialize();
         $metrics = getMetrics($cred);
