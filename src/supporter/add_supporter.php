@@ -87,7 +87,7 @@
                                 "value" => $cred["phone"]
                             ],
                             [
-                                "type" => "CELL_PHONE",
+                                "type" => "CELL PHONE",
                                 "value" => $cred["cellPhone"]
                             ]
                         ]
