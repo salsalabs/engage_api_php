@@ -12,6 +12,8 @@
         firstName: a name, or empty if you want to see what will happen
         lastName:  a name
         email: an email address
+        phone: a phone number
+        cellPhone: a phoneNumber
     */
     // Output is the payload and the result, both in JSON. 
 
@@ -41,7 +43,9 @@
             "host",
             "firstName",
             "lastName",
-            "email"
+            "email",
+            "phone",
+            "cellPhone"
         );
         foreach ($fields as $f) {
             if (false == array_key_exists($f, $cred)) {
@@ -71,12 +75,20 @@
         $payload = [ 'payload' => [
                 'supporters' => [
                     [
-                        firstName => $cred['firstName'],
-                        lastName => $cred['lastName'],
-                        contacts => [
+                        "firstName" => $cred['firstName'],
+                        "lastName" => $cred['lastName'],
+                        "contacts" => [
                             [
-                                type => "EMAIL",
-                                value => $cred["email"]
+                                "type" => "EMAIL",
+                                "value" => $cred["email"]
+                            ],
+                            [
+                                "type" => "HOME_PHONE",
+                                "value" => $cred["phone"]
+                            ],
+                            [
+                                "type" => "CELL_PHONE",
+                                "value" => $cred["cellPhone"]
                             ]
                         ]
                     ]
