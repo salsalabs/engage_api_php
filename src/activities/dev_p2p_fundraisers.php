@@ -90,11 +90,16 @@
                 $response = $client->request($method, $command);
  //               print($response->getBody());
                 $data = json_decode($response -> getBody());
-                if (property_exists ( $data->payload , 'total' )) {
+                if (property_exists ($data->payload, 'total')) {
                     $count = $data->payload->total;
+                    printf("Found %d records", $count); 
                     if ($count > 0) {
                         $fundraisers = array_merge($fundraisers, $data->payload->results);
                     }
+                } else {
+                    print("Empty payload...\n");
+                    printf("%s\n", json_encode($data, JSON_PRETTY_PRINT));
+                    $count = 0;
                 }
             } catch (Exception $e) {
                 echo 'Caught exception: ', $e->getMessage(), "\n";
