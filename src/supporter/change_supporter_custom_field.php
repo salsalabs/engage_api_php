@@ -189,13 +189,15 @@
         $cred = initialize();
         
         $supporter = read_supporter($cred);
-        // show("Supporter is", $supporter);
+        // show("Supporter initial condition", $supporter);
         $needsWrite = update_supporter($cred, $supporter);
         if ($needsWrite) {
             show("Saving updated record", $supporter);
             write_supporter($cred, $supporter);
-        } else {
-            printf("Custom field value unchanged.\n");
+            $supporter = read_supporter($cred);
+            show("Suporter read-after-write", $supporter);
+            } else {
+                printf("Custom field value unchanged.\n");
         }
     }
 
