@@ -11,7 +11,10 @@
     // See https://help.salsalabs.com/hc/en-us/sections/360000258473-API-Web-Developer
     /*
     token: your-integration-api-token-here
-    activityId: ticketed-event-uuid
+    activityIds:
+      - ticketed-event-uuid_1
+      - ticketed-event-uuid_2
+      - ticketed-event-uuid_3
     */
 
     // Uses Composer.
@@ -42,7 +45,7 @@
         $errors = false;
         $fields = array(
             "token",
-            "activityId"
+            "activityIds"
         );
         foreach ($fields as $f) {
             if (false == array_key_exists($f, $cred)) {
@@ -64,27 +67,27 @@
             'authToken' => $cred["token"],
             'Content-Type' => 'application/json',
         ];
-        $method = 'GET';
+        $method = 'POST';
         $host = "http://api.salsalabs.org";
-        $command = '/api/developer/ext/v1/activities';
-        $uri = $host . $command;
-        $params = [
-            'types' => "TICKETED_EVENT",
-            'activityIds' => [ $cred["activityId"]],
+        $command = '/api/integration/ext/v1/activities/search';
+         $payload = [
+            'activityIds' => $cred["activityIds"],
             'count' => 20,
             'offset' => 0
         ];
 
         $client = new GuzzleHttp\Client([
-            'base_uri' => $uri,
+            'base_uri' => $host,
             'headers'  => $headers
         ]);
-
+    
         $forms = array();
         $count = 0;
         do {
             try {
-                $response = $client->request($method, $uri);
+                $response = $client->request($method, $command, [
+                    'json' => $payload,
+                ]);
                 $data = json_decode($response -> getBody());
                 // echo json_encode($data, JSON_PRETTY_PRINT);
                 $count = $data->payload->count;
@@ -106,7 +109,7 @@
     function main() {
         $cred = initialize();
         $forms = fetchForms($cred);
-        printf("%s\n", json_decode($forms, JSON_PRETTY_PRINT));
+        printf("%s\n", json_encode($forms, JSON_PRETTY_PRINT));
     }
     main()
 ?>

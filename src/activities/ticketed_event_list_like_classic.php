@@ -44,14 +44,18 @@
     function validateCredentials($cred, $filename) {
         $errors = false;
         $fields = array(
-            "devToken",
-            "devHost"
+            "devToken"
         );
         foreach ($fields as $f) {
             if (false == array_key_exists($f, $cred)) {
                 printf("Error: %s must contain a %s.\n", $filename, $f);
                 $errors = true;
             }
+        }
+        if (true == array_key_exists("devHost", $cred)) {
+            $cred["host"] = $cred["devHost"];
+        } else {
+            $cred["host"] = "http://api.salsalabs.org";
         }
         if ($errors) {
             exit("Too many errors, terminating.\n");
@@ -61,16 +65,16 @@
     // Use the provided credentials to locate all events matching 'eventType'.
     // See: https://help.salsalabs.com/hc/en-us/articles/360001206693-Activity-Form-List
     function fetchForms($cred) {
-        //var_dump($cred);
+        // var_dump($cred);
         $headers = [
             'authToken' => $cred["devToken"],
             'Content-Type' => 'application/json',
         ];
         $method = 'GET';
-        $uri = $cred["devHost"];
+        $uri = 'http://api.salsalabs.org';
         $command = '/api/developer/ext/v1/activities';
         $params = [
-            'types' => "FUNDRAISE,TICKET_EVENT",
+            'types' => "TICKETED_EVENT",
             'count' => 25,
             'offset' => 0
         ];
@@ -119,7 +123,7 @@
             ]
         ];
         $method = 'GET';
-        $uri = $cred["devHost"];
+        $uri = 'http://api.salsalabs.org';
         $command = '/api/developer/ext/v1/activities/'.$id.'/metadata';
         $client = new GuzzleHttp\Client([
             'base_uri' => $uri,
@@ -143,6 +147,7 @@
     function main() {
         $cred = initialize();
         $forms = fetchForms($cred);
+        printf("Forms: %s\n", json_encode($forms, JSON_PRETTY_PRINT));
         printf("\nEvent Summary\n\n");
         printf("\n%-24s %-36s %s\n",
             "Type",
@@ -162,7 +167,6 @@
                 $entry = [
                     "id" =>  $m->id,
                     "name" =>  $m->name,
-                    "description" =>  $m->description,
                     "pageUrl" => $m->pageUrl,
                     "status" => $m->status,
                     "visibility" => $m->visibility,
@@ -184,9 +188,9 @@
             printf("\n");
         }
         // Display as JSON.
-        $json = json_encode($data, JSON_PRETTY_PRINT);
-        printf("\nJSON Metadata\n");
-        printf("\n$json\n");
+        // $json = json_encode($data, JSON_PRETTY_PRINT);
+        // printf("\nJSON Metadata\n");
+        // printf("\n$json\n");
     }
 
     main()
