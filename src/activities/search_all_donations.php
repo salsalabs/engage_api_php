@@ -47,8 +47,8 @@
             "token",
             "host",
             "identifierType",
-            "modifiedFrom",
-            "modifiedTo"
+            "modifiedFrom"//,
+            //`"modifiedTo"
         );
         foreach ($fields as $f) {
             if (false == array_key_exists($f, $cred)) {
@@ -72,7 +72,7 @@
             'payload' => [
                 'type' => $cred["identifierType"],
                 'modifiedFrom' => $cred['modifiedFrom'],
-                'modidifedTo' => $cred['modifiedTo'],
+                //'modidifedTo' => $cred['modifiedTo'],
                 'offset' => $offset,
                 'count' => $count
             ],
@@ -90,7 +90,13 @@
             ]);
             $data = json_decode($response->getBody());
             $payload = $data->payload;
+            if ($offset == 0) {
+                printf("Retrieving %d donations.\n", $payload->total);
+            }
             $count = $payload->count;
+            if ($count % 1000 == 0) {
+                printf("%6d: %3d donations\n", $payload->offset, $payload->count);
+            }
             if ($count == 0) {
                 return null;
             }
@@ -112,36 +118,50 @@
             if (is_null($activities)) {
                 $count = 0;
             } else {
-                $i = 0;
+                $count = count($activities);
+                $i = 1;
                 foreach ($activities as $s) {
-                    fprintf(STDOUT, "[%3d:%3d] %s %-30s %s %s %s %s\n",
-                        $offset,
-                        $i,
-                        $s->activityId,
-                        $s->activityFormName,
-                        $s->activityDate,
-                        $s->activityType,
-                        $s->donationId,
-                        $s->totalReceivedAmount);
-                    $i++;
-                    // foreach ($s->transactions as $t) {
-                    //     fprintf(STDOUT, "Transaction: %s %s %s %s %s %s %s\n",
-                    //         $t->type,
-                    //         $t->reason,
-                    //         $t->date,
-                    //         $t->amount,
-                    //         $t->deductibleAmount,
-                    //         $t->feesPaid,
-                    //         $t->gatewayTransactionId);
-                    // }
+                    if (!property_exists($s, 'activityFormId')
+                        || !property_exists($s, 'personName')
+                        || !property_exists($s, 'personEmail')) {
+                            seeActivity($s, ($offset + $i));
+                            //seeTransactions($s);
+                            $i++;
+                    }
                 }
-                $count = $i;
             }
             $offset += $count;
         }
-        fprintf(STDOUT, "[%5d:00] end of search\n",
-            $offset,
-            $i);
+    }
+
+    // Function to see an activity.
+    function seeActivity($s, $serialNumber) {
+        fprintf(STDOUT, "%6d: %s %s %-30s %-30s %-20s %s %s %s imported? %s apiImported? %s %s\n",
+            ($serialNumber),
+            $s->activityId,
+            property_exists($s, 'activityFormId') ? $s->activityFormId : "-- Undefined --",
+            $s->supporterId,
+            property_exists($s, 'personName') ? $s->personName : "-- Undefined --",
+            property_exists($s, 'personEmail') ? $s->personEmail : "-- Undefined --",
+            $s->activityDate,
+            $s->lastModified,
+            $s->activityType,
+            $s->wasImported,
+            ($s->wasAPIImported) ? $s->wasAPIImported : 0,
+            // $s->donationId,
+            $s->totalReceivedAmount);
+    }
+
+    //See transactions for an activity.
+    function seeTransactions($s) {
+        foreach ($s->transactions as $t) {
+            fprintf(STDOUT, "        %s %s %s %s %s\n",
+                $t->transactionId,
+                $t->type,
+                $t->reason,
+                $t->date,
+                $t->amount);
+        }
     }
 
     main();
