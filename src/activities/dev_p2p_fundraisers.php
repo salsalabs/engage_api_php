@@ -92,7 +92,7 @@
                 $data = json_decode($response -> getBody());
                 if (property_exists ($data->payload, 'total')) {
                     $count = $data->payload->total;
-                    printf("Found %d records", $count); 
+                    printf("Found %d records\n", $count); 
                     if ($count > 0) {
                         $fundraisers = array_merge($fundraisers, $data->payload->results);
                     }
@@ -114,10 +114,24 @@
     // TODO: Consider CSV output.
     function processFundraisers($fundraisers) {
         foreach($fundraisers as $f) {
-            printf("%-30s %5d %s\n",
+
+//            printf("%s\n", json_encode($f, JSON_PRETTY_PRINT));
+//            printf("%-30s %5d %s\n",
+//                $f->fundraiserPageName,
+//                $f->goal,
+//                $f->fundraiserUrl);
+
+            printf("Page: %s\nGoal: %5d\nURL: %s\nAddress: %s\nCity: %s\nState: %s\nZip: %s\nCountry: %s\n\n",
                 $f->fundraiserPageName,
                 $f->goal,
-                $f->fundraiserUrl);
+                $f->fundraiserUrl,
+                $f->addressLine1,
+                $f->city,
+                $f->state,
+                $f->stateCode,
+                $f->zipCode,
+                $f->country,
+                $f->countryCode);
         }
     }
 
