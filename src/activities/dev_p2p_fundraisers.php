@@ -114,23 +114,15 @@
     // TODO: Consider CSV output.
     function processFundraisers($fundraisers) {
         foreach($fundraisers as $f) {
-
-//            printf("%s\n", json_encode($f, JSON_PRETTY_PRINT));
-//            printf("%-30s %5d %s\n",
-//                $f->fundraiserPageName,
-//                $f->goal,
-//                $f->fundraiserUrl);
-
+            // printf("%s\n", json_encode($f, JSON_PRETTY_PRINT));
             printf("Page: %s\nGoal: %5d\nURL: %s\nAddress: %s\nCity: %s\nState: %s\nZip: %s\nCountry: %s\n\n",
                 $f->fundraiserPageName,
                 $f->goal,
                 $f->fundraiserUrl,
                 $f->addressLine1,
                 $f->city,
-                $f->state,
                 $f->stateCode,
                 $f->zipCode,
-                $f->country,
                 $f->countryCode);
         }
     }
