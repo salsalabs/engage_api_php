@@ -15,7 +15,7 @@
     // Your Engage token is read from a YAML file.  Here's an example:
     /*
     token: Your-incredibly-long-Engage-API-token
-    host: https://dev-api.salsalabs.org
+    host: https://api.salsalabs.org
     */
 
     //Return something for a null variable.
@@ -73,7 +73,7 @@
         ];
 
         // Example criteria from the doc.
-        // https://dev-api.salsalabs.org/api/developer/ext/v1/blasts
+        // https://api.salsalabs.org/api/developer/ext/v1/blasts
         // ?endDate=2018-02-06T23:01:18.999Z
         // &startDate=2018-01-08T23:01:18.000Z
         // &criteria=blast1

@@ -14,7 +14,7 @@
     intToken: your-integration-api-token-here
     intHost: "https://api.salsalabs.org"
     devToken: your-web-developer-api-token-here
-    devHost: "https://dev-api.salsalabs.org"
+    devHost: "https://api.salsalabs.org"
     summary: true
     */
     // Use true in summary to just see the activity summary.  Use false for detailed report.
@@ -77,7 +77,7 @@
         $uri = $cred["devHost"];
         $command = '/api/developer/ext/v1/activities';
         $params = [
-            'types' => "P2P_EVENT",
+            'types' => "TICKETED_EVENT",
             'sortField' => "name",
             'sortOrder' => "ASCENDING",
             'count' => 25,

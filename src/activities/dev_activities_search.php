@@ -13,7 +13,7 @@
     // See https://help.salsalabs.com/hc/en-us/sections/360000258473-API-Web-Developer
     /*
     devToken: your-web-developer-api-token-here
-    devHost: "https://dev-api.salsalabs.org"
+    devHost: "https://api.salsalabs.org"
     */
 
     // Uses Composer.

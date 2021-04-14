@@ -12,7 +12,7 @@
     // Sample YAML file.  All fields must start in column 1. Comments are for PHP.
     /*
     devToken: your-web-developer-api-token-here
-    devHost: "https://dev-api.salsalabs.org"
+    devHost: "https://api.salsalabs.org"
     */
     // No need to put quotes around the API keys.  Field "devHost"
     // is there to accomodate Engage clients that use sandbox accounts.

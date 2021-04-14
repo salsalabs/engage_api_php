@@ -16,7 +16,7 @@
     intToken: your-integration-api-token-here
     intHost: "https://api.salsalabs.org"
     devToken: your-web-developer-api-token-here
-    devHost: "https://dev-api.salsalabs.org"
+    devHost: "https://api.salsalabs.org"
     summary: true
     */
     // Use true in summary to just see the activity summary.  Use false for detailed report.

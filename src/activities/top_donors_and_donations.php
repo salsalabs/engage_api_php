@@ -14,7 +14,7 @@
     intToken: your-integration-api-token-here
     intHost: "https://api.salsalabs.org"
     devToken: your-web-developer-api-token-here
-    devHost: "https://dev-api.salsalabs.org"
+    devHost: "https://api.salsalabs.org"
     */
     // No need to put quotes around the API keys.  Fields "intHost" and "devHost"
     //are there to accomodate Engage clients that use sandbox accounts.
