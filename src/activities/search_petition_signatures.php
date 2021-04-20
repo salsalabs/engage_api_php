@@ -61,7 +61,7 @@ function main()
 
     $payload = [
         'payload' => [
-            'modifiedFrom' => '2017-09-01T11:49:24.905Z',
+            'modifiedFrom' => '2021-01-01T00:00:00.000Z',
             'count' => 10,
             'offset' => 0,
             'type' => 'PETITION'
