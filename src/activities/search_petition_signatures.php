@@ -40,6 +40,17 @@ function validateCredentials($cred, $filename) {
     }
 }
 
+function see_signature($r) {
+    $comment = "(None)";
+    if (true == array_key_exists('comment', $r)) {
+        $comment = $r->comment;
+    }
+    printf("%-36s %-20s %30s %s\n",
+        $r->activityId,
+        $r->personName,
+        $r->activityDate,
+        $comment);
+}
 function main()
 {
     $cred = initialize();
@@ -64,16 +75,30 @@ function main()
         'headers' => $headers,
     ]);
 
-    try {
-        $response = $client->request($method, $command, [
-            'json' => $payload,
-        ]);
-        $data = json_decode($response->getBody());
-        echo json_encode($data, JSON_PRETTY_PRINT);
-    } catch (Exception $e) {
-        echo 'Caught exception: ', $e->getMessage(), "\n";
-        // var_dump($e);
-    }
+    $count = 0;
+    $offset = $payload['payload']['offset'];
+    printf("Offset: %d\n", $offset);
+    do {
+        try {
+            $response = $client->request($method, $command, [
+                'json' => $payload,
+            ]);
+            $data = json_decode($response -> getBody());
+            // echo json_encode($data, JSON_PRETTY_PRINT);
+            $count = $data->payload->count;
+            if ($count > 0) {
+                foreach ($data->payload->activities as $r) {
+                    see_signature($r);
+                }
+                $payload['payload']['offset'] = $payload['payload']['offset'] + $count;
+            }
+        } catch (Exception $e) {
+            echo 'Caught exception: ', $e->getMessage(), "\n";
+            return $forms;
+        }
+    } while ($count > 0);
 }
 
 main();
+
+?>
