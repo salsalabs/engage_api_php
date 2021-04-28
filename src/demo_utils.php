@@ -90,9 +90,9 @@ class DemoUtils {
      * @return object  Contents of the parsed YAML file or none.
      * @access public
      */
-        public function getEnvironment() {
-            return $this->environment;
-        }
+    public function getEnvironment() {
+        return $this->environment;
+    }
 
     /**
      *  Load a YAML file and set the standard fields.  Errors are noisy
@@ -100,8 +100,9 @@ class DemoUtils {
      * file can be retrieved using `getEnvironment()`.
      * @param  string $filename  YAML file to parse
      * @throws (File exception class) File access exceptions
+     * @access public
      */
-     public function loadYAML($filename) {
+    public function loadYAML($filename) {
          $env = Yaml::parseFile($filename);
 
          printf("\nYAML contents\n");
@@ -129,6 +130,39 @@ class DemoUtils {
             }
             $this->environment = $env;
         }
+     }
+
+    /**
+     * Return the headers that Engage needs: authToken and Content-Type
+     * in an object ready to send.
+     * @param  string  token  API token
+     * @param  boolean integration True if the headers need the integration
+     *                            API Token.
+     * @return object  Object containing the required tokens
+     */
+     public function getHeaders($token) {
+         $headers = [
+             'authToken' => $token,
+             'Content-Type' => 'application/json'
+         ];
+         return $headers;
+        }
+
+    /**
+     * Return a GuzzleHTTPClient for the specified API endpoint
+     * and token.  No validation.
+     * @param string $endpoint  API endpoint.
+     *                          For example api/dev/v1/search/whatever
+     * @param string $token     API token
+     */
+     public function getClient($token) {
+         $base_uri = $this->getAPIHost();
+         $headers = $this->getHeaders($token);
+         $client =  new \GuzzleHttp\Client([
+                        'base_uri' => $base_uri,
+                        'headers'  => $headers
+        ]);
+        return $client;
      }
  }
 ?>
