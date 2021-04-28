@@ -183,6 +183,25 @@ class DemoUtils {
        return $this->getClient($token);
    }
 
+
+   /* Retrieve the current metrics.  Metrics tell apps how many records
+    * can be read and approximately when they will need to throttle back.
+    *
+    * Metrics change with every API call.  Monitoring the metrics can help
+    * you avoid unwanted terminations and slowdowns.
+    * See https://help.salsalabs.com/hc/en-us/articles/224531208-General-Use
+    * @return object  Current metrics object.
+    */
+   function getMetrics()
+   {
+       $method = 'GET';
+       $command = '/api/integration/ext/v1/metrics';
+       $client = $this->getIntClient();
+       $response = $client->request($method, $command);
+       $data = json_decode($response -> getBody());
+       return $data->payload;
+   }
+
   /**
    * Convenience method to retrieve the YAML filename from the command
    * line and create a new DemoUtils instance with it.  Call this first

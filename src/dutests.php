@@ -43,4 +43,9 @@ printf("*** Pass 4 ***, command line");
 $du = new \DemoUtils\DemoUtils();
 $du->start();
 see($du, "Pass 4");
+
+printf("*** Passs 4 ***, metrics");
+$metrics = $du->getMetrics();
+$j = json_encode($metrics, JSON_PRETTY_PRINT);
+print($j);
 ?>
