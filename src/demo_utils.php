@@ -149,11 +149,10 @@ class DemoUtils {
         }
 
     /**
-     * Return a GuzzleHTTPClient for the specified API endpoint
-     * and token.  No validation.
-     * @param string $endpoint  API endpoint.
-     *                          For example api/dev/v1/search/whatever
+     * Return a GuzzleHTTPClient for the specified token.
+     * Automatically creates the headers.
      * @param string $token     API token
+     * @return object           GuzzleHTTPClient object
      */
      public function getClient($token) {
          $base_uri = $this->getAPIHost();
@@ -164,5 +163,53 @@ class DemoUtils {
         ]);
         return $client;
      }
- }
+
+ /**
+  * Convenience method to return a GuzzleHTTPClient for the
+  * Integration API. Calls `getClient()`.
+  * @return object           GuzzleHTTPClient object
+  */
+  public function getIntClient() {
+      $token = $this->getIntToken();
+      return $this->getClient($token);
+  }
+
+  /**
+   * Convenience method to return  a GuzzleHTTPClient for the
+   * Web Development API.  Calls `getClient()`.
+   * @return object           GuzzleHTTPClient object
+   */
+   public function getWebDevClient() {
+       $token = $this->getWebDevToken();
+       return $this->getClient($token);
+   }
+
+  /**
+   * Convenience method to retrieve the YAML filename from the command
+   * line and create a new DemoUtils instance with it.  Call this first
+   * thing when you're writing a demo app.
+   *
+   * Usage:
+   *
+   * php your_app.php --login tokens_file.yaml
+   *
+   * Errors are fatal and noisy.
+   * @return object  DemoUtils nstance loaded from the contents of
+   *                 `tokens_file.yaml`.
+   */
+  public function start() {
+      $shortopts = "";
+      $longopts = array(
+          "login:"
+      );
+      $options = getopt($shortopts, $longopts);
+      if (false == array_key_exists('login', $options)) {
+          exit("\nYou must provide a parameter file with --login!\n");
+      }
+      $filename = $options['login'];
+      $this->loadYAML($filename);
+      return $this;
+  }
+}
+
 ?>

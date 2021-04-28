@@ -18,6 +18,7 @@ $du = new DemoUtils\DemoUtils();
 $du->loadYAML("logins/owc.yaml");
 see($du, "Pass 2");
 
+printf("Pass 3, the miscellanous stuff pass");
 printf("Headers, int token\n");
 var_dump($du->getHeaders($du->getIntToken()));
 
@@ -31,6 +32,15 @@ var_dump($du->getClient($du->getIntToken()));
 printf("Client, dev token\n");
 var_dump($du->getClient($du->getWebDevToken()));
 
-$endpoint = "api/dev/v1/activity/search"
 
+printf("Client, Int direct\n");
+var_dump($du->getIntClient());
+
+printf("Client, WebDev direct\n");
+var_dump($du->getWebDevClient());
+
+printf("*** Pass 4 ***, command line");
+$du = new \DemoUtils\DemoUtils();
+$du->start();
+see($du, "Pass 4");
 ?>
