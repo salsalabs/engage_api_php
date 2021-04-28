@@ -4,7 +4,7 @@
      * for listing the activities on a web page.  Output is freeform, but could be
      * a CSV or HTML fairly easily enough.
      *
-     * Usage: php src/dev_p2p_goals.php --login CONFIGURATION_FILE.yaml.
+     * Usage: php src/dev_activities_and_details.php --login CONFIGURATION_FILE.yaml.
     */
 
     // Uses DemoUtils.
@@ -78,10 +78,11 @@
         }
     }
 
-    // Ubiquitous main function.
-    function main() {
-        $util =  new \DemoUtils\DemoUtils();
-        $util-> start();
+    /* Function to retrieve and view forms.  Output contains both form
+     * data and metadata.  Output goes to the console.
+     * @param array $util  Populated nstance of DemoUtils.
+     */
+    function seeForms($util) {
         $forms = fetchForms($util);
         $format = "%-36s %-70s %-24s %-10s %s\n";
         printf($format,
@@ -103,6 +104,13 @@
                     $pageUrl);
             }
         }
+    }
+
+    // Ubiquitous main function.
+    function main() {
+        $util =  new \DemoUtils\DemoUtils();
+        $util->start();
+        seeForms($util);
     }
     main()
 ?>
