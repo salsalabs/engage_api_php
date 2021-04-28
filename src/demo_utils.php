@@ -20,13 +20,14 @@ class DemoUtils {
     private $apiHost;
     private $intToken;
     private $devToken;
-    private $environment;
+    private $envnvironment;
 
     /**
      *  Build a new instance using default and null values.
      */
         function __constructor() {
-            $this->apiHost = "https://api.salslabs.net/";
+            $this->setAPIHost(
+            );
             $this->intToken = null;
             $this->devToken = null;
         }
@@ -55,7 +56,7 @@ class DemoUtils {
      * @return string  Engage Integration API token or null.
      * @access public
      */
-        public function getIntegrationToken() {
+        public function getIntToken() {
             return $this->intToken;
         }
     /**
@@ -63,7 +64,7 @@ class DemoUtils {
      * @param string $value  New value for the Engage API token.
      * @access public
      */
-        public function setIntegrationToken($value) {
+        public function setIntToken($value) {
             $this->intToken = $value;
         }
 
@@ -101,28 +102,32 @@ class DemoUtils {
      * @throws (File exception class) File access exceptions
      */
      public function loadYAML($filename) {
-         $e = Yaml::parseFile($filename);
+         $env = Yaml::parseFile($filename);
+
+         printf("\nYAML contents\n");
+         var_dump($env);
+
          $fields = [ "apiHost",
                      "intToken",
                      "devToken"];
          foreach ($fields as $f) {
-             if (array_key_exists($f, $e)) {
+             if (array_key_exists($f, $env)) {
                 switch ($f) {
                     case "apiHost":
-                        $this->apiHost = $b[$f];
+                        $this->apiHost = $env[$f];
                         break;
                     case "intToken":
-                        $this->intToken = $b[$f];
+                        $this->intToken = $env[$f];
                         break;
                     case "devToken":
-                        $this->devToken = $b[$r];
+                        $this->devToken = $env[$f];
                         break;
                     default:
                         printf("Warning: unknown YAML parameter '%s'\n", $f);
                         break;
                 }
             }
-            $this->environment = $e;
+            $this->environment = $env;
         }
      }
  }
