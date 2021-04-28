@@ -4,6 +4,11 @@
      * for listing the activities on a web page.  Output is freeform, but could be
      * a CSV or HTML fairly easily enough.
      *
+     * Endpoints:
+     *
+     * /api/developer/ext/v1/activities
+     * /api/developer/ext/v1/activities/{uuid}}/metadata
+     *
      * Usage: php src/dev_activities_and_details.php --login CONFIGURATION_FILE.yaml.
     */
 
