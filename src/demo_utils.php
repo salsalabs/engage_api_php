@@ -20,7 +20,8 @@ class DemoUtils {
     private $apiHost;
     private $intToken;
     private $devToken;
-    private $envnvironment;
+    private $environment;
+    private $metrics;
 
     /**
      *  Build a new instance using default and null values.
@@ -98,6 +99,10 @@ class DemoUtils {
      *  Load a YAML file and set the standard fields.  Errors are noisy
      *  and fatal. For your convenience, the parsed contents of the YAML
      * file can be retrieved using `getEnvironment()`.
+     *
+     * Side effect: Automatically retrieves the metrics.  Useful for apps
+     * that need to paginate.
+     *
      * @param  string $filename  YAML file to parse
      * @throws Exceptions File access exceptions
      * @access public
@@ -125,6 +130,7 @@ class DemoUtils {
                 }
             }
             $this->environment = $env;
+            $this->getMetrics();
         }
      }
 
@@ -184,39 +190,59 @@ class DemoUtils {
    }
 
 
-   /* Retrieve the current metrics.  Metrics tell apps how many records
-    * can be read and approximately when they will need to throttle back.
+   /* Returns the stashed metrics.  If the metrics have not been retrieved
+    * yet, then calls updateMetrics().  Raises an exception if the metrics
+    * can't be retrieved.
     *
     * Metrics change with every API call.  Monitoring the metrics can help
     * you avoid unwanted terminations and slowdowns.
     * See https://help.salsalabs.com/hc/en-us/articles/224531208-General-Use
-    * @return object  Current metrics object.
+    * @return object                                Stashed metrics object.
+    * @raises GuzzleHttp\Exception\ClientException  Read failures
+    * @scope public
     */
    function getMetrics()
    {
-       $method = 'GET';
-       $command = '/api/integration/ext/v1/metrics';
-       $client = $this->getIntClient();
-       $response = $client->request($method, $command);
-       $data = json_decode($response -> getBody());
-       return $data->payload;
+       if (!isset($this->metrics)) {
+           $this->updateMetrics();
+       }
+       return $this->metrics;
    }
+
+   /**
+    * Updates stashed metrics.  Does nothing if the API Host or Integration
+    * token is not initialized.  Useful for apps that want to see where
+    * they are in the call limits.
+    * @return object                                Updated metrics value.
+    * @raises GuzzleHttp\Exception\ClientException  Read failures
+    * @access public
+    */
+    public function updateMetrics() {
+        if (isset($this->apiHost) && (isset($this->intToken))) {
+            $method = 'GET';
+            $command = '/api/integration/ext/v1/metrics';
+            $client = $this->getIntClient();
+            $response = $client->request($method, $command);
+            $data = json_decode($response -> getBody());
+            $this->metrics = $data->payload;
+        }
+        return $this->metrics;
+    }
 
   /**
    * Convenience method to retrieve the YAML filename from the command
    * line and create a new DemoUtils instance with it.  Call this first
-   * thing when you're writing a demo app.
+   * thing when you're writing a demo app. Errors are noisy and fatal.
    *
    * Usage:
    *
    * php your_app.php --login tokens_file.yaml
    *
-   * Errors are fatal and noisy.
    * @return object  DemoUtils nstance loaded from the contents of
    *                 `tokens_file.yaml`.
    * @access public
    */
-  public function start() {
+  public function appInit() {
       $shortopts = "";
       $longopts = array(
           "login:"
