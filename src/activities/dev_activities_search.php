@@ -1,8 +1,7 @@
 <?php
 
-    /** Program to retrieve what can be retrieved from P2P pages.  Uses the
-     * Web Developer API to retrieve activity-related information.  Uses the
-     * Integration API to retrieve activities.
+    /** Program to retrieve one "page" of P2P and Ticketed Event activities
+    * from Engage. 
      *
      * Endpoints:
      *
@@ -55,12 +54,8 @@
         return $forms;
     }
 
-    // Application starts here.
-    function main() {
-        $util =  new \DemoUtils\DemoUtils();
-        $util->appInit();
-
-        $forms = fetchForms($util);
+    // See the contents of the forms.
+    function seeForms($util, $forms) {
         printf("\nEvent Summary\n\n");
         printf("\n%-24s %-36s %s\n",
             "Type",
@@ -73,6 +68,14 @@
                 $r->id,
                 $r->name);
         }
+    }
+
+    // Application starts here.
+    function main() {
+        $util =  new \DemoUtils\DemoUtils();
+        $util->appInit();
+        $forms = fetchForms($util);
+        seeForms($util, $forms);
     }
     main()
 ?>
