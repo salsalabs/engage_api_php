@@ -1,22 +1,15 @@
 <?php
 
-    // Program to retrieve information about p2p fundraisers using the 
-    // Engage Developer API.
-    // see https://api.salsalabs.org/help/web-dev#operation/getP2PFundraisers
-    //
-    // This application requires a configuration file.
-    //
-    // Usage: php src/dev_p2p_goals.php --login CONFIGURATION_FILE.yaml.
-    //
-    // Sample YAML file.  All fields must start in column 1. Comments are for PHP.
-    //
-    /*
-    intToken: your-integration-api-token-here
-    apiHost: "https://api.salsalabs.org"
-    devToken: your-web-developer-api-token-here
-    apiHost: "https://dev-api.salsalabs.org"
-    p2pActivityId: a-very-long-form-id-here
-    */
+ /** Program to retrieve information about p2p fundraisers using the
+  * Engage Developer API.
+  * see https: *api.salsalabs.org/help/web-dev#operation/getP2PFundraisers
+  *
+  * Endpoints.
+  *
+  * /api/developer/ext/v1/activities/{uuid}/summary/fundraisers
+  *
+  * Usage: php src/dev_p2p_goals.php --login CONFIGURATION_FILE.yaml.
+  */
 
     // Uses Composer.
     require 'vendor/autoload.php';
@@ -92,7 +85,7 @@
                 $data = json_decode($response -> getBody());
                 if (property_exists ($data->payload, 'total')) {
                     $count = $data->payload->total;
-                    printf("Found %d records\n", $count); 
+                    printf("Found %d records\n", $count);
                     if ($count > 0) {
                         $fundraisers = array_merge($fundraisers, $data->payload->results);
                     }
@@ -127,7 +120,7 @@
         }
     }
 
-    // 
+    //
     // Standard application entry point.
     function main()
     {
