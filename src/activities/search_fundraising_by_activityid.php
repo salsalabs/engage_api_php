@@ -16,14 +16,14 @@ function initialize()
         exit("\nYou must provide a parameter file with --login!\n");
     }
     $filename = $options['login'];
-    $cred = Yaml::parseFile($filename);
-    validateCredentials($cred, $filename);
-    return $cred;
+    $util = Yaml::parseFile($filename);
+    validateCredentials($util, $filename);
+    return $util;
 }
 
 // Validate the contents of the provided credential file.
 // All fields are required.  Exits on errors.
-function validateCredentials($cred, $filename)
+function validateCredentials($util, $filename)
 {
     $errors = false;
     $fields = array(
@@ -33,7 +33,7 @@ function validateCredentials($cred, $filename)
         "modifiedFrom",
     );
     foreach ($fields as $f) {
-        if (false == array_key_exists($f, $cred)) {
+        if (false == array_key_exists($f, $util)) {
             printf("Error: %s must contain a %s.\n", $filename, $f);
             $errors = true;
         }
@@ -45,9 +45,9 @@ function validateCredentials($cred, $filename)
 
 function main()
 {
-    $cred = initialize();
+    $util = initialize();
     $headers = [
-        'authToken' => $cred["token"],
+        'authToken' => $util["token"],
         'Content-Type' => 'application/json',
     ];
 
@@ -56,13 +56,13 @@ function main()
             "offset" => 0,
             "count" => 20,
             "type" => "FUNDRAISE",
-            'activityIds' => $cred['activityIds'],
-            'modifiedFrom' => $cred['modifiedFrom'],
+            'activityIds' => $util['activityIds'],
+            'modifiedFrom' => $util['modifiedFrom'],
         ],
     ];
     echo json_encode($payload, JSON_PRETTY_PRINT);
     $method = 'POST';
-    $uri = 'https://' . $cred['host'];
+    $uri = 'https://' . $util['host'];
     $command = '/api/integration/ext/v1/activities/search';
     $client = new GuzzleHttp\Client([
         'base_uri' => $uri,

@@ -34,21 +34,21 @@
             exit("\nYou must provide a parameter file with --login!\n");
         }
         $filename = $options['login'];
-        $cred = Yaml::parseFile($filename);
-        validateCredentials($cred, $filename);
-        return $cred;
+        $util = Yaml::parseFile($filename);
+        validateCredentials($util, $filename);
+        return $util;
     }
 
     // Validate the contents of the provided credential file.
     // All fields are required.  Exits on errors.
-    function validateCredentials($cred, $filename) {
+    function validateCredentials($util, $filename) {
         $errors = false;
         $fields = array(
             "token",
             "activityIds"
         );
         foreach ($fields as $f) {
-            if (false == array_key_exists($f, $cred)) {
+            if (false == array_key_exists($f, $util)) {
                 printf("Error: %s must contain a %s.\n", $filename, $f);
                 $errors = true;
             }
@@ -61,18 +61,18 @@
 
     // Use the provided credentials to locate all events matching 'eventType'.
     // See: https://help.salsalabs.com/hc/en-us/articles/360001206693-Activity-Form-List
-    function fetchForms($cred) {
-        //var_dump($cred);
+    function fetchForms($util) {
+        //var_dump($util);
         $headers = [
-            'authToken' => $cred["token"],
+            'authToken' => $util["token"],
             'Content-Type' => 'application/json',
         ];
         $method = 'POST';
         $host = "http://api.salsalabs.org";
         $command = '/api/integration/ext/v1/activities/search';
          $payload = [
-            'activityIds' => $cred["activityIds"],
-            'count' => 20,
+            'activityIds' => $util["activityIds"],
+            'count' => $util->getMetrics()->maxBatchSize,
             'offset' => 0
         ];
 
@@ -107,8 +107,8 @@
 
     // Ubiquitous main function.
     function main() {
-        $cred = initialize();
-        $forms = fetchForms($cred);
+        $util = initialize();
+        $forms = fetchForms($util);
         printf("%s\n", json_encode($forms, JSON_PRETTY_PRINT));
     }
     main()

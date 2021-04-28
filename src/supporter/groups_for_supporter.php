@@ -34,15 +34,15 @@ host: https://api.salsalabs.org
 // Standard application entry point.
 function main()
 {
-    $cred = initialize();
-    $metrics = getMetrics($cred);
-    $groups = getGroups($cred, $metrics);
+    $util = initialize();
+    $metrics = getMetrics($util);
+    $groups = getGroups($util, $metrics);
     $count = count($groups);
     if ($count == 0) {
-        printf("\nSupporter with key %s does not belong to any groups\n", $cred["supporterID"]);
+        printf("\nSupporter with key %s does not belong to any groups\n", $util["supporterID"]);
     }
     else {
-        printf("\nSupporter with key %s belongs to %d groups:\n", $cred["supporterID"], $count);
+        printf("\nSupporter with key %s belongs to %d groups:\n", $util["supporterID"], $count);
         foreach ($groups as $r) {
             printf("    * %s (%-7s) %s\n", $r->segmentId, $r->type, $r->name);
         }
@@ -61,14 +61,14 @@ function initialize()
         exit("\nYou must provide a parameter file with --login!\n");
     }
     $filename = $options['login'];
-    $cred = Yaml::parseFile($filename);
-    validateCredentials($cred, $filename);
-    return $cred;
+    $util = Yaml::parseFile($filename);
+    validateCredentials($util, $filename);
+    return $util;
 }
 
 // Validate the contents of the provided credential file.
 // All fields are required.  Exits on errors.
-function validateCredentials($cred, $filename)
+function validateCredentials($util, $filename)
 {
     $errors = false;
     $fields = array(
@@ -77,7 +77,7 @@ function validateCredentials($cred, $filename)
         "supporterID"
     );
     foreach ($fields as $f) {
-        if (false == array_key_exists($f, $cred)) {
+        if (false == array_key_exists($f, $util)) {
             printf("Error: %s must contain a %s.\n", $filename, $f);
             $errors = true;
         }
@@ -90,15 +90,15 @@ function validateCredentials($cred, $filename)
 // Retrieve the current metrics.
 // See https://help.salsalabs.com/hc/en-us/articles/224531208-General-Use
 
-function getMetrics($cred) {
+function getMetrics($util) {
     $headers = [
-        'authToken' => $cred['token'],
+        'authToken' => $util['token'],
         'Content-Type' => 'application/json',
     ];
     $method = 'GET';
     $command = '/api/integration/ext/v1/metrics';
     $client = new GuzzleHttp\Client([
-        'base_uri' => $cred['host'],
+        'base_uri' => $util['host'],
         'headers'  => $headers
     ]);
     $response = $client->request($method, $command);
@@ -108,9 +108,9 @@ function getMetrics($cred) {
 
 // Headers used by all API calls.
 
-function getHeaders($cred) {
+function getHeaders($util) {
     $headers = [
-        'authToken' => $cred['token'],
+        'authToken' => $util['token'],
         'Content-Type' => 'application/json',
     ];
     return $headers;
@@ -120,7 +120,7 @@ function getHeaders($cred) {
 // the supporter of interest.
 // See: https://help.salsalabs.com/hc/en-us/articles/224531528-Engage-API-Segment-Data#searching-for-segments
 
-function getGroups($cred, $metrics)
+function getGroups($util, $metrics)
 {
     $payload = [
         'payload' => [
@@ -129,11 +129,11 @@ function getGroups($cred, $metrics)
             'includeMemberCounts' => 'true',
         ],
     ];
-    $headers = getHeaders($cred);
+    $headers = getHeaders($util);
     $method = 'POST';
     $command = '/api/integration/ext/v1/segments/search';
     $client = new GuzzleHttp\Client([
-        'base_uri' => $cred["host"],
+        'base_uri' => $util["host"],
         'headers' => $headers
     ]);
 
@@ -149,7 +149,7 @@ function getGroups($cred, $metrics)
             $count = $p->count;
             if ($count > 0) {
                 foreach ($p->segments as $r) {
-                    if (containsSupporter($cred, $metrics, $r, $cred["supporterID"])) {
+                    if (containsSupporter($util, $metrics, $r, $util["supporterID"])) {
                         array_push($groups, $r);
                     }
                 }
@@ -166,7 +166,7 @@ function getGroups($cred, $metrics)
 // Return true if a segment (group) has a supporter.
 // See https://help.salsalabs.com/hc/en-us/articles/224531528-Engage-API-Segment-Data#searching-for-supporters-assigned-to-a-segment
 
-function containsSupporter($cred, $metrics, $group, $supporterID) {
+function containsSupporter($util, $metrics, $group, $supporterID) {
     $payload = [
         'payload' => [
             'segmentId' => $group->segmentId,
@@ -175,11 +175,11 @@ function containsSupporter($cred, $metrics, $group, $supporterID) {
             'count' => $metrics->maxBatchSize,
         ],
     ];
-    $headers = getHeaders($cred);
+    $headers = getHeaders($util);
     $method = 'POST';
     $command = '/api/integration/ext/v1/segments/members/search';
     $client = new GuzzleHttp\Client([
-        'base_uri' => $cred["host"],
+        'base_uri' => $util["host"],
         'headers' => $headers
     ]);
 

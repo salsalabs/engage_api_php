@@ -38,14 +38,14 @@
             exit("\nYou must provide a parameter file with --login!\n");
         }
         $filename = $options['login'];
-        $cred = Yaml::parseFile($filename);
-        validateCredentials($cred, $filename);
-        return $cred;
+        $util = Yaml::parseFile($filename);
+        validateCredentials($util, $filename);
+        return $util;
     }
 
     // Validate the contents of the provided credential file.
     // All fields are required.  Exits on errors.
-    function validateCredentials($cred, $filename) {
+    function validateCredentials($util, $filename) {
         $errors = false;
         $fields = array(
             "devToken",
@@ -55,7 +55,7 @@
             "summary"
         );
         foreach ($fields as $f) {
-            if (false == array_key_exists($f, $cred)) {
+            if (false == array_key_exists($f, $util)) {
                 printf("Error: %s must contain a %s.\n", $filename, $f);
                 $errors = true;
             }
@@ -67,20 +67,20 @@
 
     // Use the provided credentials to locate all events matching 'eventType'.
     // See: https://help.salsalabs.com/hc/en-us/articles/360001206693-Activity-Form-List
-    function fetchForms($cred) {
-        //var_dump($cred);
+    function fetchForms($util) {
+        //var_dump($util);
         $headers = [
-            'authToken' => $cred["devToken"],
+            'authToken' => $util["devToken"],
             'Content-Type' => 'application/json',
         ];
         $method = 'GET';
-        $uri = $cred["devHost"];
+        $uri = $util["devHost"];
         $command = '/api/developer/ext/v1/activities';
         $params = [
             'types' => "TICKETED_EVENT",
             'sortField' => "name",
             'sortOrder' => "ASCENDING",
-            'count' => 25,
+            'count' => $util->getMetrics()->maxBatchSize,
             'offset' => 0
         ];
 
@@ -118,9 +118,9 @@
     // See: https://help.salsalabs.com/hc/en-us/articles/360001219914-Activity-Form-Metadata
     // Returns a metadata object.  Note that the metadata object will have
     // different contents based on the activity form type.
-    function fetchMetadata($cred, $id) {
+    function fetchMetadata($util, $id) {
         $headers = [
-            'authToken' => $cred["devToken"],
+            'authToken' => $util["devToken"],
             'Content-Type' => 'application/json',
         ];
         $payload = [
@@ -128,7 +128,7 @@
             ]
         ];
         $method = 'GET';
-        $uri = $cred["devHost"];
+        $uri = $util["devHost"];
         $command = '/api/developer/ext/v1/activities/'.$id.'/metadata';
         $client = new GuzzleHttp\Client([
             'base_uri' => $uri,
@@ -153,16 +153,16 @@
     // Returns an array of fundraisers.
     // Note: "Fundraiser" only applies to P2P forms. Calling this for any other
     // form type doesn't make sense.
-    function fetchFundraisers($cred, $id) {
+    function fetchFundraisers($util, $id) {
         $headers = [
-            'authToken' => $cred["devToken"],
+            'authToken' => $util["devToken"],
             'Content-Type' => 'application/json',
         ];
         $method = 'GET';
-        $uri = $cred["devHost"];
+        $uri = $util["devHost"];
         $command = '/api/developer/ext/v1/activities/' . $id . "/summary/fundraisers";
         $params = [
-            'count' => 25,
+            'count' => $util->getMetrics()->maxBatchSize,
             'offset' => 0
         ];
 
@@ -201,16 +201,16 @@
     // registered for an event but are not (yet) managing their on P2P page.
     // See: https://help.salsalabs.com/hc/en-us/articles/360001206753-Activity-Form-Summary-Fundraisers
     // Returns an array of registrants.
-    function fetchRegistrations($cred, $id) {
+    function fetchRegistrations($util, $id) {
         $headers = [
-            'authToken' => $cred["devToken"],
+            'authToken' => $util["devToken"],
             'Content-Type' => 'application/json',
         ];
         $method = 'GET';
-        $uri = $cred["devHost"];
+        $uri = $util["devHost"];
         $command = '/api/developer/ext/v1/activities/' . $id . "/summary/registrations";
         $params = [
-            'count' => 25,
+            'count' => $util->getMetrics()->maxBatchSize,
             'offset' => 0
         ];
 
@@ -251,9 +251,9 @@
     // Fetch activities for an activity form.  Note that this operation requires
     // the integration API.  Returns a list of activities.
     // See https://help.salsalabs.com/hc/en-us/articles/224470267-Engage-API-Activity-Data
-    function fetchActivities($cred, $id) {
+    function fetchActivities($util, $id) {
         $headers = [
-            'authToken' => $cred["intToken"],
+            'authToken' => $util["intToken"],
             'Content-Type' => 'application/json',
         ];
         $payload = [
@@ -265,7 +265,7 @@
         ];
         //echo json_encode($payload, JSON_PRETTY_PRINT);
         $method = 'POST';
-        $uri = $cred['intHost'];
+        $uri = $util['intHost'];
         $command = '/api/integration/ext/v1/activities/search';
         $client = new GuzzleHttp\Client([
             'base_uri' => $uri,
@@ -304,9 +304,9 @@
     // Fetch teams for a P2P event.
     // See: https://api.salsalabs.org/help/web-dev#operation/getTeamsSummary
     // Returns a teams payload.
-    function fetchTeams($cred, $id) {
+    function fetchTeams($util, $id) {
         $headers = [
-            'authToken' => $cred["devToken"],
+            'authToken' => $util["devToken"],
             'Content-Type' => 'application/json',
         ];
         $payload = [
@@ -314,7 +314,7 @@
             ]
         ];
         $method = 'GET';
-        $uri = $cred["devHost"];
+        $uri = $util["devHost"];
         $command = '/api/developer/ext/v1/activities/teams/'.$id;
         https://api.salsalabs.org/api/developer/ext/v1/activities/teams/{uuid}
         $client = new GuzzleHttp\Client([
@@ -339,8 +339,8 @@
 
     // Ubiquitous main function.
     function main() {
-        $cred = initialize();
-        $forms = fetchForms($cred);
+        $util = initialize();
+        $forms = fetchForms($util);
         printf("\nEvent Summary\n\n");
         printf("\n%-24s %-36s %s\n",
             "Type",
@@ -356,10 +356,10 @@
                 $r->name,
                 $r->pageUrl);
         }
-        if (!$cred['summary']) {
+        if (!$util['summary']) {
             printf("\nEvent MetaData\n\n");
             foreach ($forms as $r) {
-                if (!$cred["summary"]) {
+                if (!$util["summary"]) {
                     printf("\n%-24s %-36s %-20s %-10s %-10s %-10s %s\n",
                         "Type",
                         "ID",
@@ -369,7 +369,7 @@
                         "Goal Amount",
                         "PageURL");
                 }
-                $meta = fetchMetadata($cred, $r->id);
+                $meta = fetchMetadata($util, $r->id);
                 $goal = empty($meta->hasEventLevelFundraisingGoal) ? "--" : $meta->hasEventLevelFundraisingGoal;
                 $goalValue = empty($meta->hasEventLevelFundraisingGoalValue) ? "--" : $meta->hasEventLevelFundraisingGoal;
                 $status = empty($meta->status) ? "--" : $meta->status;
@@ -383,7 +383,7 @@
                     $goalValue,
                     $pageUrl);
 
-                $fundraisers = fetchFundRaisers($cred, $meta->id);
+                $fundraisers = fetchFundRaisers($util, $meta->id);
                 if (empty($fundraisers)) {
                     printf("\nNo fundraisers...\n");
                 } else {
@@ -406,7 +406,7 @@
                     }
                 }
 
-                $registrations = fetchRegistrations($cred, $meta->id);
+                $registrations = fetchRegistrations($util, $meta->id);
                 if (empty($registrations)) {
                     printf("\nNo registrations...\n");
                 } else {
@@ -430,7 +430,7 @@
                     }
                 }
 
-                $activities = fetchActivities($cred, $meta->id);
+                $activities = fetchActivities($util, $meta->id);
                 if (empty($activities)) {
                     printf("\nNo activities...\n");
                 } else {
@@ -465,7 +465,7 @@
                 }
 
                 if ($r->type == "P2P_EVENT" && $r->status == "PUBLISHED") {
-                    $teams = fetchTeams($cred, $meta->id);
+                    $teams = fetchTeams($util, $meta->id);
                     if (empty($teams)) {
                         printf("\nNo teams...\n");
                     } else {

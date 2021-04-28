@@ -35,14 +35,14 @@
             exit("\nYou must provide a parameter file with --login!\n");
         }
         $filename = $options['login'];
-        $cred = Yaml::parseFile($filename);
-        validateCredentials($cred, $filename);
-        return $cred;
+        $util = Yaml::parseFile($filename);
+        validateCredentials($util, $filename);
+        return $util;
     }
 
     // Validate the contents of the provided credential file.
     // All fields are required.  Exits on errors.
-    function validateCredentials($cred, $filename)
+    function validateCredentials($util, $filename)
     {
         $errors = false;
         $fields = array(
@@ -52,7 +52,7 @@
             "p2pActivityId"
         );
         foreach ($fields as $f) {
-            if (false == array_key_exists($f, $cred)) {
+            if (false == array_key_exists($f, $util)) {
                 printf("Error: %s must contain a %s.\n", $filename, $f);
                 $errors = true;
             }
@@ -63,14 +63,14 @@
     }
 
     // Return a Guzzle client for HTTP operations.
-    function getClient($cred)
+    function getClient($util)
     {
         $headers = [
-            'authToken' => $cred['devToken'],
+            'authToken' => $util['devToken'],
             'Content-Type' => 'application/json',
         ];
         $client = new GuzzleHttp\Client([
-            'base_uri' => $cred["apiHost"],
+            'base_uri' => $util["apiHost"],
             'headers' => $headers
         ]);
         return $client;
@@ -79,10 +79,10 @@
     // Fetch fundraisers for an activity form.
     // See: https://api.salsalabs.org/help/web-dev#operation/getP2PFundraisers
     // Returns an array of fundraisers.
-    function getFundraisers($cred) {
-        $client = getClient($cred);
+    function getFundraisers($util) {
+        $client = getClient($util);
         $method = 'GET';
-        $command = '/api/developer/ext/v1/activities/' . $cred['p2pActivityId'] . '/summary/fundraisers';
+        $command = '/api/developer/ext/v1/activities/' . $util['p2pActivityId'] . '/summary/fundraisers';
         $fundraisers = array();
         $count = 50;
         do {
@@ -131,8 +131,8 @@
     // Standard application entry point.
     function main()
     {
-        $cred = initialize();
-        $fundraisers = getFundraisers($cred);
+        $util = initialize();
+        $fundraisers = getFundraisers($util);
         processFundraisers($fundraisers);
     }
 

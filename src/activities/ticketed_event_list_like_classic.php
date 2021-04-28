@@ -34,28 +34,28 @@
             exit("\nYou must provide a parameter file with --login!\n");
         }
         $filename = $options['login'];
-        $cred = Yaml::parseFile($filename);
-        validateCredentials($cred, $filename);
-        return $cred;
+        $util = Yaml::parseFile($filename);
+        validateCredentials($util, $filename);
+        return $util;
     }
 
     // Validate the contents of the provided credential file.
     // All fields are required.  Exits on errors.
-    function validateCredentials($cred, $filename) {
+    function validateCredentials($util, $filename) {
         $errors = false;
         $fields = array(
             "devToken"
         );
         foreach ($fields as $f) {
-            if (false == array_key_exists($f, $cred)) {
+            if (false == array_key_exists($f, $util)) {
                 printf("Error: %s must contain a %s.\n", $filename, $f);
                 $errors = true;
             }
         }
-        if (true == array_key_exists("devHost", $cred)) {
-            $cred["host"] = $cred["devHost"];
+        if (true == array_key_exists("devHost", $util)) {
+            $util["host"] = $util["devHost"];
         } else {
-            $cred["host"] = "http://api.salsalabs.org";
+            $util["host"] = "http://api.salsalabs.org";
         }
         if ($errors) {
             exit("Too many errors, terminating.\n");
@@ -64,10 +64,10 @@
 
     // Use the provided credentials to locate all events matching 'eventType'.
     // See: https://help.salsalabs.com/hc/en-us/articles/360001206693-Activity-Form-List
-    function fetchForms($cred) {
-        // var_dump($cred);
+    function fetchForms($util) {
+        // var_dump($util);
         $headers = [
-            'authToken' => $cred["devToken"],
+            'authToken' => $util["devToken"],
             'Content-Type' => 'application/json',
         ];
         $method = 'GET';
@@ -75,7 +75,7 @@
         $command = '/api/developer/ext/v1/activities';
         $params = [
             'types' => "TICKETED_EVENT",
-            'count' => 25,
+            'count' => $util->getMetrics()->maxBatchSize,
             'offset' => 0
         ];
 
@@ -113,9 +113,9 @@
     // See: https://help.salsalabs.com/hc/en-us/articles/360001219914-Activity-Form-Metadata
     // Returns a metadata object.  Note that the metadata object will have
     // different contents based on the activity form type.
-    function fetchMetadata($cred, $id) {
+    function fetchMetadata($util, $id) {
         $headers = [
-            'authToken' => $cred["devToken"],
+            'authToken' => $util["devToken"],
             'Content-Type' => 'application/json',
         ];
         $payload = [
@@ -145,8 +145,8 @@
 
     // Ubiquitous main function.
     function main() {
-        $cred = initialize();
-        $forms = fetchForms($cred);
+        $util = initialize();
+        $forms = fetchForms($util);
         printf("Forms: %s\n", json_encode($forms, JSON_PRETTY_PRINT));
         printf("\nEvent Summary\n\n");
         printf("\n%-24s %-36s %s\n",
@@ -162,7 +162,7 @@
         $data = array();
         printf("\nEvent MetaData\n\n");
         foreach ($forms as $r) {
-            $m = fetchMetaData($cred, $r->id);
+            $m = fetchMetaData($util, $r->id);
             if ($m -> status == "PUBLISHED" && $m->visibility = "PUBLIC") {
                 $entry = [
                     "id" =>  $m->id,

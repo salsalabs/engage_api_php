@@ -20,9 +20,9 @@ segmentId: incredibly-long-segment-id
 // Standard application entry point.
 function main()
 {
-    $cred = initialize();
-    $metrics = getMetrics($cred);
-    run($cred, $metrics);
+    $util = initialize();
+    $metrics = getMetrics($util);
+    run($util, $metrics);
 }
 
 // Retrieve the runtime parameters and validate them.
@@ -37,14 +37,14 @@ function initialize()
         exit("\nYou must provide a parameter file with --login!\n");
     }
     $filename = $options['login'];
-    $cred = Yaml::parseFile($filename);
-    validateCredentials($cred, $filename);
-    return $cred;
+    $util = Yaml::parseFile($filename);
+    validateCredentials($util, $filename);
+    return $util;
 }
 
 // Validate the contents of the provided credential file.
 // All fields are required.  Exits on errors.
-function validateCredentials($cred, $filename)
+function validateCredentials($util, $filename)
 {
     $errors = false;
     $fields = array(
@@ -53,7 +53,7 @@ function validateCredentials($cred, $filename)
         "segmentId"
     );
     foreach ($fields as $f) {
-        if (false == array_key_exists($f, $cred)) {
+        if (false == array_key_exists($f, $util)) {
             printf("Error: %s must contain a %s.\n", $filename, $f);
             $errors = true;
         }
@@ -65,25 +65,25 @@ function validateCredentials($cred, $filename)
 
 // Retrieve the current metrics.
 // See https://help.salsalabs.com/hc/en-us/articles/224531208-General-Use
-function getMetrics($cred)
+function getMetrics($util)
 {
     $method = 'GET';
     $command = '/api/integration/ext/v1/metrics';
-    $client = getClient($cred);
+    $client = getClient($util);
     $response = $client->request($method, $command);
     $data = json_decode($response -> getBody());
     return $data->payload;
 }
 
 // Return a Guzzle client for HTTP operations.
-function getClient($cred)
+function getClient($util)
 {
     $headers = [
-        'authToken' => $cred['token'],
+        'authToken' => $util['token'],
         'Content-Type' => 'application/json',
     ];
     $client = new GuzzleHttp\Client([
-        'base_uri' => $cred["host"],
+        'base_uri' => $util["host"],
         'headers' => $headers
     ]);
     return $client;
@@ -108,7 +108,7 @@ function getEmail($supporter)
 // using the provided supporterIds.
 // See: https://api.salsalabs.org/help/integration#operation/getGroupsForSupporters
 
-function getGroupsPayload($cred, $metrics, $supporterIds)
+function getGroupsPayload($util, $metrics, $supporterIds)
 {
     $payload = [
         'payload' => [
@@ -121,7 +121,7 @@ function getGroupsPayload($cred, $metrics, $supporterIds)
     ];
     $method = 'POST';
     $command = '/api/integration/ext/v1/supporters/groups';
-    $client = getClient($cred);
+    $client = getClient($util);
 
     try {
         $response = $client->request($method, $command, [
@@ -137,10 +137,10 @@ function getGroupsPayload($cred, $metrics, $supporterIds)
 }
 
 // Retrieve the segument record for the provided segment ID.
-function getSegment($cred, $metrics, $segmentId)
+function getSegment($util, $metrics, $segmentId)
 {
     $method = 'POST';
-    $uri = $cred["host"];
+    $uri = $util["host"];
     $command = '/api/integration/ext/v1/segments/search';
     $payload = [
         'payload' => [
@@ -151,7 +151,7 @@ function getSegment($cred, $metrics, $segmentId)
             'includeMemberCounts' => 'true'
         ],
     ];
-    $client = getClient($cred);
+    $client = getClient($util);
     try {
         $response = $client->request($method, $command, [
             'json' => $payload,
@@ -173,7 +173,7 @@ function getSegment($cred, $metrics, $segmentId)
 
 // Process groups for a list of supporters.  Writes supproter info
 // and a comma-delimited list of groups to the output file.
-function processGroupsForSupporters($cred, $metrics, $csv, $supporters)
+function processGroupsForSupporters($util, $metrics, $csv, $supporters)
 {
     // Create list if supporter IDs to send to Engage *and*
     // a hash of supporter IDs and supporter records. We'll
@@ -186,7 +186,7 @@ function processGroupsForSupporters($cred, $metrics, $csv, $supporters)
         $hash[$s->supporterId] = $s;
     }
 
-    $p = getGroupsPayload($cred, $metrics, $ids);
+    $p = getGroupsPayload($util, $metrics, $ids);
 
     // Iterate through payload results. Each result item
     // has a supporter_ID and a list of groups.  We'll use
@@ -230,12 +230,12 @@ function processGroupsForSupporters($cred, $metrics, $csv, $supporters)
 // to a tab-delimited file("all_supporter_groups.txt"). Supporters
 // without groups are ignored.
 
-function run($cred, $metrics)
+function run($util, $metrics)
 {
     // Show the segment in case the segment ID is not what the user
     // wanted...
-    $segmentId = $cred["segmentId"];
-    $segment = getSegment($cred, $metrics, $segmentId);
+    $segmentId = $util["segmentId"];
+    $segment = getSegment($util, $metrics, $segmentId);
     if (!is_null($segment)) {
         printf("Searching %s: (%s) for %d supporters.\n\n",
             $segment->name,
@@ -262,12 +262,12 @@ function run($cred, $metrics)
         'payload' => [
             'offset' => 0,
             'count' => $metrics->maxBatchSize,
-            'segmentId' => $cred['segmentId'],
+            'segmentId' => $util['segmentId'],
         ],
     ];
     $method = 'POST';
     $command = '/api/integration/ext/v1/segments/members/search';
-    $client = getClient($cred);
+    $client = getClient($util);
 
     // Do until end of data. Read a number of supporters.
     // Find their groups.  Write to a CSV file.
@@ -280,7 +280,7 @@ function run($cred, $metrics)
             $data = json_decode($response -> getBody());
             $count = $data -> payload -> count;
             if ($count > 0) {
-                processGroupsForSupporters($cred, $metrics, $csv, $data ->payload->supporters);
+                processGroupsForSupporters($util, $metrics, $csv, $data ->payload->supporters);
             }
             $payload["payload"]["offset"] = $payload["payload"]["offset"] + $count;
         } catch (Exception $e) {

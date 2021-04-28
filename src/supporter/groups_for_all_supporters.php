@@ -40,9 +40,9 @@ host: https://api.salsalabs.org
 // Standard application entry point.
 function main()
 {
-    $cred = initialize();
-    $metrics = getMetrics($cred);
-    run($cred, $metrics);
+    $util = initialize();
+    $metrics = getMetrics($util);
+    run($util, $metrics);
 }
 
 // Retrieve the runtime parameters and validate them.
@@ -57,14 +57,14 @@ function initialize()
         exit("\nYou must provide a parameter file with --login!\n");
     }
     $filename = $options['login'];
-    $cred = Yaml::parseFile($filename);
-    validateCredentials($cred, $filename);
-    return $cred;
+    $util = Yaml::parseFile($filename);
+    validateCredentials($util, $filename);
+    return $util;
 }
 
 // Validate the contents of the provided credential file.
 // All fields are required.  Exits on errors.
-function validateCredentials($cred, $filename)
+function validateCredentials($util, $filename)
 {
     $errors = false;
     $fields = array(
@@ -72,7 +72,7 @@ function validateCredentials($cred, $filename)
         "host"
     );
     foreach ($fields as $f) {
-        if (false == array_key_exists($f, $cred)) {
+        if (false == array_key_exists($f, $util)) {
             printf("Error: %s must contain a %s.\n", $filename, $f);
             $errors = true;
         }
@@ -84,25 +84,25 @@ function validateCredentials($cred, $filename)
 
 // Retrieve the current metrics.
 // See https://help.salsalabs.com/hc/en-us/articles/224531208-General-Use
-function getMetrics($cred)
+function getMetrics($util)
 {
     $method = 'GET';
     $command = '/api/integration/ext/v1/metrics';
-    $client = getClient($cred);
+    $client = getClient($util);
     $response = $client->request($method, $command);
     $data = json_decode($response -> getBody());
     return $data->payload;
 }
 
 // Return a Guzzle client for HTTP operations.
-function getClient($cred)
+function getClient($util)
 {
     $headers = [
-        'authToken' => $cred['token'],
+        'authToken' => $util['token'],
         'Content-Type' => 'application/json',
     ];
     $client = new GuzzleHttp\Client([
-        'base_uri' => $cred["host"],
+        'base_uri' => $util["host"],
         'headers' => $headers
     ]);
     return $client;
@@ -141,7 +141,7 @@ function getStatus($supporter)
 // using the provided supporterIds.
 // See: https://api.salsalabs.org/help/integration#operation/getGroupsForSupporters
 
-function getGroupsPayload($cred, $metrics, $supporterIds)
+function getGroupsPayload($util, $metrics, $supporterIds)
 {
     $payload = [
         'payload' => [
@@ -154,7 +154,7 @@ function getGroupsPayload($cred, $metrics, $supporterIds)
     ];
     $method = 'POST';
     $command = '/api/integration/ext/v1/supporters/groups';
-    $client = getClient($cred);
+    $client = getClient($util);
 
     try {
         $response = $client->request($method, $command, [
@@ -171,7 +171,7 @@ function getGroupsPayload($cred, $metrics, $supporterIds)
 
 // Process groups for a list of supporters.  Writes supproter info
 // and a comma-delimited list of groups to the output file.
-function processGroupsForSupporters($cred, $metrics, $csv, $supporters)
+function processGroupsForSupporters($util, $metrics, $csv, $supporters)
 {
     // Create list if supporter IDs to send to Engage *and*
     // a hash of supporter IDs and supporter records. We'll
@@ -186,7 +186,7 @@ function processGroupsForSupporters($cred, $metrics, $csv, $supporters)
     if (count($ids) == 0) {
         return;
     }
-    $p = getGroupsPayload($cred, $metrics, $ids);
+    $p = getGroupsPayload($util, $metrics, $ids);
 
     // Iterate through payload results. Each result item
     // has a supporter_ID and a list of groups.  We'll use
@@ -232,7 +232,7 @@ function processGroupsForSupporters($cred, $metrics, $csv, $supporters)
 // are written to a tab-delimited file("all_supporter_groups.txt").
 // Supporters without groups are ignored.
 
-function run($cred, $metrics)
+function run($util, $metrics)
 {
     $payload = [ 'payload' => [
             'count' => $metrics->maxBatchSize,
@@ -242,7 +242,7 @@ function run($cred, $metrics)
     ];
     $method = 'POST';
     $command = '/api/integration/ext/v1/supporters/search';
-    $client = getClient($cred);
+    $client = getClient($util);
 
     $csv = fopen("all_supporter_groups.csv", "w");
     $headers = [
@@ -266,7 +266,7 @@ function run($cred, $metrics)
 
             $data = json_decode($response -> getBody());
             $count = $data -> payload -> count;
-            processGroupsForSupporters($cred, $metrics, $csv, $data ->payload->supporters);
+            processGroupsForSupporters($util, $metrics, $csv, $data ->payload->supporters);
             $payload["payload"]["offset"] = $payload["payload"]["offset"] + $count;
         } catch (Exception $e) {
             echo 'run: caught exception: ', $e->getMessage(), "\n";

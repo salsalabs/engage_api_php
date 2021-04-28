@@ -49,14 +49,14 @@
             exit("\nYou must provide a parameter file with --login!\n");
         }
         $filename = $options['login'];
-        $cred =  Yaml::parseFile($filename);
-        validateCredentials($cred, $filename);
-        return $cred;
+        $util =  Yaml::parseFile($filename);
+        validateCredentials($util, $filename);
+        return $util;
     }
 
     // Validate the contents of the provided credential file.
     // All fields are required.  Exits on errors.
-    function validateCredentials($cred, $filename) {
+    function validateCredentials($util, $filename) {
         $errors = false;
         $fields = array(
             "token",
@@ -67,7 +67,7 @@
             "activityIds"
         );
         foreach ($fields as $f) {
-            if (false == array_key_exists($f, $cred)) {
+            if (false == array_key_exists($f, $util)) {
                 printf("Error: %s must contain a %s.\n", $filename, $f);
                 $errors = true;
             }
@@ -79,9 +79,9 @@
 
     function main()
     {
-        $cred = initialize();
+        $util = initialize();
         $headers = [
-            'authToken' => $cred["token"],
+            'authToken' => $util["token"],
             'Content-Type' => 'application/json',
         ];
 
@@ -93,17 +93,17 @@
         #  * add some activity IDs to the param file.
         $payload = [
             'payload' => [
-                'type' => $cred["identifierType"],
-                'modifiedFrom' => $cred["modifiedFrom"],
-                'modifiedTo' => $cred["modifiedTo"],
-                'activityIds' => $cred["activityIds"],
-                'count' => 10,
+                'type' => $util["identifierType"],
+                'modifiedFrom' => $util["modifiedFrom"],
+                'modifiedTo' => $util["modifiedTo"],
+                'activityIds' => $util["activityIds"],
+                'count' => $util->getMetrics()->maxBatchSize,
                 'offset' => 0,
             ],
         ];
 
         $method = 'POST';
-        $uri = 'https://' . $cred['host'];
+        $uri = 'https://' . $util['host'];
         $command = '/api/integration/ext/v1/activities/search';
         $client = new GuzzleHttp\Client([
             'base_uri' => $uri,

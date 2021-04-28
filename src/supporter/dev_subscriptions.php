@@ -31,14 +31,14 @@
             exit("\nYou must provide a parameter file with --login!\n");
         }
         $filename = $options['login'];
-        $cred = Yaml::parseFile($filename);
-        validateCredentials($cred, $filename);
-        return $cred;
+        $util = Yaml::parseFile($filename);
+        validateCredentials($util, $filename);
+        return $util;
     }
 
     // Validate the contents of the provided credential file.
     // All fields are required.  Exits on errors.
-    function validateCredentials($cred, $filename) {
+    function validateCredentials($util, $filename) {
         $errors = false;
         $fields = array(
             "devToken",
@@ -47,7 +47,7 @@
             "intHost"
         );
         foreach ($fields as $f) {
-            if (false == array_key_exists($f, $cred)) {
+            if (false == array_key_exists($f, $util)) {
                 printf("Error: %s must contain a %s.\n", $filename, $f);
                 $errors = true;
             }
@@ -59,16 +59,16 @@
 
     // Retrieve the current metrics.
     // See https://help.salsalabs.com/hc/en-us/articles/224531208-General-Use
-    function getMetrics($cred) {
+    function getMetrics($util) {
         $headers = [
-            'authToken' => $cred['intToken'],
+            'authToken' => $util['intToken'],
             'Content-Type' => 'application/json',
         ];
         $method = 'GET';
         //$command = '/api/development/ext/v1/callMetrics';
         $command = '/api/integration/ext/v1/metrics';
         $client = new GuzzleHttp\Client([
-            'base_uri' => $cred['intHost'],
+            'base_uri' => $util['intHost'],
             'headers'  => $headers
         ]);
         $response = $client->request($method, $command);
@@ -78,10 +78,10 @@
 
     // Use the provided credentials to locate all submission activities.
     // See: https://help.salsalabs.com/hc/en-us/articles/360001220294-Submissions
-    function fetchSubmissions($cred, $metrics, $type) {
-        //var_dump($cred);
+    function fetchSubmissions($util, $metrics, $type) {
+        //var_dump($util);
         $headers = [
-            'authToken' => $cred["devToken"],
+            'authToken' => $util["devToken"],
             'Content-Type' => 'application/json',
         ];
         $method = 'POST';
@@ -98,7 +98,7 @@
         //$text = json_encode($payload, JSON_PRETTY_PRINT);
         //printf("%s\n", $text);
         $client = new GuzzleHttp\Client([
-            'base_uri' => $cred["devHost"],
+            'base_uri' => $util["devHost"],
             'headers'  => $headers
         ]);
 
@@ -160,8 +160,8 @@
     }
     // Ubiquitous main function.
     function main() {
-        $cred = initialize();
-        $metrics = getMetrics($cred);
+        $util = initialize();
+        $metrics = getMetrics($util);
         //$text = json_encode($metrics, JSON_PRETTY_PRINT);
         //printf("Metrics:\n%s\n", $text);
         $types = [
@@ -176,7 +176,7 @@
             "P2P_REGISTRATIONS"];
         foreach ($types as $type) {
             printf("\n%s\n", $type);
-            $submissions = fetchSubmissions($cred, $metrics, $type);
+            $submissions = fetchSubmissions($util, $metrics, $type);
             //$text = json_encode($submissions, JSON_PRETTY_PRINT);
             //printf("Submissions:\n%s\n", $text);
             showSubmissions($submissions);

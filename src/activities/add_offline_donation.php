@@ -38,21 +38,21 @@
             exit("\nYou must provide a parameter file with --login!\n");
         }
         $filename = $options['login'];
-        $cred =  Yaml::parseFile($filename);
-        validateCredentials($cred, $filename);
-        return $cred;
+        $util =  Yaml::parseFile($filename);
+        validateCredentials($util, $filename);
+        return $util;
     }
 
     // Validate the contents of the provided credential file.
     // All fields are required.  Exits on errors.
-    function validateCredentials($cred, $filename) {
+    function validateCredentials($util, $filename) {
         $errors = false;
         $fields = array(
             "token",
             "host",
         );
         foreach ($fields as $f) {
-            if (false == array_key_exists($f, $cred)) {
+            if (false == array_key_exists($f, $util)) {
                 printf("Error: %s must contain a %s.\n", $filename, $f);
                 $errors = true;
             }
@@ -64,9 +64,9 @@
 
     function main()
     {
-        $cred = initialize();
+        $util = initialize();
         $headers = [
-            'authToken' => $cred["token"],
+            'authToken' => $util["token"],
             'Content-Type' => 'application/json',
         ];
 

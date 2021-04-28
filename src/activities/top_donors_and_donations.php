@@ -36,14 +36,14 @@
             exit("\nYou must provide a parameter file with --login!\n");
         }
         $filename = $options['login'];
-        $cred = Yaml::parseFile($filename);
-        validateCredentials($cred, $filename);
-        return $cred;
+        $util = Yaml::parseFile($filename);
+        validateCredentials($util, $filename);
+        return $util;
     }
 
     // Validate the contents of the provided credential file.
     // All fields are required.  Exits on errors.
-    function validateCredentials($cred, $filename) {
+    function validateCredentials($util, $filename) {
         $errors = false;
         $fields = array(
             "devToken",
@@ -52,7 +52,7 @@
             "intHost"
         );
         foreach ($fields as $f) {
-            if (false == array_key_exists($f, $cred)) {
+            if (false == array_key_exists($f, $util)) {
                 printf("Error: %s must contain a %s.\n", $filename, $f);
                 $errors = true;
             }
@@ -64,20 +64,20 @@
 
     // Use the provided credentials to locate all events matching 'eventType'.
     // See: https://help.salsalabs.com/hc/en-us/articles/360001206693-Activity-Form-List
-    function fetchForms($cred) {
-        //var_dump($cred);
+    function fetchForms($util) {
+        //var_dump($util);
         $headers = [
-            'authToken' => $cred["devToken"],
+            'authToken' => $util["devToken"],
             'Content-Type' => 'application/json',
         ];
         $method = 'GET';
-        $uri = $cred["devHost"];
+        $uri = $util["devHost"];
         $command = '/api/developer/ext/v1/activities';
         $params = [
             'types' => "FUNDRAISE,",
             'sortField' => "name",
             'sortOrder' => "ASCENDING",
-            'count' => 25,
+            'count' => $util->getMetrics()->maxBatchSize,
             'offset' => 0
         ];
 
@@ -114,10 +114,10 @@
     // Fetch activities for an activity form.  Note that this operation requires
     // the integration API.  Returns a list of activities.
     // See https://help.salsalabs.com/hc/en-us/articles/224470267-Engage-API-Activity-Data
-    function fetchActivities($cred, $id) {
-        //var_dump($cred);
+    function fetchActivities($util, $id) {
+        //var_dump($util);
         $headers = [
-            'authToken' => $cred["intToken"],
+            'authToken' => $util["intToken"],
             'Content-Type' => 'application/json',
         ];
         $payload = [
@@ -130,7 +130,7 @@
         ];
         //echo json_encode($payload, JSON_PRETTY_PRINT);
         $method = 'POST';
-        $uri = $cred['intHost'];
+        $uri = $util['intHost'];
         $command = '/api/integration/ext/v1/activities/search';
         $client = new GuzzleHttp\Client([
             'base_uri' => $uri,
@@ -166,10 +166,10 @@
     }
 
     // Fetch a supporter to match the provided id.
-    function fetchSupporter($cred, $id) {
-        //var_dump($cred);
+    function fetchSupporter($util, $id) {
+        //var_dump($util);
         $headers = [
-            'authToken' => $cred["intToken"],
+            'authToken' => $util["intToken"],
             'Content-Type' => 'application/json',
         ];
         $payload = [
@@ -182,7 +182,7 @@
         ];
         //echo json_encode($payload, JSON_PRETTY_PRINT);
         $method = 'POST';
-        $uri = $cred['intHost'];
+        $uri = $util['intHost'];
         $command = '/api/integration/ext/v1/supporters/search';
         $client = new GuzzleHttp\Client([
             'base_uri' => $uri,
@@ -228,11 +228,11 @@
 
     // Ubiquitous main function.
     function main() {
-        $cred = initialize();
+        $util = initialize();
         // -----------------------------------------------------------
         // Enumerate fundraising forms.
         // -----------------------------------------------------------
-        $forms = fetchForms($cred);
+        $forms = fetchForms($util);
         // -----------------------------------------------------------
         // Summarize fundraising forms.
         // -----------------------------------------------------------
@@ -255,7 +255,7 @@
             // Enumerate activities.  Since we retrieved fundraising
             // forms, the activities will be donations.
             // -----------------------------------------------------------
-            $activities = fetchActivities($cred, $r->id);
+            $activities = fetchActivities($util, $r->id);
             // -----------------------------------------------------------
             // Donation detail, no particular order.
             // -----------------------------------------------------------
@@ -277,7 +277,7 @@
                 $donorAmounts = array();
                 $activityTotalDollars = 0.0;
                 foreach ($activities as $d) {
-                    $s = fetchSupporter($cred, $d->supporterId);
+                    $s = fetchSupporter($util, $d->supporterId);
                     $fullName = getFullName($s);
 
                     printf("%-36s %-20s %-36s %-20s %-16s %-24s %10.2f\n",
@@ -331,7 +331,7 @@
                     "Date",
                     "Amount");
                 foreach ($activities as $d) {
-                    $s = fetchSupporter($cred, $d->supporterId);
+                    $s = fetchSupporter($util, $d->supporterId);
                     $fullName = getFullName($s);
 
                     printf("%-36s %-20s %-36s %-20s %-16s %-24s %10.2f\n",

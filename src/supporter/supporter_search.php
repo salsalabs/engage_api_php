@@ -40,14 +40,14 @@ function initialize()
         exit("\nYou must provide a parameter file with --login!\n");
     }
     $filename = $options['login'];
-    $cred = Yaml::parseFile($filename);
-    validateCredentials($cred, $filename);
-    return $cred;
+    $util = Yaml::parseFile($filename);
+    validateCredentials($util, $filename);
+    return $util;
 }
 
 // Validate the contents of the provided credential file.
 // All fields are required.  Exits on errors.
-function validateCredentials($cred, $filename)
+function validateCredentials($util, $filename)
 {
     $errors = false;
     $fields = array(
@@ -56,7 +56,7 @@ function validateCredentials($cred, $filename)
         "identifiers",
     );
     foreach ($fields as $f) {
-        if (false == array_key_exists($f, $cred)) {
+        if (false == array_key_exists($f, $util)) {
             printf("Error: %s must contain a %s.\n", $filename, $f);
             $errors = true;
         }
@@ -69,22 +69,22 @@ function validateCredentials($cred, $filename)
 // This is the task.  Uses the contents of params/supporter-add.yamlporter-search.yaml to find some
 // supporters.
 //
-// @param array  $cred  Contents of params/supporter-add.yamlporter-search.yaml
+// @param array  $util  Contents of params/supporter-add.yamlporter-search.yaml
 //
-function run($cred)
+function run($util)
 {
     $headers = [
-        'authToken' => $cred['token'],
+        'authToken' => $util['token'],
         'Content-Type' => 'application/json',
     ];
     // 'identifiers' in the YAML file is an array of identifiers.
     // 'identifierType' is one of the official identifier types.
     $payload = [
         'payload' => [
-            'count' => 10,
+            'count' => $util->getMetrics()->maxBatchSize,
             'offset' => 0,
-            'identifiers' => $cred['identifiers'],
-            'identifierType' => $cred['identifierType'],
+            'identifiers' => $util['identifiers'],
+            'identifierType' => $util['identifierType'],
         ],
     ];
     $method = 'POST';
@@ -125,8 +125,8 @@ function run($cred)
 
 function main()
 {
-    $cred = initialize();
-    run($cred);
+    $util = initialize();
+    run($util);
 }
 
 main();

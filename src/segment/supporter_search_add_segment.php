@@ -29,14 +29,14 @@
             exit("\nYou must provide a parameter file with --login!\n");
         }
         $filename = $options['login'];
-        $cred =  Yaml::parseFile($filename);
-        validateCredentials($cred, $filename);
-        return $cred;
+        $util =  Yaml::parseFile($filename);
+        validateCredentials($util, $filename);
+        return $util;
     }
 
     // Validate the contents of the provided credential file.
     // All fields are required.  Exits on errors.
-    function validateCredentials($cred, $filename) {
+    function validateCredentials($util, $filename) {
         $errors = false;
         $fields = array(
             "token",
@@ -46,7 +46,7 @@
             "segmentId"
         );
         foreach ($fields as $f) {
-            if (false == array_key_exists($f, $cred)) {
+            if (false == array_key_exists($f, $util)) {
                 printf("Error: %s must contain a %s.\n", $filename, $f);
                 $errors = true;
             }
@@ -59,11 +59,11 @@
     // Return the supporter record for the first (and typically only)
     // supporterID in the `identifers` field in the credentials.
     //
-    // @param array  $cred  Contents of params/supporter-add.yamlporter-search.yaml
+    // @param array  $util  Contents of params/supporter-add.yamlporter-search.yaml
     //
-    function getSupporter($cred) {
+    function getSupporter($util) {
         $headers = [
-            'authToken' => $cred['token'],
+            'authToken' => $util['token'],
             'Content-Type' => 'application/json'
         ];
         // 'identifiers' in the YAML file is an array of identifiers.
@@ -71,14 +71,14 @@
         // @see https://help.salsalabs.com/hc/en-us/articles/224470107-Supporter-Data
         $payload = [
             'payload' => [
-                'count' => 10,
+                'count' => $util->getMetrics()->maxBatchSize,
                 'offset' => 0,
-                'identifiers' => $cred['identifiers'],
-                'identifierType' => $cred['identifierType']
+                'identifiers' => $util['identifiers'],
+                'identifierType' => $util['identifierType']
             ]
         ];
         $method = 'POST';
-        $uri = $cred['host'];
+        $uri = $util['host'];
         $command = '/api/integration/ext/v1/supporters/search';
         $client = new GuzzleHttp\Client([
             'base_uri' => $uri,
@@ -100,11 +100,11 @@
     // Return the segment record for the first (and typically only)
     // segmentID in the `segmentId` field in the credentials.
     //
-    // @param array  $cred  Contents of params/supporter-add.yamlporter-search.yaml
+    // @param array  $util  Contents of params/supporter-add.yamlporter-search.yaml
     //
-    function getSegment($cred) {
+    function getSegment($util) {
         $headers = [
-            'authToken' => $cred['token'],
+            'authToken' => $util['token'],
             'Content-Type' => 'application/json'
         ];
         // Search for the segmentId.  Make sure that it exists.
@@ -112,9 +112,9 @@
         // YAML file can be used to make the list happen.
         $payload = [
             'payload' => [
-                'count' => 10,
+                'count' => $util->getMetrics()->maxBatchSize,
                 'offset' => 0,
-                'identifiers' => $cred['segmentId'],
+                'identifiers' => $util['segmentId'],
                 'identifierType' => 'SEGMENT_ID'
             ]
         ];
@@ -122,7 +122,7 @@
         printf("\nPayload\n%s\n", $text);
 
         $method = 'POST';
-        $uri = $cred['host'];
+        $uri = $util['host'];
         $command = '/api/integration/ext/v1/segments/search';
         $client = new GuzzleHttp\Client([
             'base_uri' => $uri,
@@ -147,15 +147,15 @@
 
     // Assign the supporter to the segment.
     //
-    // @param array  $cred
+    // @param array  $util
     // @param array  supporter
     // @param array  segment
     //
     // @see https://help.salsalabs.com/hc/en-us/articles/224531528-Segment-Data#assigning-supporters-to-a-segment
     //
-    function register($cred, $supporter, $segment) {
+    function register($util, $supporter, $segment) {
         $headers = [
-            'authToken' => $cred['token'],
+            'authToken' => $util['token'],
             'Content-Type' => 'application/json'
         ];
         $payload = [
@@ -168,7 +168,7 @@
         ];
 
         $method = 'PUT';
-        $uri = $cred['host'];
+        $uri = $util['host'];
         $command = '/api/integration/ext/v1/segments/members';
         $client = new GuzzleHttp\Client([
             'base_uri' => $uri,
@@ -186,22 +186,22 @@
     }
 
     function main() {
-        $cred = initialize();
-        $supporter = getSupporter($cred);
+        $util = initialize();
+        $supporter = getSupporter($util);
         if (is_null($supporter)) {
             echo ("Sorry, can't find supporter for ID.\n");
             exit();
         };
         // var_dump("Supporter data is ", $supporter);
 
-        $segment = getSegment($cred);
+        $segment = getSegment($util);
         if (is_null($segment)) {
-            printf("Sorry, can't find segment for ID %s.\n", $cred['segmentId']);
+            printf("Sorry, can't find segment for ID %s.\n", $util['segmentId']);
             exit();
         };
         // var_dump("Segment data is ", $segment);
 
-        register($cred, $supporter, $segment);
+        register($util, $supporter, $segment);
     }
 
     main();

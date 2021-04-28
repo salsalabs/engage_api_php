@@ -26,14 +26,14 @@
              exit("\nYou must provide a parameter file with --login!\n");
          }
          $filename = $options['login'];
-         $cred = Yaml::parseFile($filename);
-         validateCredentials($cred, $filename);
-         return $cred;
+         $util = Yaml::parseFile($filename);
+         validateCredentials($util, $filename);
+         return $util;
      }
  
      // Validate the contents of the provided credential file.
      // All fields are required.  Exits on errors.
-     function validateCredentials($cred, $filename) {
+     function validateCredentials($util, $filename) {
          $errors = false;
          $fields = array(
              "token",
@@ -43,7 +43,7 @@
              "fieldValue"
          );
          foreach ($fields as $f) {
-             if (false == array_key_exists($f, $cred)) {
+             if (false == array_key_exists($f, $util)) {
                  printf("Error: %s must contain a %s.\n", $filename, $f);
                  $errors = true;
              }
@@ -54,11 +54,11 @@
      }
  
     // Return the supporter record for the email in the credentials.
-    // @param array  $cred  Contents of YAML credentials file
+    // @param array  $util  Contents of YAML credentials file
     //
-    function getSupporter($cred) {
+    function getSupporter($util) {
         $headers = [
-            'authToken' => $cred['token'],
+            'authToken' => $util['token'],
             'Content-Type' => 'application/json'
         ];
         // 'identifiers' in the YAML file is an array of identifiers.
@@ -66,9 +66,9 @@
         // @see https://help.salsalabs.com/hc/en-us/articles/224470107-Supporter-Data
         $payload = [
             'payload' => [
-                'count' => 10,
+                'count' => $util->getMetrics()->maxBatchSize,
                 'offset' => 0,
-                'identifiers' => [ $cred['email'] ],
+                'identifiers' => [ $util['email'] ],
                 'identifierType' => "EMAIL_ADDRESS"
             ]
         ];
@@ -113,24 +113,24 @@
         }
     }
 
-    // Update a custom field using `$cred` as a guide.
+    // Update a custom field using `$util` as a guide.
     //
-    // @param array  $cred
+    // @param array  $util
     // @param array  supporter
     //
     // @see https://help.salsalabs.com/hc/en-us/articles/224470107-Supporter-Data#partial-updates
     //
-    function update($cred, $supporter) {
+    function update($util, $supporter) {
         $headers = [
-            'authToken' => $cred['token'],
+            'authToken' => $util['token'],
             'Content-Type' => 'application/json'
         ];
 
         // Search for the custom field and change its value.
         
         foreach ($supporter->customFieldValues as $cf) {
-            if ($cf -> name == $cred["fieldName"]) {
-                $cf -> value = $cred["fieldValue"];
+            if ($cf -> name == $util["fieldName"]) {
+                $cf -> value = $util["fieldValue"];
 
                 //Unsetting a field removes it from the current object.
                 //Uncomment these to see what happens...
@@ -178,10 +178,10 @@
     
     // Main app.  Does the work.
     function main() {
-        $cred = initialize();
-        $supporter = getSupporter($cred);
+        $util = initialize();
+        $supporter = getSupporter($util);
         if (is_null($supporter)) {
-            printf("Sorry, can't find supporter for '%s'.\n", $cred["email"]);
+            printf("Sorry, can't find supporter for '%s'.\n", $util["email"]);
             exit();
         };
         // printf("Supporter is %s\n", json_encode($supporter, JSON_PRETTY_PRINT));
@@ -189,19 +189,19 @@
         // Display the current values, including the one that we want to change.
         echo("\nBefore:\n");
         foreach ($supporter->customFieldValues as $cf) {
-            if ($cf->name == $cred["fieldName"]) {
-                $cf->value = $cred["fieldValue"];
+            if ($cf->name == $util["fieldName"]) {
+                $cf->value = $util["fieldValue"];
             }
             seeCustomField($cf);
         }
 
         // Update to Engage.
-        update($cred, $supporter);
+        update($util, $supporter);
 
         // Show what Engage returns.  Note that custom field values have an 
         // optional "errors" field that will describe any errors.
         echo("\nAfter:\n");
-        $supporter = getSupporter($cred);
+        $supporter = getSupporter($util);
         foreach ($supporter->customFieldValues as $cf) {
             seeCustomField($cf);
          }

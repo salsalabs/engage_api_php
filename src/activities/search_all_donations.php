@@ -34,14 +34,14 @@
             exit("\nYou must provide a parameter file with --login!\n");
         }
         $filename = $options['login'];
-        $cred =  Yaml::parseFile($filename);
-        validateCredentials($cred, $filename);
-        return $cred;
+        $util =  Yaml::parseFile($filename);
+        validateCredentials($util, $filename);
+        return $util;
     }
 
     // Validate the contents of the provided credential file.
     // All fields are required.  Exits on errors.
-    function validateCredentials($cred, $filename) {
+    function validateCredentials($util, $filename) {
         $errors = false;
         $fields = array(
             "token",
@@ -51,7 +51,7 @@
             //`"modifiedTo"
         );
         foreach ($fields as $f) {
-            if (false == array_key_exists($f, $cred)) {
+            if (false == array_key_exists($f, $util)) {
                 printf("Error: %s must contain a %s.\n", $filename, $f);
                 $errors = true;
             }
@@ -62,23 +62,23 @@
     }
 
     // Retrieve transactions and display the applicable ones.
-    function getTransactions($cred, $offset, $count)
+    function getTransactions($util, $offset, $count)
     {
         $headers = [
-            'authToken' => $cred['token'],
+            'authToken' => $util['token'],
             'Content-Type' => 'application/json',
         ];
         $payload = [
             'payload' => [
-                'type' => $cred["identifierType"],
-                'modifiedFrom' => $cred['modifiedFrom'],
-                //'modidifedTo' => $cred['modifiedTo'],
+                'type' => $util["identifierType"],
+                'modifiedFrom' => $util['modifiedFrom'],
+                //'modidifedTo' => $util['modifiedTo'],
                 'offset' => $offset,
                 'count' => $count
             ],
         ];
         $method = 'POST';
-        $uri = $cred['host'];
+        $uri = $util['host'];
         $command = '/api/integration/ext/v1/activities/search';
         $client = new GuzzleHttp\Client([
             'base_uri' => $uri,
@@ -110,11 +110,11 @@
 
     function main()
     {
-        $cred = initialize();
+        $util = initialize();
         $offset = 0;
         $count = 20;
         while ($count > 0) {
-            $activities = getTransactions($cred, $offset, $count);
+            $activities = getTransactions($util, $offset, $count);
             if (is_null($activities)) {
                 $count = 0;
             } else {

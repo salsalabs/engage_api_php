@@ -23,14 +23,14 @@ function initialize()
         exit("\nYou must provide a parameter file with --login!\n");
     }
     $filename = $options['login'];
-    $cred = Yaml::parseFile($filename);
-    validateCredentials($cred, $filename);
-    return $cred;
+    $util = Yaml::parseFile($filename);
+    validateCredentials($util, $filename);
+    return $util;
 }
 
 // Validate the contents of the provided credential file.
 // All fields are required.  Exits on errors.
-function validateCredentials($cred, $filename)
+function validateCredentials($util, $filename)
 {
     $errors = false;
     $fields = array(
@@ -38,7 +38,7 @@ function validateCredentials($cred, $filename)
         "host",
     );
     foreach ($fields as $f) {
-        if (false == array_key_exists($f, $cred)) {
+        if (false == array_key_exists($f, $util)) {
             printf("Error: %s must contain a %s.\n", $filename, $f);
             $errors = true;
         }
@@ -49,10 +49,10 @@ function validateCredentials($cred, $filename)
 }
 
 // Retrieve the Engage info for the segment ID.
-function getSegments($cred, $offset, $count)
+function getSegments($util, $offset, $count)
 {
     $headers = [
-        'authToken' => $cred['token'],
+        'authToken' => $util['token'],
         'Content-Type' => 'application/json',
     ];
     $payload = [
@@ -63,7 +63,7 @@ function getSegments($cred, $offset, $count)
         ],
     ];
     $method = 'POST';
-    $uri = $cred['host'];
+    $uri = $util['host'];
     $command = '/api/integration/ext/v1/segments/search';
     $client = new GuzzleHttp\Client([
         'base_uri' => $uri,
@@ -90,15 +90,15 @@ function getSegments($cred, $offset, $count)
 
 // Retrieve the current metrics.
 // See https://help.salsalabs.com/hc/en-us/articles/224531208-General-Use
-function getMetrics($cred) {
+function getMetrics($util) {
     $headers = [
-        'authToken' => $cred['token'],
+        'authToken' => $util['token'],
         'Content-Type' => 'application/json',
     ];
     $method = 'GET';
     $command = '/api/integration/ext/v1/metrics';
     $client = new GuzzleHttp\Client([
-        'base_uri' => $cred['host'],
+        'base_uri' => $util['host'],
         'headers'  => $headers
     ]);
     $response = $client->request($method, $command);
@@ -108,12 +108,12 @@ function getMetrics($cred) {
 
 function main()
 {
-    $cred = initialize();
-    $metrics = getMetrics($cred);
+    $util = initialize();
+    $metrics = getMetrics($util);
     $offset = 0;
     $count = $metrics -> maxBatchSize;
     while ($count > 0) {
-        $segments = getSegments($cred, $offset, $count);
+        $segments = getSegments($util, $offset, $count);
         if (is_null($segments)) {
             $count = 0;
         } else {

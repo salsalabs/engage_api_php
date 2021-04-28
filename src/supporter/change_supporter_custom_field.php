@@ -52,20 +52,20 @@
             exit("\nYou must provide a parameter file with --login!\n");
         }
         $filename = $options['login'];
-        $cred = Yaml::parseFile($filename);
-        validateCredentials($cred, $filename);
+        $util = Yaml::parseFile($filename);
+        validateCredentials($util, $filename);
 
          // Engage API headers for all calls.
-         $cred['headers'] = [
-            'authToken' => $cred['token'],
+         $util['headers'] = [
+            'authToken' => $util['token'],
             'Content-Type' => 'application/json'
         ];
-       return $cred;
+       return $util;
     }
 
     // Validate the contents of the provided credential file.
     // All fields are required.  Exits on errors.
-    function validateCredentials($cred, $filename) {
+    function validateCredentials($util, $filename) {
         $errors = false;
         $fields = array(
             "token",
@@ -74,7 +74,7 @@
             "customFieldValue"
         );
         foreach ($fields as $f) {
-            if (false == array_key_exists($f, $cred)) {
+            if (false == array_key_exists($f, $util)) {
                 printf("Error: %s must contain a %s.\n", $filename, $f);
                 $errors = true;
             }
@@ -82,8 +82,8 @@
         if ($errors) {
             exit("Too many errors, terminating.\n");
         }
-        if (false == array_key_exists("host", $cred)) {
-            $cred['host'] = "https://api.salsalabs.org";
+        if (false == array_key_exists("host", $util)) {
+            $util['host'] = "https://api.salsalabs.org";
         }
     }
 
@@ -96,24 +96,24 @@
 
     // Read the supporter specified by 'uuid' in the provided credentials.
     // Dies noisily on any errors.  Returns a supporter record.
-    function read_supporter($cred) {
+    function read_supporter($util) {
         // 'identifiers' in the YAML file is an array of identifiers.
         // 'identifierType' is one of the official identifier types.
         // @see https://help.salsalabs.com/hc/en-us/articles/224470107-Supporter-Data
         $payload = [
             'payload' => [
-                'count' => 1,
+                'count' => $util->getMetrics()->maxBatchSize,
                 'offset' => 0,
-                'identifiers' => [ $cred['supporterId']],
+                'identifiers' => [ $util['supporterId']],
                 'identifierType' => 'SUPPORTER_ID'
             ]
         ];
         $method = 'POST';
         $command = '/api/integration/ext/v1/supporters/search';
-        $uri = $cred['host'] . $command;
+        $uri = $util['host'] . $command;
         $client = new GuzzleHttp\Client([
             'base_uri' => $uri,
-            'headers'  => $cred['headers']
+            'headers'  => $util['headers']
         ]);
         // show("Find supporter request payload", $payload);
 
@@ -138,11 +138,11 @@
     // Locate and change the value of the custom field.  If the custom field does not
     // yet have a value, then it's added to the supporter record.  Returns true
     // if the supporter record has been updated.
-    function update_supporter($cred, $supporter) {
+    function update_supporter($util, $supporter) {
         $values = [];
         foreach ($supporter -> customFieldValues as $c) {
-            if ($c->name == $cred['customFieldName']) {
-                $c->value = $cred['customFieldValue'];
+            if ($c->name == $util['customFieldName']) {
+                $c->value = $util['customFieldValue'];
                 $values[] = $c;
             }
         }
@@ -155,7 +155,7 @@
     }
 
     // Write the updated supporter to Engage.
-    function write_supporter($cred, $supporter) {
+    function write_supporter($util, $supporter) {
         $payload = [ 'payload' => [
             'supporters' => [$supporter ]
             ]
@@ -163,14 +163,14 @@
 
         $method = 'PUT';
         $command = '/api/integration/ext/v1/supporters';
-        $uri = $cred['host'] . $command;
+        $uri = $util['host'] . $command;
 
         // show("Write request payload", $payload);
 
         // Make the call to Engage.
         $client = new GuzzleHttp\Client([
             'base_uri' => $uri,
-            'headers'  => $cred['headers']
+            'headers'  => $util['headers']
         ]);
         try {
             $response = $client->request($method, $command, [
@@ -186,15 +186,15 @@
     // Mainline that does the work.  Functions die messily if the
     // there are errors or the supporter doesn't exist.
     function main() {
-        $cred = initialize();
+        $util = initialize();
         
-        $supporter = read_supporter($cred);
+        $supporter = read_supporter($util);
         // show("Supporter initial condition", $supporter);
-        $needsWrite = update_supporter($cred, $supporter);
+        $needsWrite = update_supporter($util, $supporter);
         if ($needsWrite) {
             show("Saving updated record", $supporter);
-            write_supporter($cred, $supporter);
-            $supporter = read_supporter($cred);
+            write_supporter($util, $supporter);
+            $supporter = read_supporter($util);
             show("Suporter read-after-write", $supporter);
             } else {
                 printf("Custom field value unchanged.\n");

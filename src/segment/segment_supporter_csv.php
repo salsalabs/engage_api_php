@@ -31,14 +31,14 @@ function initialize()
         exit("\nYou must provide a parameter file with --login!\n");
     }
     $filename = $options['login'];
-    $cred = Yaml::parseFile($filename);
-    validateCredentials($cred, $filename);
-    return $cred;
+    $util = Yaml::parseFile($filename);
+    validateCredentials($util, $filename);
+    return $util;
 }
 
 // Validate the contents of the provided credential file.
 // All fields are required.  Exits on errors.
-function validateCredentials($cred, $filename)
+function validateCredentials($util, $filename)
 {
     $errors = false;
     $fields = array(
@@ -46,7 +46,7 @@ function validateCredentials($cred, $filename)
         "host",
     );
     foreach ($fields as $f) {
-        if (false == array_key_exists($f, $cred)) {
+        if (false == array_key_exists($f, $util)) {
             printf("Error: %s must contain a %s.\n", $filename, $f);
             $errors = true;
         }
@@ -57,10 +57,10 @@ function validateCredentials($cred, $filename)
 }
 
 // Retrieve the Engage info for the segment ID.
-function getSegments($cred, $offset, $count)
+function getSegments($util, $offset, $count)
 {
     $headers = [
-        'authToken' => $cred['token'],
+        'authToken' => $util['token'],
         'Content-Type' => 'application/json',
     ];
     $payload = [
@@ -71,7 +71,7 @@ function getSegments($cred, $offset, $count)
         ],
     ];
     $method = 'POST';
-    $uri = $cred['host'];
+    $uri = $util['host'];
     $command = '/api/integration/ext/v1/segments/search';
     $client = new GuzzleHttp\Client([
         'base_uri' => $uri,
@@ -110,12 +110,12 @@ function showSegments($segments) {
 }
 
 // Retrieve an array containing all segments.
-    function getAllSegments($cred, $metrics) {
+    function getAllSegments($util, $metrics) {
     $offset = 0;
     $count = $metrics -> maxBatchSize;
     $all = [];
     while ($count > 0) {
-        $segments = getSegments($cred, $offset, $count);
+        $segments = getSegments($util, $offset, $count);
         if (is_null($segments)) {
             $count = 0;
         } else {
@@ -129,15 +129,15 @@ function showSegments($segments) {
 
 // Retrieve the current metrics.
 // See https://help.salsalabs.com/hc/en-us/articles/224531208-General-Use
-function getMetrics($cred) {
+function getMetrics($util) {
     $headers = [
-        'authToken' => $cred['token'],
+        'authToken' => $util['token'],
         'Content-Type' => 'application/json',
     ];
     $method = 'GET';
     $command = '/api/integration/ext/v1/metrics';
     $client = new GuzzleHttp\Client([
-        'base_uri' => $cred['host'],
+        'base_uri' => $util['host'],
         'headers'  => $headers
     ]);
     $response = $client->request($method, $command);
@@ -191,16 +191,16 @@ function getCSVLine($segment, $supporter) {
 }
 
 // Return an array of supporters for a group.
-function getSupportersForSegment($cred, $metrics, $segment) {
+function getSupportersForSegment($util, $metrics, $segment) {
     $offset = 0;
     $count = $metrics -> maxBatchSize;
     $headers = [
-        'authToken' => $cred['token'],
+        'authToken' => $util['token'],
         'Content-Type' => 'application/json',
     ];
     $command = '/api/integration/ext/v1/segments/members/search';
     $method = 'POST';
-    $uri = $cred["host"];
+    $uri = $util["host"];
     $client = new GuzzleHttp\Client([
         'base_uri' => $uri,
         'headers' => $headers,
@@ -235,7 +235,7 @@ function getSupportersForSegment($cred, $metrics, $segment) {
 }
 
 // Write segments and supporters to a CSV file.
-function writeSegments($cred, $metrics, $segments) {
+function writeSegments($util, $metrics, $segments) {
     $handle = fopen("segment_supporters.csv", "w");
     $headers = [
         "segment_ID",
@@ -248,7 +248,7 @@ function writeSegments($cred, $metrics, $segments) {
     fputcsv($handle, $headers);
     foreach ($segments as $segment) {
         printf("%s...\n", $segment->name);
-        $supporters = getSupportersForSegment($cred, $metrics, $segment);
+        $supporters = getSupportersForSegment($util, $metrics, $segment);
         if ($supporters == null || count($supporters) == 0) {
             printf("%s, no supporters\n", $segment->name);
         } else {
@@ -263,13 +263,13 @@ function writeSegments($cred, $metrics, $segments) {
 
 function main()
 {
-    $cred = initialize();
-    $metrics = getMetrics($cred);
-    $all = getAllSegments($cred, $metrics);
+    $util = initialize();
+    $metrics = getMetrics($util);
+    $all = getAllSegments($util, $metrics);
     $customSegments = array_filter($all, "isCustom");
     $customSegments = array_filter($customSegments, "hasMembers");
     //showSegments($customSegments);
-    writeSegments($cred, $metrics, $customSegments);
+    writeSegments($util, $metrics, $customSegments);
 }
 
 main()

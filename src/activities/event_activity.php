@@ -19,7 +19,7 @@ function main() {
         'payload' => [
             'modifiedFrom' => '2016-05-26T11:49:24.905Z',
             'offset' => 0,
-            'count' => 20,
+            'count' => $util->getMetrics()->maxBatchSize,
             'type' => 'SUBSCRIBE'
         ]
     ];

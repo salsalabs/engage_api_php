@@ -1,87 +1,34 @@
 <?php
 
-    // Program to retrieve what can be retrieved from P2P pages.  Uses the
-    // Web Developer API to retrieve activity-related information.  Uses the
-    // Integration API to retrieve activities.
-    //
-    // This application requires a configuration file.
-    //
-    // Usage: php src/dev_p2p_goals.php --login CONFIGURATION_FILE.yaml.
-    //
-    // Sample YAML file.  All fields must start in column 1. Comments are for PHP.
-    // Note that this APP uses the Engage Web Developer API, not the standard Engage API.
-    // See https://help.salsalabs.com/hc/en-us/sections/360000258473-API-Web-Developer
-    /*
-    devToken: your-web-developer-api-token-here
-    devHost: "https://api.salsalabs.org"
+    /** Program to retrieve what can be retrieved from P2P pages.  Uses the
+     * Web Developer API to retrieve activity-related information.  Uses the
+     * Integration API to retrieve activities.
+     *
+     * Endpoints:
+     *
+     * /api/developer/ext/v1/activities
+     *
+     * Usage: php src/dev_p2p_goals.php --login CONFIGURATION_FILE.yaml.
     */
 
-    // Uses Composer.
+    // Uses DemoUtils.
     require 'vendor/autoload.php';
-    use GuzzleHttp\Client;
-    use Symfony\Component\Yaml\Yaml;
-
-    // Retrieve the runtime parameters and validate them.
-    function initialize()
-    {
-        $shortopts = "";
-        $longopts = array(
-            "login:"
-        );
-        $options = getopt($shortopts, $longopts);
-        if (false == array_key_exists('login', $options)) {
-            exit("\nYou must provide a parameter file with --login!\n");
-        }
-        $filename = $options['login'];
-        $cred = Yaml::parseFile($filename);
-        validateCredentials($cred, $filename);
-        return $cred;
-    }
-
-    // Validate the contents of the provided credential file.
-    // All fields are required.  Exits on errors.
-    function validateCredentials($cred, $filename) {
-        $errors = false;
-        $fields = array(
-            "devToken",
-            "devHost"
-        );
-        foreach ($fields as $f) {
-            if (false == array_key_exists($f, $cred)) {
-                printf("Error: %s must contain a %s.\n", $filename, $f);
-                $errors = true;
-            }
-        }
-        if ($errors) {
-            exit("Too many errors, terminating.\n");
-        }
-    }
-
+    require 'src/demo_utils.php';
 
     // Use the provided credentials to locate all events matching 'eventType'.
     // See: https://help.salsalabs.com/hc/en-us/articles/360001206693-Activity-Form-List
-    function fetchForms($cred) {
-        //var_dump($cred);
-        $headers = [
-            'authToken' => $cred["devToken"],
-            'Content-Type' => 'application/json',
-        ];
+    function fetchForms($util) {
         $method = 'GET';
-        $uri = $cred["devHost"];
         $command = '/api/developer/ext/v1/activities';
         $params = [
             'types' => "P2P_EVENT,TICKETED_EVENT",
             'sortField' => "name",
             'sortOrder' => "ASCENDING",
             'status' => "PUBLISHED",
-            'count' => 25,
+            'count' => $util->getMetrics()->maxBatchSize,
             'offset' => 0
         ];
-
-        $client = new GuzzleHttp\Client([
-            'base_uri' => $uri,
-            'headers'  => $headers
-        ]);
+        $client = $util->getWebDevClient();
 
         $forms = array();
         $count = 0;
@@ -108,10 +55,12 @@
         return $forms;
     }
 
-    // Ubiquitous main function.
+    // Application starts here.
     function main() {
-        $cred = initialize();
-        $forms = fetchForms($cred);
+        $util =  new \DemoUtils\DemoUtils();
+        $util->appInit();
+
+        $forms = fetchForms($util);
         printf("\nEvent Summary\n\n");
         printf("\n%-24s %-36s %s\n",
             "Type",

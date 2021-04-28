@@ -24,14 +24,14 @@ function initialize()
         exit("\nYou must provide a parameter file with --login!\n");
     }
     $filename = $options['login'];
-    $cred = Yaml::parseFile($filename);
-    validateCredentials($cred, $filename);
-    return $cred;
+    $util = Yaml::parseFile($filename);
+    validateCredentials($util, $filename);
+    return $util;
 }
 
 // Validate the contents of the provided credential file.
 // All fields are required.  Exits on errors.
-function validateCredentials($cred, $filename)
+function validateCredentials($util, $filename)
 {
     $errors = false;
     $fields = array(
@@ -40,7 +40,7 @@ function validateCredentials($cred, $filename)
         "segmentId"
     );
     foreach ($fields as $f) {
-        if (false == array_key_exists($f, $cred)) {
+        if (false == array_key_exists($f, $util)) {
             printf("Error: %s must contain a %s.\n", $filename, $f);
             $errors = true;
         }
@@ -51,23 +51,23 @@ function validateCredentials($cred, $filename)
 }
 
 // Retrieve the Engage info for the segment ID.
-function getSegment($cred)
+function getSegment($util)
 {
     $headers = [
-        'authToken' => $cred['token'],
+        'authToken' => $util['token'],
         'Content-Type' => 'application/json',
     ];
     $payload = [
         'payload' => [
             'identifierType' => 'SEGMENT_ID',
-            'identifiers' => array($cred['segmentId']),
+            'identifiers' => array($util['segmentId']),
             'includeMemberCounts' => 'true',
             'offset' => 0,
-            'count' => 20,
+            'count' => $util->getMetrics()->maxBatchSize,
         ],
     ];
     $method = 'POST';
-    $uri = $cred["host"];
+    $uri = $util["host"];
     $command = '/api/integration/ext/v1/segments/search';
     $client = new GuzzleHttp\Client([
         'base_uri' => $uri,
@@ -93,10 +93,10 @@ function getSegment($cred)
 
 }
 // Search for members in a group. Not paginating in this app.
-function search($cred, $offset, $count)
+function search($util, $offset, $count)
 {
     $headers = [
-        'authToken' => $cred['token'],
+        'authToken' => $util['token'],
         'Content-Type' => 'application/json',
     ];
     $command = '/api/integration/ext/v1/segments/members/search';
@@ -104,11 +104,11 @@ function search($cred, $offset, $count)
         'payload' => [
             'count' => $count,
             'offset' => $offset,
-            'segmentId' => $cred['segmentId'],
+            'segmentId' => $util['segmentId'],
         ],
     ];
     $method = 'POST';
-    $uri = $cred["host"];
+    $uri = $util["host"];
     $client = new GuzzleHttp\Client([
         'base_uri' => $uri,
         'headers' => $headers,
@@ -128,8 +128,8 @@ function search($cred, $offset, $count)
 
 function main()
 {
-    $cred = initialize();
-    $segment = getSegment($cred);
+    $util = initialize();
+    $segment = getSegment($util);
     if (!is_null($segment)) {
         printf("\nSearching %s: %s for %d supporters.\n\n",
             $segment->segmentId,
@@ -143,7 +143,7 @@ function main()
                 $count = $segment->totalMembers % 20;
             }
             printf("Offset/count: %6d/%2d\n", $offset, $count);
-            $r = search($cred, $offset, $count);
+            $r = search($util, $offset, $count);
             $c = (int) $r->payload->count;
             if ($c > 0) {
                 $s = $r->payload->supporters;

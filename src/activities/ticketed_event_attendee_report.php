@@ -29,14 +29,14 @@ function initialize()
         exit("\nYou must provide a parameter file with --login!\n");
     }
     $filename = $options['login'];
-    $cred = Yaml::parseFile($filename);
-    validateCredentials($cred, $filename);
-    return $cred;
+    $util = Yaml::parseFile($filename);
+    validateCredentials($util, $filename);
+    return $util;
 }
 
 // Validate the contents of the provided credential file.
 // All fields are required.  Exits on errors.
-function validateCredentials($cred, $filename)
+function validateCredentials($util, $filename)
 {
     $errors = false;
     $fields = array(
@@ -44,7 +44,7 @@ function validateCredentials($cred, $filename)
         "eventId",
     );
     foreach ($fields as $f) {
-        if (false == array_key_exists($f, $cred)) {
+        if (false == array_key_exists($f, $util)) {
             printf("Error: %s must contain a %s.\n", $filename, $f);
             $errors = true;
         }
@@ -57,19 +57,19 @@ function validateCredentials($cred, $filename)
 // Use the provided credentials to retrieve attendees for the
 // specified event.  Returns a list of attendees.
 // See: https://api.salsalabs.org/help/web-dev#operation/getEventAttendees
-function fetchAttendees($cred)
+function fetchAttendees($util)
 {
     $headers = [
-        'authToken' => $cred["devToken"],
+        'authToken' => $util["devToken"],
         'Content-Type' => 'application/json',
     ];
     $method = 'GET';
     $endpoint = 'https://api.salsalabs.org/api/developer/ext/v1/activities/'
-        . $cred["eventId"]
+        . $util["eventId"]
         . '/summary/registrations';
 
     $params = [
-        'count' => 20,
+        'count' => $util->getMetrics()->maxBatchSize,
         'offset' => 0,
     ];
 
@@ -103,8 +103,8 @@ function fetchAttendees($cred)
 // Ubiquitous main function.
 function main()
 {
-    $cred = initialize();
-    $attendees = fetchAttendees($cred);
+    $util = initialize();
+    $attendees = fetchAttendees($util);
     $json = json_encode($attendees, JSON_PRETTY_PRINT);
     printf("%s\n", $json);
 

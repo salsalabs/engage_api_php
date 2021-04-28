@@ -29,14 +29,14 @@
             exit("\nYou must provide a parameter file with --login!\n");
         }
         $filename = $options['login'];
-        $cred = Yaml::parseFile($filename);
-        validateCredentials($cred, $filename);
-        return $cred;
+        $util = Yaml::parseFile($filename);
+        validateCredentials($util, $filename);
+        return $util;
     }
 
     // Validate the contents of the provided credential file.
     // All fields are required.  Exits on errors.
-    function validateCredentials($cred, $filename) {
+    function validateCredentials($util, $filename) {
         $errors = false;
         $fields = array(
             "token",
@@ -48,7 +48,7 @@
             "cellPhone"
         );
         foreach ($fields as $f) {
-            if (false == array_key_exists($f, $cred)) {
+            if (false == array_key_exists($f, $util)) {
                 printf("Error: %s must contain a %s.\n", $filename, $f);
                 $errors = true;
             }
@@ -60,11 +60,11 @@
 
     // Mainline that does the work.
     function main() {
-        $cred = initialize();
+        $util = initialize();
     
         // The Engage token goes into HTTP headers.
         $headers = [
-            'authToken' => $cred['token'],
+            'authToken' => $util['token'],
             'Content-Type' => 'application/json'
         ];
 
@@ -75,20 +75,20 @@
         $payload = [ 'payload' => [
                 'supporters' => [
                     [
-                        "firstName" => $cred['firstName'],
-                        "lastName" => $cred['lastName'],
+                        "firstName" => $util['firstName'],
+                        "lastName" => $util['lastName'],
                         "contacts" => [
                             [
                                 "type" => "EMAIL",
-                                "value" => $cred["email"]
+                                "value" => $util["email"]
                             ],
                             [
                                 "type" => "HOME_PHONE",
-                                "value" => $cred["phone"]
+                                "value" => $util["phone"]
                             ],
                             [
                                 "type" => "CELL PHONE",
-                                "value" => $cred["cellPhone"]
+                                "value" => $util["cellPhone"]
                             ]
                         ]
                     ]
@@ -96,7 +96,7 @@
             ]
         ];
         $method = 'PUT';
-        $uri = $cred['host'];
+        $uri = $util['host'];
         $command = '/api/integration/ext/v1/supporters';
 
         // Show the payload.
