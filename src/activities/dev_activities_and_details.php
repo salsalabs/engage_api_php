@@ -114,7 +114,7 @@
     // Ubiquitous main function.
     function main() {
         $util =  new \DemoUtils\DemoUtils();
-        $util->start();
+        $util->appInit();
         seeForms($util);
     }
     main()
