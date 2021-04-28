@@ -197,7 +197,14 @@ class DemoUtils {
     * Metrics change with every API call.  Monitoring the metrics can help
     * you avoid unwanted terminations and slowdowns.
     * See https://help.salsalabs.com/hc/en-us/articles/224531208-General-Use
-    * @return object                                Stashed metrics object.
+    *
+    * Note:
+    *
+    * $currentRateLimit = $du->getMetrics()->currentRateLimit
+    #
+    # Because metrics are a object(stdClass).
+    *
+    * @return object(stdClass)                      Stashed metrics object.
     * @raises GuzzleHttp\Exception\ClientException  Read failures
     * @scope public
     */
