@@ -104,10 +104,6 @@ class DemoUtils {
      */
     public function loadYAML($filename) {
          $env = Yaml::parseFile($filename);
-
-         printf("\nYAML contents\n");
-         var_dump($env);
-
          $fields = [ "apiHost",
                      "intToken",
                      "devToken"];
