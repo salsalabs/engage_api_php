@@ -99,7 +99,7 @@ class DemoUtils {
      *  and fatal. For your convenience, the parsed contents of the YAML
      * file can be retrieved using `getEnvironment()`.
      * @param  string $filename  YAML file to parse
-     * @throws (File exception class) File access exceptions
+     * @throws Exceptions File access exceptions
      * @access public
      */
     public function loadYAML($filename) {
@@ -149,6 +149,7 @@ class DemoUtils {
      * Automatically creates the headers.
      * @param string $token     API token
      * @return object           GuzzleHTTPClient object
+     * @access public
      */
      public function getClient($token) {
          $base_uri = $this->getAPIHost();
@@ -164,6 +165,7 @@ class DemoUtils {
   * Convenience method to return a GuzzleHTTPClient for the
   * Integration API. Calls `getClient()`.
   * @return object           GuzzleHTTPClient object
+  * @access public
   */
   public function getIntClient() {
       $token = $this->getIntToken();
@@ -174,6 +176,7 @@ class DemoUtils {
    * Convenience method to return  a GuzzleHTTPClient for the
    * Web Development API.  Calls `getClient()`.
    * @return object           GuzzleHTTPClient object
+   * @access public
    */
    public function getWebDevClient() {
        $token = $this->getWebDevToken();
@@ -192,6 +195,7 @@ class DemoUtils {
    * Errors are fatal and noisy.
    * @return object  DemoUtils nstance loaded from the contents of
    *                 `tokens_file.yaml`.
+   * @access public
    */
   public function start() {
       $shortopts = "";
