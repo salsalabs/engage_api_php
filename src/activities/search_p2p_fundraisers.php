@@ -9,80 +9,37 @@
   * /api/developer/ext/v1/activities/{uuid}/summary/fundraisers
   *
   * Usage: php src/dev_p2p_goals.php --login CONFIGURATION_FILE.yaml.
-  */
+  *
+  * Note:
+  *
+  * This app requires an field named 'p2pActivityId' in the YAML configuration file.
+  * Add the activityId using a line this:
+  *
+  * +-- column 1
+  * |
+  * v
+  * p2pActvityId: "83bxx9o-auix-w9p6-n-kk3r25hy9hayyco"
+*/
 
-    // Uses Composer.
-    require 'vendor/autoload.php';
-    use GuzzleHttp\Client;
-    use Symfony\Component\Yaml\Yaml;
-
-    // Retrieve the runtime parameters and validate them.
-    function initialize()
-    {
-        $shortopts = "";
-        $longopts = array(
-            "login:",
-        );
-        $options = getopt($shortopts, $longopts);
-        if (false == array_key_exists('login', $options)) {
-            exit("\nYou must provide a parameter file with --login!\n");
-        }
-        $filename = $options['login'];
-        $util = Yaml::parseFile($filename);
-        validateCredentials($util, $filename);
-        return $util;
-    }
-
-    // Validate the contents of the provided credential file.
-    // All fields are required.  Exits on errors.
-    function validateCredentials($util, $filename)
-    {
-        $errors = false;
-        $fields = array(
-            "intToken",
-            "apiHost",
-            "devToken",
-            "p2pActivityId"
-        );
-        foreach ($fields as $f) {
-            if (false == array_key_exists($f, $util)) {
-                printf("Error: %s must contain a %s.\n", $filename, $f);
-                $errors = true;
-            }
-        }
-        if ($errors) {
-            exit("Too many errors, terminating.\n");
-        }
-    }
-
-    // Return a Guzzle client for HTTP operations.
-    function getClient($util)
-    {
-        $headers = [
-            'authToken' => $util['devToken'],
-            'Content-Type' => 'application/json',
-        ];
-        $client = new GuzzleHttp\Client([
-            'base_uri' => $util["apiHost"],
-            'headers' => $headers
-        ]);
-        return $client;
-    }
+  // Uses DemoUtils.
+  require 'vendor/autoload.php';
+  require 'src/demo_utils.php';
 
     // Fetch fundraisers for an activity form.
     // See: https://api.salsalabs.org/help/web-dev#operation/getP2PFundraisers
     // Returns an array of fundraisers.
     function getFundraisers($util) {
-        $client = getClient($util);
+        $client = $util->getWebDevClient();
         $method = 'GET';
-        $command = '/api/developer/ext/v1/activities/' . $util['p2pActivityId'] . '/summary/fundraisers';
+        $environment = $util->getEnvironment();
+        $activityId = $environment["p2pActivityId"];
+        $command = '/api/developer/ext/v1/activities/' . $activityId . '/summary/fundraisers';
         $fundraisers = array();
-        $count = 50;
+        $count = $util->getMetrics()->maxBatchSize;
         do {
             try {
                 $response = $client->request($method, $command);
- //               print($response->getBody());
-                $data = json_decode($response -> getBody());
+                 $data = json_decode($response -> getBody());
                 if (property_exists ($data->payload, 'total')) {
                     $count = $data->payload->total;
                     printf("Found %d records\n", $count);
@@ -99,7 +56,7 @@
                 return $fundraisers;
             }
             printf("End of loop, count is %d\n", $count);
-        } while ($count == 50);
+        } while ($count == $util->getMetrics()->maxBatchSize);
         return $fundraisers;
     }
 
@@ -124,7 +81,8 @@
     // Standard application entry point.
     function main()
     {
-        $util = initialize();
+        $util =  new \DemoUtils\DemoUtils();
+        $util->appInit();
         $fundraisers = getFundraisers($util);
         processFundraisers($fundraisers);
     }
