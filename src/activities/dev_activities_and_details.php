@@ -24,11 +24,13 @@
         $command = '/api/developer/ext/v1/activities';
 
         $types = "SUBSCRIPTION_MANAGEMENT,SUBSCRIBE,FUNDRAISE,PETITION,TARGETED_LETTER,REGULATION_COMMENTS,TICKETED_EVENT,P2P_EVENT,FACEBOOK_AD";
+        // metrics are a PHP object(stdClass)...
+        $count = $util->getMetrics()->maxBatchSize;
         $params = [
             'types' => $types,
             'sortField' => "name",
             'sortOrder' => "ASCENDING",
-            'count' => 20,
+            'count' => $count,
             'offset' => 0
         ];
 
