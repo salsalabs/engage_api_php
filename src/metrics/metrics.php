@@ -3,12 +3,7 @@
     require 'vendor/autoload.php';
     use GuzzleHttp\Client;
 
-    $headers = [
-            'authToken' => 'YOUR-INCREDIBLY-LONG-API-TOKEN',
-            'Content-Type' => 'application/json'
-    ];
     $method = 'GET';
-
     $endpoint = '/api/integration/ext/v1/metrics';
     $client = $util->getClient($endpoint);
     $response = $client->request($method, $endpoint);

@@ -65,13 +65,7 @@
     // Use the provided credentials to locate all events matching 'eventType'.
     // See: https://help.salsalabs.com/hc/en-us/articles/360001206693-Activity-Form-List
     function fetchForms($util) {
-        // var_dump($util);
-        $headers = [
-            'authToken' => $util["devToken"],
-            'Content-Type' => 'application/json',
-        ];
         $method = 'GET';
-
         $endpoint = '/api/developer/ext/v1/activities';
         $client = $util->getClient($endpoint);
         $params = [
@@ -110,18 +104,13 @@
     // Returns a metadata object.  Note that the metadata object will have
     // different contents based on the activity form type.
     function fetchMetadata($util, $id) {
-        $headers = [
-            'authToken' => $util["devToken"],
-            'Content-Type' => 'application/json',
-        ];
+        $method = 'GET';
+        $endpoint = '/api/developer/ext/v1/activities/'.$id.'/metadata';
+        $client = $util->getClient($endpoint);
         $payload = [
             'payload' => [
             ]
         ];
-        $method = 'GET';
-
-        $endpoint = '/api/developer/ext/v1/activities/'.$id.'/metadata';
-        $client = $util->getClient($endpoint);
 
         try {
             $response = $client->request($method, $endpoint, [

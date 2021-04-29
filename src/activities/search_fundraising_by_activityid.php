@@ -47,10 +47,6 @@ function main()
 {
     $util =  new \DemoUtils\DemoUtils();
     $util->appInit();
-    $headers = [
-        'authToken' => $util["token"],
-        'Content-Type' => 'application/json',
-    ];
 
     $payload = [
         'payload' => [

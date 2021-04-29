@@ -62,10 +62,6 @@
     // @param array  $util  Contents of params/supporter-add.yamlporter-search.yaml
     //
     function getSupporter($util) {
-        $headers = [
-            'authToken' => $util['token'],
-            'Content-Type' => 'application/json'
-        ];
         // 'identifiers' in the YAML file is an array of identifiers.
         // 'identifierType' is one of the official identifier types.
         // @see https://help.salsalabs.com/hc/en-us/articles/224470107-Supporter-Data
@@ -101,10 +97,6 @@
     // @param array  $util  Contents of params/supporter-add.yamlporter-search.yaml
     //
     function getSegment($util) {
-        $headers = [
-            'authToken' => $util['token'],
-            'Content-Type' => 'application/json'
-        ];
         // Search for the segmentId.  Make sure that it exists.
         // Note that the call requires a list of segments.  The
         // YAML file can be used to make the list happen.
@@ -149,10 +141,6 @@
     // @see https://help.salsalabs.com/hc/en-us/articles/224531528-Segment-Data#assigning-supporters-to-a-segment
     //
     function register($util, $supporter, $segment) {
-        $headers = [
-            'authToken' => $util['token'],
-            'Content-Type' => 'application/json'
-        ];
         $payload = [
             'payload' => [
                 'segmentId' => $segment -> segmentId,

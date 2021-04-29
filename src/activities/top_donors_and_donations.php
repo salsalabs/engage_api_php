@@ -65,13 +65,7 @@
     // Use the provided credentials to locate all events matching 'eventType'.
     // See: https://help.salsalabs.com/hc/en-us/articles/360001206693-Activity-Form-List
     function fetchForms($util) {
-        //var_dump($util);
-        $headers = [
-            'authToken' => $util["devToken"],
-            'Content-Type' => 'application/json',
-        ];
         $method = 'GET';
-
         $endpoint = '/api/developer/ext/v1/activities';
         $client = $util->getClient($endpoint);
         $params = [
@@ -111,11 +105,6 @@
     // the integration API.  Returns a list of activities.
     // See https://help.salsalabs.com/hc/en-us/articles/224470267-Engage-API-Activity-Data
     function fetchActivities($util, $id) {
-        //var_dump($util);
-        $headers = [
-            'authToken' => $util["intToken"],
-            'Content-Type' => 'application/json',
-        ];
         $payload = [
             'payload' => [
                 "offset" => 0,
@@ -161,11 +150,6 @@
 
     // Fetch a supporter to match the provided id.
     function fetchSupporter($util, $id) {
-        //var_dump($util);
-        $headers = [
-            'authToken' => $util["intToken"],
-            'Content-Type' => 'application/json',
-        ];
         $payload = [
             'payload' => [
                 "offset" => 0,

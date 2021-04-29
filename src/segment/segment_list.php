@@ -51,10 +51,9 @@ function validateCredentials($util, $filename)
 // Retrieve the Engage info for the segment ID.
 function getSegments($util, $offset, $count)
 {
-    $headers = [
-        'authToken' => $util['token'],
-        'Content-Type' => 'application/json',
-    ];
+    $method = 'POST';
+    $endpoint = '/api/integration/ext/v1/segments/search';
+    $client = $util->getClient($endpoint);
     $payload = [
         'payload' => [
             'offset' => $offset,
@@ -62,10 +61,6 @@ function getSegments($util, $offset, $count)
             'includeMemberCounts' => 'true',
         ],
     ];
-    $method = 'POST';
-
-    $endpoint = '/api/integration/ext/v1/segments/search';
-    $client = $util->getClient($endpoint);
 
     try {
         $response = $client->request($method, $endpoint, [
@@ -89,10 +84,6 @@ function getSegments($util, $offset, $count)
 // Retrieve the current metrics.
 // See https://help.salsalabs.com/hc/en-us/articles/224531208-General-Use
 function getMetrics($util) {
-    $headers = [
-        'authToken' => $util['token'],
-        'Content-Type' => 'application/json',
-    ];
     $method = 'GET';
     $endpoint = '/api/integration/ext/v1/metrics';
     $client = $util->getClient($endpoint);

@@ -57,10 +57,6 @@
     // @param array  $util  Contents of YAML credentials file
     //
     function getSupporter($util) {
-        $headers = [
-            'authToken' => $util['token'],
-            'Content-Type' => 'application/json'
-        ];
         // 'identifiers' in the YAML file is an array of identifiers.
         // 'identifierType' is one of the official identifier types.
         // @see https://help.salsalabs.com/hc/en-us/articles/224470107-Supporter-Data
@@ -118,11 +114,6 @@
     // @see https://help.salsalabs.com/hc/en-us/articles/224470107-Supporter-Data#partial-updates
     //
     function update($util, $supporter) {
-        $headers = [
-            'authToken' => $util['token'],
-            'Content-Type' => 'application/json'
-        ];
-
         // Search for the custom field and change its value.
 
         foreach ($supporter->customFieldValues as $cf) {

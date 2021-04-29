@@ -81,10 +81,6 @@
     {
         $util =  new \DemoUtils\DemoUtils();
         $util->appInit();
-        $headers = [
-            'authToken' => $util["token"],
-            'Content-Type' => 'application/json',
-        ];
 
         # This payload defaults to finding donations between two dates.
         # To see donations for a set of activity IDs

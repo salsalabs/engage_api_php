@@ -53,10 +53,6 @@ function validateCredentials($util, $filename)
 // Retrieve the Engage info for the segment ID.
 function getSegment($util)
 {
-    $headers = [
-        'authToken' => $util['token'],
-        'Content-Type' => 'application/json',
-    ];
     $payload = [
         'payload' => [
             'identifierType' => 'SEGMENT_ID',
@@ -93,10 +89,6 @@ function getSegment($util)
 // Search for members in a group. Not paginating in this app.
 function search($util, $offset, $count)
 {
-    $headers = [
-        'authToken' => $util['token'],
-        'Content-Type' => 'application/json',
-    ];
     $endpoint = '/api/integration/ext/v1/segments/members/search';
     $client = $util->getClient($endpoint);
     $payload = [

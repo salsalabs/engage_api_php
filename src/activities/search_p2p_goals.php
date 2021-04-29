@@ -71,10 +71,6 @@
     // See: https://help.salsalabs.com/hc/en-us/articles/360001206693-Activity-Form-List
     function fetchForms($util) {
         //var_dump($util);
-        $headers = [
-            'authToken' => $util["devToken"],
-            'Content-Type' => 'application/json',
-        ];
         $method = 'GET';
 
         $endpoint = '/api/developer/ext/v1/activities';
@@ -119,10 +115,6 @@
     // Returns a metadata object.  Note that the metadata object will have
     // different contents based on the activity form type.
     function fetchMetadata($util, $id) {
-        $headers = [
-            'authToken' => $util["devToken"],
-            'Content-Type' => 'application/json',
-        ];
         $payload = [
             'payload' => [
             ]
@@ -151,13 +143,7 @@
     // Note: "Fundraiser" only applies to P2P forms. Calling this for any other
     // form type doesn't make sense.
     function fetchFundraisers($util, $id) {
-        //var_dump($util);
-        $headers = [
-            'authToken' => $util["devToken"],
-            'Content-Type' => 'application/json',
-        ];
         $method = 'GET';
-
         $endpoint = '/api/developer/ext/v1/activities/' . $id . "/summary/fundraisers";
         $client = $util->getClient($endpoint);
 
@@ -197,13 +183,7 @@
     // See: https://help.salsalabs.com/hc/en-us/articles/360001206753-Activity-Form-Summary-Fundraisers
     // Returns an array of registrants.
     function fetchRegistrations($util, $id) {
-        //var_dump($util);
-        $headers = [
-            'authToken' => $util["devToken"],
-            'Content-Type' => 'application/json',
-        ];
         $method = 'GET';
-
         $endpoint = '/api/developer/ext/v1/activities/' . $id . "/summary/registrations";
         $client = $util->getClient($endpoint);
 
@@ -245,11 +225,6 @@
     // the integration API.  Returns a list of activities.
     // See https://help.salsalabs.com/hc/en-us/articles/224470267-Engage-API-Activity-Data
     function fetchActivities($util, $id) {
-        //var_dump($util);
-        $headers = [
-            'authToken' => $util["intToken"],
-            'Content-Type' => 'application/json',
-        ];
         $payload = [
             'payload' => [
                 "offset" => 0,

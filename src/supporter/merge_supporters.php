@@ -72,13 +72,6 @@
         // Show the credentials.
         $t = json_encode($util, JSON_PRETTY_PRINT);
         printf("\nCredentials\n%s\n", $t);
-
-        // The Engage token goes into HTTP headers.
-        $headers = [
-            'authToken' => $util['token'],
-            'Content-Type' => 'application/json'
-        ];
-
         $payload = [
             'payload' => [
                 "destination" => [

@@ -66,10 +66,6 @@
     {
         $util =  new \DemoUtils\DemoUtils();
         $util->appInit();
-        $headers = [
-            'authToken' => $util["token"],
-            'Content-Type' => 'application/json',
-        ];
 
         # This payload contains the donation to import.
         # Some of the settings are specific to a Salsa internal Engage.

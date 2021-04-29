@@ -59,10 +59,6 @@ function validateCredentials($util, $filename)
 // See: https://api.salsalabs.org/help/web-dev#operation/getEventAttendees
 function fetchAttendees($util)
 {
-    $headers = [
-        'authToken' => $util["devToken"],
-        'Content-Type' => 'application/json',
-    ];
     $method = 'GET';
     $endpoint = 'https://api.salsalabs.org/api/developer/ext/v1/activities/'
         . $util["eventId"]

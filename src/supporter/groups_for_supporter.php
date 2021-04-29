@@ -92,26 +92,12 @@ function validateCredentials($util, $filename)
 // See https://help.salsalabs.com/hc/en-us/articles/224531208-General-Use
 
 function getMetrics($util) {
-    $headers = [
-        'authToken' => $util['token'],
-        'Content-Type' => 'application/json',
-    ];
     $method = 'GET';
     $endpoint = '/api/integration/ext/v1/metrics';
     $client = $util->getClient($endpoint);
     $response = $client->request($method, $endpoint);
     $data = json_decode($response -> getBody());
     return $data->payload;
-}
-
-// Headers used by all API calls.
-
-function getHeaders($util) {
-    $headers = [
-        'authToken' => $util['token'],
-        'Content-Type' => 'application/json',
-    ];
-    return $headers;
 }
 
 // Retrieve all groups, then return a list of groups that contain
@@ -127,7 +113,6 @@ function getGroups($util, $metrics)
             'includeMemberCounts' => 'true',
         ],
     ];
-    $headers = getHeaders($util);
     $method = 'POST';
     $endpoint = '/api/integration/ext/v1/segments/search';
     $client = $util->getClient($endpoint);
@@ -170,7 +155,6 @@ function containsSupporter($util, $metrics, $group, $supporterID) {
             'count' => $metrics->maxBatchSize,
         ],
     ];
-    $headers = getHeaders($util);
     $method = 'POST';
     $endpoint = '/api/integration/ext/v1/segments/members/search';
     $client = $util->getClient($endpoint);

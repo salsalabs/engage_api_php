@@ -60,10 +60,6 @@
     // Retrieve the current metrics.
     // See https://help.salsalabs.com/hc/en-us/articles/224531208-General-Use
     function getMetrics($util) {
-        $headers = [
-            'authToken' => $util['intToken'],
-            'Content-Type' => 'application/json',
-        ];
         $method = 'GET';
         $endpoint = '/api/integration/ext/v1/metrics';
         $client = $util->getClient($endpoint);
@@ -76,11 +72,6 @@
     // Use the provided credentials to locate all submission activities.
     // See: https://help.salsalabs.com/hc/en-us/articles/360001220294-Submissions
     function fetchSubmissions($util, $metrics, $type) {
-        //var_dump($util);
-        $headers = [
-            'authToken' => $util["devToken"],
-            'Content-Type' => 'application/json',
-        ];
         $method = 'POST';
         $endpoint = '/api/developer/ext/v1/submissions';
         $payload = [

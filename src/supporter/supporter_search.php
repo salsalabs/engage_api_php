@@ -73,10 +73,6 @@ function validateCredentials($util, $filename)
 //
 function run($util)
 {
-    $headers = [
-        'authToken' => $util['token'],
-        'Content-Type' => 'application/json',
-    ];
     // 'identifiers' in the YAML file is an array of identifiers.
     // 'identifierType' is one of the official identifier types.
     $payload = [

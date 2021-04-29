@@ -74,10 +74,6 @@
     // Retrieve transactions and display the applicable ones.
     function getTransactions($util, $offset, $count)
     {
-        $headers = [
-            'authToken' => $util['token'],
-            'Content-Type' => 'application/json',
-        ];
         $payload = [
             'payload' => [
                 'type' => $util["identifierType"],

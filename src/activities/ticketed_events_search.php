@@ -62,11 +62,6 @@
     // Use the provided credentials to locate all events matching 'eventType'.
     // See: https://help.salsalabs.com/hc/en-us/articles/360001206693-Activity-Form-List
     function fetchForms($util) {
-        //var_dump($util);
-        $headers = [
-            'authToken' => $util["token"],
-            'Content-Type' => 'application/json',
-        ];
         $method = 'POST';
         $host = "http://api.salsalabs.org";
         $endpoint = '/api/integration/ext/v1/activities/search';
