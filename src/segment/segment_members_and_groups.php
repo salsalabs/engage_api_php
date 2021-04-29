@@ -68,9 +68,9 @@ function validateCredentials($util, $filename)
 function getMetrics($util)
 {
     $method = 'GET';
-    $command = '/api/integration/ext/v1/metrics';
+    $endpoint = '/api/integration/ext/v1/metrics';
     $client = getClient($util);
-    $response = $client->request($method, $command);
+    $response = $client->request($method, $endpoint);
     $data = json_decode($response -> getBody());
     return $data->payload;
 }
@@ -120,11 +120,11 @@ function getGroupsPayload($util, $metrics, $supporterIds)
         ]
     ];
     $method = 'POST';
-    $command = '/api/integration/ext/v1/supporters/groups';
+    $endpoint = '/api/integration/ext/v1/supporters/groups';
     $client = getClient($util);
 
     try {
-        $response = $client->request($method, $command, [
+        $response = $client->request($method, $endpoint, [
             'json' => $payload,
         ]);
         $data = json_decode($response->getBody());
@@ -141,7 +141,7 @@ function getSegment($util, $metrics, $segmentId)
 {
     $method = 'POST';
     $uri = $util["host"];
-    $command = '/api/integration/ext/v1/segments/search';
+    $endpoint = '/api/integration/ext/v1/segments/search';
     $payload = [
         'payload' => [
             'offset' => 0,
@@ -153,7 +153,7 @@ function getSegment($util, $metrics, $segmentId)
     ];
     $client = getClient($util);
     try {
-        $response = $client->request($method, $command, [
+        $response = $client->request($method, $endpoint, [
             'json' => $payload,
         ]);
         $data = json_decode($response->getBody());
@@ -266,14 +266,14 @@ function run($util, $metrics)
         ],
     ];
     $method = 'POST';
-    $command = '/api/integration/ext/v1/segments/members/search';
+    $endpoint = '/api/integration/ext/v1/segments/members/search';
     $client = getClient($util);
 
     // Do until end of data. Read a number of supporters.
     // Find their groups.  Write to a CSV file.
     do {
         try {
-            $response = $client->request($method, $command, [
+            $response = $client->request($method, $endpoint, [
                 'json'     => $payload
             ]);
 

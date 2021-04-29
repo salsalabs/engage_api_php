@@ -72,7 +72,7 @@
         ];
         $method = 'GET';
         $uri = 'http://api.salsalabs.org';
-        $command = '/api/developer/ext/v1/activities';
+        $endpoint = '/api/developer/ext/v1/activities';
         $params = [
             'types' => "TICKETED_EVENT",
             'count' => $util->getMetrics()->maxBatchSize,
@@ -88,7 +88,7 @@
         $count = 0;
         do {
             $queries = http_build_query($params);
-            $x = $command . "?" . $queries;
+            $x = $endpoint . "?" . $queries;
             // printf("Command: %s\n", $x);
             try {
                 $response = $client->request($method, $x);
@@ -124,14 +124,14 @@
         ];
         $method = 'GET';
         $uri = 'http://api.salsalabs.org';
-        $command = '/api/developer/ext/v1/activities/'.$id.'/metadata';
+        $endpoint = '/api/developer/ext/v1/activities/'.$id.'/metadata';
         $client = new GuzzleHttp\Client([
             'base_uri' => $uri,
             'headers'  => $headers
         ]);
 
         try {
-            $response = $client->request($method, $command, [
+            $response = $client->request($method, $endpoint, [
                 'json'     => $payload
             ]);
             $data = json_decode($response -> getBody());

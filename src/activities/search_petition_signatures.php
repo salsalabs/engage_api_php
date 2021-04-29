@@ -69,7 +69,7 @@ function main()
     ];
     $method = 'POST';
     $uri = $util["host"];
-    $command = '/api/integration/ext/v1/activities/search';
+    $endpoint = '/api/integration/ext/v1/activities/search';
     $client = new GuzzleHttp\Client([
         'base_uri' => $uri,
         'headers' => $headers,
@@ -80,7 +80,7 @@ function main()
     printf("Offset: %d\n", $offset);
     do {
         try {
-            $response = $client->request($method, $command, [
+            $response = $client->request($method, $endpoint, [
                 'json' => $payload,
             ]);
             $data = json_decode($response -> getBody());

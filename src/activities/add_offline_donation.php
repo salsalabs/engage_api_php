@@ -121,14 +121,14 @@
         $method = 'POST';
         $uri = 'https://api.salsalabs.org';
         $uri = 'https://hq.uat.igniteaction.net';
-        $command = '/api/integration/ext/v1/offlineDonations';
+        $endpoint = '/api/integration/ext/v1/offlineDonations';
         $client = new GuzzleHttp\Client([
             'base_uri' => $uri,
             'headers' => $headers,
         ]);
 
         try {
-            $response = $client->request($method, $command, [
+            $response = $client->request($method, $endpoint, [
                 'json' => $payload,
             ]);
             $data = json_decode($response->getBody());

@@ -68,13 +68,13 @@ function getSegment($util)
     ];
     $method = 'POST';
     $uri = $util["host"];
-    $command = '/api/integration/ext/v1/segments/search';
+    $endpoint = '/api/integration/ext/v1/segments/search';
     $client = new GuzzleHttp\Client([
         'base_uri' => $uri,
         'headers' => $headers,
     ]);
     try {
-        $response = $client->request($method, $command, [
+        $response = $client->request($method, $endpoint, [
             'json' => $payload,
         ]);
         $data = json_decode($response->getBody());
@@ -99,7 +99,7 @@ function search($util, $offset, $count)
         'authToken' => $util['token'],
         'Content-Type' => 'application/json',
     ];
-    $command = '/api/integration/ext/v1/segments/members/search';
+    $endpoint = '/api/integration/ext/v1/segments/members/search';
     $payload = [
         'payload' => [
             'count' => $count,
@@ -115,7 +115,7 @@ function search($util, $offset, $count)
     ]);
 
     try {
-        $response = $client->request($method, $command, [
+        $response = $client->request($method, $endpoint, [
             'json' => $payload,
         ]);
         return json_decode($response->getBody());

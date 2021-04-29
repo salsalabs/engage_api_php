@@ -18,7 +18,7 @@
     // See: https://help.salsalabs.com/hc/en-us/articles/360001206693-Activity-Form-List
     function fetchForms($util) {
         $method = 'GET';
-        $command = '/api/developer/ext/v1/activities';
+        $endpoint = '/api/developer/ext/v1/activities';
         $params = [
             'types' => "P2P_EVENT,TICKETED_EVENT",
             'sortField' => "name",
@@ -33,7 +33,7 @@
         $count = 0;
         do {
             $queries = http_build_query($params);
-            $x = $command . "?" . $queries;
+            $x = $endpoint . "?" . $queries;
             // printf("Command: %s\n", $x);
             try {
                 $response = $client->request($method, $x);

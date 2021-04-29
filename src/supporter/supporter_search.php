@@ -89,13 +89,13 @@ function run($util)
     ];
     $method = 'POST';
     $host = 'https://api.salsalabs.org';
-    $command = '/api/integration/ext/v1/supporters/search';
-    $uri = $host . $command;
+    $endpoint = '/api/integration/ext/v1/supporters/search';
+    $uri = $host . $endpoint;
     $client = new GuzzleHttp\Client([
         'base_uri' => $uri,
         'headers' => $headers,
     ]);
-    $response = $client->request($method, $command, [
+    $response = $client->request($method, $endpoint, [
         'json' => $payload,
     ]);
     $data = json_decode($response->getBody());

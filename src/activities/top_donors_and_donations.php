@@ -72,7 +72,7 @@
         ];
         $method = 'GET';
         $uri = $util["devHost"];
-        $command = '/api/developer/ext/v1/activities';
+        $endpoint = '/api/developer/ext/v1/activities';
         $params = [
             'types' => "FUNDRAISE,",
             'sortField' => "name",
@@ -90,7 +90,7 @@
         $count = 0;
         do {
             $queries = http_build_query($params);
-            $x = $command . "?" . $queries;
+            $x = $endpoint . "?" . $queries;
             // printf("Command: %s\n", $x);
             try {
                 $response = $client->request($method, $x);
@@ -131,7 +131,7 @@
         //echo json_encode($payload, JSON_PRETTY_PRINT);
         $method = 'POST';
         $uri = $util['intHost'];
-        $command = '/api/integration/ext/v1/activities/search';
+        $endpoint = '/api/integration/ext/v1/activities/search';
         $client = new GuzzleHttp\Client([
             'base_uri' => $uri,
             'headers' => $headers,
@@ -141,7 +141,7 @@
         do {
             try {
                 //printf("Command: %s\n", $x);
-                $response = $client->request($method, $command, [
+                $response = $client->request($method, $endpoint, [
                     'json' => $payload,
                 ]);
                 $data = json_decode($response -> getBody());
@@ -183,7 +183,7 @@
         //echo json_encode($payload, JSON_PRETTY_PRINT);
         $method = 'POST';
         $uri = $util['intHost'];
-        $command = '/api/integration/ext/v1/supporters/search';
+        $endpoint = '/api/integration/ext/v1/supporters/search';
         $client = new GuzzleHttp\Client([
             'base_uri' => $uri,
             'headers' => $headers,
@@ -192,7 +192,7 @@
         $count = 0;
         try {
             //printf("Command: %s\n", $x);
-            $response = $client->request($method, $command, [
+            $response = $client->request($method, $endpoint, [
                 'json' => $payload,
             ]);
             $data = json_decode($response -> getBody());

@@ -96,12 +96,12 @@ function getMetrics($util) {
         'Content-Type' => 'application/json',
     ];
     $method = 'GET';
-    $command = '/api/integration/ext/v1/metrics';
+    $endpoint = '/api/integration/ext/v1/metrics';
     $client = new GuzzleHttp\Client([
         'base_uri' => $util['host'],
         'headers'  => $headers
     ]);
-    $response = $client->request($method, $command);
+    $response = $client->request($method, $endpoint);
     $data = json_decode($response -> getBody());
     return $data->payload;
 }
@@ -131,7 +131,7 @@ function getGroups($util, $metrics)
     ];
     $headers = getHeaders($util);
     $method = 'POST';
-    $command = '/api/integration/ext/v1/segments/search';
+    $endpoint = '/api/integration/ext/v1/segments/search';
     $client = new GuzzleHttp\Client([
         'base_uri' => $util["host"],
         'headers' => $headers
@@ -141,7 +141,7 @@ function getGroups($util, $metrics)
     $count = 0;
     do {
         try {
-            $response = $client->request($method, $command, [
+            $response = $client->request($method, $endpoint, [
                 'json' => $payload,
             ]);
             $data = json_decode($response->getBody());
@@ -177,13 +177,13 @@ function containsSupporter($util, $metrics, $group, $supporterID) {
     ];
     $headers = getHeaders($util);
     $method = 'POST';
-    $command = '/api/integration/ext/v1/segments/members/search';
+    $endpoint = '/api/integration/ext/v1/segments/members/search';
     $client = new GuzzleHttp\Client([
         'base_uri' => $util["host"],
         'headers' => $headers
     ]);
 
-    $response = $client->request($method, $command, [
+    $response = $client->request($method, $endpoint, [
         'json' => $payload,
     ]);
     $data = json_decode($response->getBody());

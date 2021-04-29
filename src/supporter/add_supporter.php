@@ -97,7 +97,7 @@
         ];
         $method = 'PUT';
         $uri = $util['host'];
-        $command = '/api/integration/ext/v1/supporters';
+        $endpoint = '/api/integration/ext/v1/supporters';
 
         // Show the payload.
         $t = json_encode($payload, JSON_PRETTY_PRINT);
@@ -109,7 +109,7 @@
             'headers'  => $headers
         ]);
         try {
-            $response = $client->request($method, $command, [
+            $response = $client->request($method, $endpoint, [
                 'json'     => $payload
             ]);
 

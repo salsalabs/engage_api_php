@@ -26,19 +26,18 @@
   require 'src/demo_utils.php';
 
     // Fetch fundraisers for an activity form.
-    // See: https://api.salsalabs.org/help/web-dev#operation/getP2PFundraisers
     // Returns an array of fundraisers.
     function getFundraisers($util) {
         $client = $util->getWebDevClient();
         $method = 'GET';
         $environment = $util->getEnvironment();
         $activityId = $environment["p2pActivityId"];
-        $command = '/api/developer/ext/v1/activities/' . $activityId . '/summary/fundraisers';
+        $endpoint = '/api/developer/ext/v1/activities/' . $activityId . '/summary/fundraisers';
         $fundraisers = array();
         $count = $util->getMetrics()->maxBatchSize;
         do {
             try {
-                $response = $client->request($method, $command);
+                $response = $client->request($method, $endpoint);
                  $data = json_decode($response -> getBody());
                 if (property_exists ($data->payload, 'total')) {
                     $count = $data->payload->total;

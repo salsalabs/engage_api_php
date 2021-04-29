@@ -69,7 +69,7 @@
             ]
         ];
         $method = 'POST';
-        $command = '/api/integration/ext/v1/supporters/search';
+        $endpoint = '/api/integration/ext/v1/supporters/search';
 
         $client = new GuzzleHttp\Client([
             'base_uri' => $util['host'],
@@ -80,7 +80,7 @@
         // from the current offset.
         do {
             try {
-                $response = $client->request($method, $command, [
+                $response = $client->request($method, $endpoint, [
                     'json'     => $payload
                 ]);
 

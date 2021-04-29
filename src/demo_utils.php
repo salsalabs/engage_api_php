@@ -227,9 +227,9 @@ class DemoUtils {
     public function updateMetrics() {
         if (isset($this->apiHost) && (isset($this->intToken))) {
             $method = 'GET';
-            $command = '/api/integration/ext/v1/metrics';
+            $endpoint = '/api/integration/ext/v1/metrics';
             $client = $this->getIntClient();
-            $response = $client->request($method, $command);
+            $response = $client->request($method, $endpoint);
             $data = json_decode($response -> getBody());
             $this->metrics = $data->payload;
         }

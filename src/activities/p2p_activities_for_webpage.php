@@ -21,7 +21,7 @@
     function fetchForms($util) {
         //var_dump($util);
         $method = 'GET';
-        $command = '/api/developer/ext/v1/activities';
+        $endpoint = '/api/developer/ext/v1/activities';
 
         $types = "SUBSCRIPTION_MANAGEMENT,SUBSCRIBE,FUNDRAISE,PETITION,TARGETED_LETTER,REGULATION_COMMENTS,TICKETED_EVENT,P2P_EVENT,FACEBOOK_AD";
         // metrics are a PHP object(stdClass)...
@@ -38,7 +38,7 @@
         $count = 0;
         do {
             $queries = http_build_query($params);
-            $x = $command . "?" . $queries;
+            $x = $endpoint . "?" . $queries;
             //printf("Command: %s\n", $x);
             try {
                 $client = $util->getWebDevClient();
@@ -70,10 +70,10 @@
             ]
         ];
         $method = 'GET';
-        $command = '/api/developer/ext/v1/activities/'.$id.'/metadata';
+        $endpoint = '/api/developer/ext/v1/activities/'.$id.'/metadata';
         $client = $util->getWebDevClient();
         try {
-            $response = $client->request($method, $command, [
+            $response = $client->request($method, $endpoint, [
                 'json'     => $payload
             ]);
             $data = json_decode($response -> getBody());

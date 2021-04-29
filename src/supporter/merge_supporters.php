@@ -92,7 +92,7 @@
 
         $method = 'POST';
         $uri = $util['host'];
-        $command = '/api/integration/ext/v1/supporters/merge';
+        $endpoint = '/api/integration/ext/v1/supporters/merge';
 
         // Show the payload.
         $t = json_encode($payload, JSON_PRETTY_PRINT);
@@ -104,7 +104,7 @@
             'headers'  => $headers
         ]);
         try {
-            $response = $client->request($method, $command, [
+            $response = $client->request($method, $endpoint, [
                 'json'     => $payload
             ]);
 

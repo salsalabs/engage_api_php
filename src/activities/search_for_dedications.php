@@ -89,13 +89,13 @@
         ];
         $method = 'POST';
         $uri = 'https://' . $util['host'];
-        $command = '/api/integration/ext/v1/activities/search';
+        $endpoint = '/api/integration/ext/v1/activities/search';
         $client = new GuzzleHttp\Client([
             'base_uri' => $uri,
             'headers' => $headers,
         ]);
         try {
-            $response = $client->request($method, $command, [
+            $response = $client->request($method, $endpoint, [
                 'json' => $payload,
             ]);
             $data = json_decode($response->getBody());

@@ -79,12 +79,12 @@
         ];
         $method = 'POST';
         $uri = $util['host'];
-        $command = '/api/integration/ext/v1/supporters/search';
+        $endpoint = '/api/integration/ext/v1/supporters/search';
         $client = new GuzzleHttp\Client([
             'base_uri' => $uri,
             'headers'  => $headers
         ]);
-        $response = $client->request($method, $command, [
+        $response = $client->request($method, $endpoint, [
             'json'     => $payload
         ]);
         $data = json_decode($response -> getBody());
@@ -123,12 +123,12 @@
 
         $method = 'POST';
         $uri = $util['host'];
-        $command = '/api/integration/ext/v1/segments/search';
+        $endpoint = '/api/integration/ext/v1/segments/search';
         $client = new GuzzleHttp\Client([
             'base_uri' => $uri,
             'headers'  => $headers
         ]);
-        $response = $client->request($method, $command, [
+        $response = $client->request($method, $endpoint, [
             'json'     => $payload
         ]);
         $data = json_decode($response -> getBody());
@@ -169,12 +169,12 @@
 
         $method = 'PUT';
         $uri = $util['host'];
-        $command = '/api/integration/ext/v1/segments/members';
+        $endpoint = '/api/integration/ext/v1/segments/members';
         $client = new GuzzleHttp\Client([
             'base_uri' => $uri,
             'headers'  => $headers
         ]);
-        $response = $client->request($method, $command, [
+        $response = $client->request($method, $endpoint, [
             'json'     => $payload
         ]);
         $data = json_decode($response -> getBody());

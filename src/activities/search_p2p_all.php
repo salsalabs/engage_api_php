@@ -29,7 +29,7 @@ function fetchForms($util)
 {
     //var_dump($util);
     $method = 'GET';
-    $command = '/api/developer/ext/v1/activities';
+    $endpoint = '/api/developer/ext/v1/activities';
     $params = [
         'types' => "TICKETED_EVENT",
         'sortField' => "name",
@@ -42,7 +42,7 @@ function fetchForms($util)
     $count = 0;
     do {
         $queries = http_build_query($params);
-        $x = $command . "?" . $queries;
+        $x = $endpoint . "?" . $queries;
         try {
             $response = $client->request($method, $x);
             $data = json_decode($response->getBody());
@@ -72,11 +72,11 @@ function fetchMetadata($util, $id)
         ],
     ];
     $method = 'GET';
-    $command = '/api/developer/ext/v1/activities/' . $id . '/metadata';
+    $endpoint = '/api/developer/ext/v1/activities/' . $id . '/metadata';
     $client = $util->getWebDevClient();
 
     try {
-        $response = $client->request($method, $command, [
+        $response = $client->request($method, $endpoint, [
             'json' => $payload,
         ]);
         $data = json_decode($response->getBody());
@@ -95,7 +95,7 @@ function fetchMetadata($util, $id)
 function fetchFundraisers($util, $id)
 {
     $method = 'GET';
-    $command = '/api/developer/ext/v1/activities/' . $id . "/summary/fundraisers";
+    $endpoint = '/api/developer/ext/v1/activities/' . $id . "/summary/fundraisers";
     $params = [
         'count' => $util->getMetrics()->maxBatchSize,
         'offset' => 0,
@@ -107,7 +107,7 @@ function fetchFundraisers($util, $id)
     $count = 0;
     do {
         $queries = http_build_query($params);
-        $x = $command . "?" . $queries;
+        $x = $endpoint . "?" . $queries;
         try {
             $response = $client->request($method, $x);
             $data = json_decode($response->getBody());
@@ -135,7 +135,7 @@ function fetchFundraisers($util, $id)
 function fetchRegistrations($util, $id)
 {
     $method = 'GET';
-    $command = '/api/developer/ext/v1/activities/' . $id . "/summary/registrations";
+    $endpoint = '/api/developer/ext/v1/activities/' . $id . "/summary/registrations";
     $params = [
         'count' => $util->getMetrics()->maxBatchSize,
         'offset' => 0,
@@ -147,7 +147,7 @@ function fetchRegistrations($util, $id)
     $count = 0;
     do {
         $queries = http_build_query($params);
-        $x = $command . "?" . $queries;
+        $x = $endpoint . "?" . $queries;
         try {
             $response = $client->request($method, $x);
             $data = json_decode($response->getBody());
@@ -184,13 +184,13 @@ function fetchActivities($util, $id)
         ],
     ];
     $method = 'POST';
-    $command = '/api/integration/ext/v1/activities/search';
+    $endpoint = '/api/integration/ext/v1/activities/search';
     $client = $util->getWebDevClient();
     $forms = array();
     $count = 0;
     do {
         try {
-            $response = $client->request($method, $command, [
+            $response = $client->request($method, $endpoint, [
                 'json' => $payload,
             ]);
             $data = json_decode($response->getBody());
@@ -224,11 +224,11 @@ function fetchTeams($util, $id)
         ],
     ];
     $method = 'GET';
-    $command = '/api/developer/ext/v1/activities/teams/' . $id;
+    $endpoint = '/api/developer/ext/v1/activities/teams/' . $id;
     $client = $util->getWebDevClient();
 
     try {
-        $response = $client->request($method, $command, [
+        $response = $client->request($method, $endpoint, [
             'json' => $payload,
         ]);
         $data = json_decode($response->getBody());

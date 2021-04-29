@@ -91,7 +91,7 @@
         ]
          ];
         $method = 'GET';
-        $command = '/api/developer/ext/v1/blasts';
+        $endpoint = '/api/developer/ext/v1/blasts';
 
         $client = new GuzzleHttp\Client([
             'base_uri' => $util['host'],
@@ -104,7 +104,7 @@
         // from the current offset.
         do {
             try {
-                $response = $client->request($method, $command, $params);
+                $response = $client->request($method, $endpoint, $params);
                 $data = json_decode($response -> getBody());
                 if (false == array_key_exists('results', $data->payload)) {
                     break;

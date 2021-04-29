@@ -77,7 +77,7 @@
         ];
         $method = 'GET';
         $uri = $util["devHost"];
-        $command = '/api/developer/ext/v1/activities';
+        $endpoint = '/api/developer/ext/v1/activities';
         $params = [
             'types' => "P2P_EVENT,TICKETED_EVENT",
             'sortField' => "name",
@@ -96,7 +96,7 @@
         $count = 0;
         do {
             $queries = http_build_query($params);
-            $x = $command . "?" . $queries;
+            $x = $endpoint . "?" . $queries;
             // printf("Command: %s\n", $x);
             try {
                 $response = $client->request($method, $x);
@@ -132,14 +132,14 @@
         ];
         $method = 'GET';
         $uri = $util["devHost"];
-        $command = '/api/developer/ext/v1/activities/'.$id.'/metadata';
+        $endpoint = '/api/developer/ext/v1/activities/'.$id.'/metadata';
         $client = new GuzzleHttp\Client([
             'base_uri' => $uri,
             'headers'  => $headers
         ]);
 
         try {
-            $response = $client->request($method, $command, [
+            $response = $client->request($method, $endpoint, [
                 'json'     => $payload
             ]);
             $data = json_decode($response -> getBody());
@@ -164,7 +164,7 @@
         ];
         $method = 'GET';
         $uri = $util["devHost"];
-        $command = '/api/developer/ext/v1/activities/' . $id . "/summary/fundraisers";
+        $endpoint = '/api/developer/ext/v1/activities/' . $id . "/summary/fundraisers";
         $params = [
             'count' => $util->getMetrics()->maxBatchSize,
             'offset' => 0
@@ -179,7 +179,7 @@
         $count = 0;
         do {
             $queries = http_build_query($params);
-            $x = $command . "?" . $queries;
+            $x = $endpoint . "?" . $queries;
             try {
                 $response = $client->request($method, $x);
                 $data = json_decode($response -> getBody());
@@ -213,7 +213,7 @@
         ];
         $method = 'GET';
         $uri = $util["devHost"];
-        $command = '/api/developer/ext/v1/activities/' . $id . "/summary/registrations";
+        $endpoint = '/api/developer/ext/v1/activities/' . $id . "/summary/registrations";
         $params = [
             'count' => $util->getMetrics()->maxBatchSize,
             'offset' => 0
@@ -228,7 +228,7 @@
         $count = 0;
         do {
             $queries = http_build_query($params);
-            $x = $command . "?" . $queries;
+            $x = $endpoint . "?" . $queries;
             try {
                 //printf("Command: %s\n", $x);
                 $response = $client->request($method, $x);
@@ -272,7 +272,7 @@
         //echo json_encode($payload, JSON_PRETTY_PRINT);
         $method = 'POST';
         $uri = $util['intHost'];
-        $command = '/api/integration/ext/v1/activities/search';
+        $endpoint = '/api/integration/ext/v1/activities/search';
         $client = new GuzzleHttp\Client([
             'base_uri' => $uri,
             'headers' => $headers,
@@ -282,7 +282,7 @@
         do {
             try {
                 //printf("Command: %s\n", $x);
-                $response = $client->request($method, $command, [
+                $response = $client->request($method, $endpoint, [
                     'json' => $payload,
                 ]);
                 $data = json_decode($response -> getBody());

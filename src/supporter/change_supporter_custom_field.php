@@ -109,8 +109,8 @@
             ]
         ];
         $method = 'POST';
-        $command = '/api/integration/ext/v1/supporters/search';
-        $uri = $util['host'] . $command;
+        $endpoint = '/api/integration/ext/v1/supporters/search';
+        $uri = $util['host'] . $endpoint;
         $client = new GuzzleHttp\Client([
             'base_uri' => $uri,
             'headers'  => $util['headers']
@@ -118,7 +118,7 @@
         // show("Find supporter request payload", $payload);
 
         try {
-            $response = $client->request($method, $command, [
+            $response = $client->request($method, $endpoint, [
                 'json'     => $payload
             ]);
             $data = json_decode($response -> getBody());
@@ -162,8 +162,8 @@
         ];
 
         $method = 'PUT';
-        $command = '/api/integration/ext/v1/supporters';
-        $uri = $util['host'] . $command;
+        $endpoint = '/api/integration/ext/v1/supporters';
+        $uri = $util['host'] . $endpoint;
 
         // show("Write request payload", $payload);
 
@@ -173,7 +173,7 @@
             'headers'  => $util['headers']
         ]);
         try {
-            $response = $client->request($method, $command, [
+            $response = $client->request($method, $endpoint, [
                 'json'     => $payload
             ]);
             $data = json_decode($response -> getBody());

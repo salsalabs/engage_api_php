@@ -77,7 +77,7 @@
         ];
         $method = 'GET';
         $uri = $util["devHost"];
-        $command = '/api/developer/ext/v1/activities';
+        $endpoint = '/api/developer/ext/v1/activities';
         $params = [
             'types' => "P2P_EVENT,TICKETED_EVENT",
             'sortField' => "name",
@@ -96,7 +96,7 @@
         $count = 0;
         do {
             $queries = http_build_query($params);
-            $x = $command . "?" . $queries;
+            $x = $endpoint . "?" . $queries;
             // printf("Command: %s\n", $x);
             try {
                 $response = $client->request($method, $x);
@@ -132,14 +132,14 @@
         ];
         $method = 'GET';
         $uri = $util["devHost"];
-        $command = '/api/developer/ext/v1/activities/'.$id.'/metadata';
+        $endpoint = '/api/developer/ext/v1/activities/'.$id.'/metadata';
         $client = new GuzzleHttp\Client([
             'base_uri' => $uri,
             'headers'  => $headers
         ]);
 
         try {
-            $response = $client->request($method, $command, [
+            $response = $client->request($method, $endpoint, [
                 'json'     => $payload
             ]);
             $data = json_decode($response -> getBody());
@@ -164,7 +164,7 @@
         ];
         $method = 'GET';
         $uri = $util["devHost"];
-        $command = '/api/developer/ext/v1/activities/teams/'.$id;
+        $endpoint = '/api/developer/ext/v1/activities/teams/'.$id;
         https://api.salsalabs.org/api/developer/ext/v1/activities/teams/{uuid}
         $client = new GuzzleHttp\Client([
             'base_uri' => $uri,
@@ -172,8 +172,8 @@
         ]);
 
         try {
-            printf("getTeams: command is %s\n", $command);
-            $response = $client->request($method, $command, [
+            printf("getTeams: command is %s\n", $endpoint);
+            $response = $client->request($method, $endpoint, [
                 'json'     => $payload
             ]);
             printf("getTeams: body is \n%s\n", json_encode($response->getBody(), JSON_PRETTY_PRINT));

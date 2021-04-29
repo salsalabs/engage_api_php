@@ -69,7 +69,7 @@
         ];
         $method = 'POST';
         $host = "http://api.salsalabs.org";
-        $command = '/api/integration/ext/v1/activities/search';
+        $endpoint = '/api/integration/ext/v1/activities/search';
          $payload = [
             'activityIds' => $util["activityIds"],
             'count' => $util->getMetrics()->maxBatchSize,
@@ -85,7 +85,7 @@
         $count = 0;
         do {
             try {
-                $response = $client->request($method, $command, [
+                $response = $client->request($method, $endpoint, [
                     'json' => $payload,
                 ]);
                 $data = json_decode($response -> getBody());

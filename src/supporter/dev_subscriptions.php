@@ -65,13 +65,13 @@
             'Content-Type' => 'application/json',
         ];
         $method = 'GET';
-        //$command = '/api/development/ext/v1/callMetrics';
-        $command = '/api/integration/ext/v1/metrics';
+        //$endpoint = '/api/development/ext/v1/callMetrics';
+        $endpoint = '/api/integration/ext/v1/metrics';
         $client = new GuzzleHttp\Client([
             'base_uri' => $util['intHost'],
             'headers'  => $headers
         ]);
-        $response = $client->request($method, $command);
+        $response = $client->request($method, $endpoint);
         $data = json_decode($response -> getBody());
         return $data->payload;
     }
@@ -85,7 +85,7 @@
             'Content-Type' => 'application/json',
         ];
         $method = 'POST';
-        $command = '/api/developer/ext/v1/submissions';
+        $endpoint = '/api/developer/ext/v1/submissions';
         $payload = [
             'payload' => [
                 'type' => $type,
@@ -106,7 +106,7 @@
         $count = 0;
         do {
             try {
-                $response = $client->request($method, $command, [
+                $response = $client->request($method, $endpoint, [
                     'json' => $payload
                 ]);
                 $data = json_decode($response -> getBody());
