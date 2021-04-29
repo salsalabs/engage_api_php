@@ -76,8 +76,10 @@
             'Content-Type' => 'application/json',
         ];
         $method = 'GET';
-        $uri = $util["devHost"];
+
         $endpoint = '/api/developer/ext/v1/activities';
+        $client = $util->getClient($endpoint);
+
         $params = [
             'types' => "P2P_EVENT,TICKETED_EVENT",
             'sortField' => "name",
@@ -86,11 +88,6 @@
             'count' => $util->getMetrics()->maxBatchSize,
             'offset' => 0
         ];
-
-        $client = new GuzzleHttp\Client([
-            'base_uri' => $uri,
-            'headers'  => $headers
-        ]);
 
         $forms = array();
         $count = 0;
@@ -131,12 +128,9 @@
             ]
         ];
         $method = 'GET';
-        $uri = $util["devHost"];
+
         $endpoint = '/api/developer/ext/v1/activities/'.$id.'/metadata';
-        $client = new GuzzleHttp\Client([
-            'base_uri' => $uri,
-            'headers'  => $headers
-        ]);
+        $client = $util->getClient($endpoint);
 
         try {
             $response = $client->request($method, $endpoint, [
@@ -163,17 +157,14 @@
             'Content-Type' => 'application/json',
         ];
         $method = 'GET';
-        $uri = $util["devHost"];
+
         $endpoint = '/api/developer/ext/v1/activities/' . $id . "/summary/fundraisers";
+        $client = $util->getClient($endpoint);
+
         $params = [
             'count' => $util->getMetrics()->maxBatchSize,
             'offset' => 0
         ];
-
-        $client = new GuzzleHttp\Client([
-            'base_uri' => $uri,
-            'headers'  => $headers
-        ]);
 
         $forms = array();
         $count = 0;
@@ -212,17 +203,14 @@
             'Content-Type' => 'application/json',
         ];
         $method = 'GET';
-        $uri = $util["devHost"];
+
         $endpoint = '/api/developer/ext/v1/activities/' . $id . "/summary/registrations";
+        $client = $util->getClient($endpoint);
+
         $params = [
             'count' => $util->getMetrics()->maxBatchSize,
             'offset' => 0
         ];
-
-        $client = new GuzzleHttp\Client([
-            'base_uri' => $uri,
-            'headers'  => $headers
-        ]);
 
         $forms = array();
         $count = 0;
@@ -271,12 +259,10 @@
         ];
         //echo json_encode($payload, JSON_PRETTY_PRINT);
         $method = 'POST';
-        $uri = $util['intHost'];
+
         $endpoint = '/api/integration/ext/v1/activities/search';
-        $client = new GuzzleHttp\Client([
-            'base_uri' => $uri,
-            'headers' => $headers,
-        ]);
+        $client = $util->getClient($endpoint);
+
         $forms = array();
         $count = 0;
         do {

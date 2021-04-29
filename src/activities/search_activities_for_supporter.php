@@ -11,19 +11,19 @@
  *
  * php src/actvities/search_activities_for_supporter.php --login credentials.yaml
  *
-* Note:
-*
-* This app requires an field named 'supporterId' in the YAML configuration file.
-* Engage wants a list of supporterIds.  We'll do that by coding our one ID into
-* a YAML array.
-*
-* +-- column 1
-* |
-* v
-* supporterId:
-*  - "83bxx9o-auix-w9p6-n-kk3r25hy9hayyco"
-*
-*/
+ * Note:
+ *
+ * This app requires an field named 'supporterId' in the YAML configuration file.
+ * Engage wants a list of supporterIds.  We'll do that by coding our one ID into
+ * a YAML array.
+ *
+ * +-- column 1
+ * |
+ * v
+ * supporterId:
+ *  - "83bxx9o-auix-w9p6-n-kk3r25hy9hayyco"
+ *
+ */
 
 // Uses DemoUtils.
 require 'vendor/autoload.php';
@@ -47,11 +47,11 @@ function main() {
         ],
     ];
     $method = 'POST';
-    $command = '/api/integration/ext/v1/activities/search';
-    $client = $util->getIntClient();
+    $endpoint = '/api/integration/ext/v1/activities/search';
+    $client = $util->getClient($endpoint)
 
     try {
-        $response = $client->request($method, $command, [
+        $response = $client->request($method, $endpoint, [
             'json' => $payload,
         ]);
         $data = json_decode($response->getBody());

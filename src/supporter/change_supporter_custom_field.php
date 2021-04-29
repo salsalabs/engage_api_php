@@ -7,7 +7,7 @@
     // App to change a custom fields for a supporter.  You provide the supporter
     // UUID, custom field name and custom field value.  The app adds/changes the
     // custom the custom field's value.
-    // 
+    //
     //Output is all of the JSON payloads (pretty noisy).
     //
     // Usage:
@@ -38,7 +38,7 @@
     // If you are adding a custom field value, then the supporter before-image
     // will not show the custom field.  The post-image will
 
-    
+
     // Function to retrieve parse the command line values, read and validate
     // the YAML file, then return an object of the file's contents.
     function initialize()
@@ -110,12 +110,8 @@
         ];
         $method = 'POST';
         $endpoint = '/api/integration/ext/v1/supporters/search';
-        $uri = $util['host'] . $endpoint;
-        $client = new GuzzleHttp\Client([
-            'base_uri' => $uri,
-            'headers'  => $util['headers']
-        ]);
-        // show("Find supporter request payload", $payload);
+        $client = $util->getClient($endpoint);
+
 
         try {
             $response = $client->request($method, $endpoint, [
@@ -163,15 +159,8 @@
 
         $method = 'PUT';
         $endpoint = '/api/integration/ext/v1/supporters';
-        $uri = $util['host'] . $endpoint;
+        $client = $util->getClient($endpoint);
 
-        // show("Write request payload", $payload);
-
-        // Make the call to Engage.
-        $client = new GuzzleHttp\Client([
-            'base_uri' => $uri,
-            'headers'  => $util['headers']
-        ]);
         try {
             $response = $client->request($method, $endpoint, [
                 'json'     => $payload
@@ -187,7 +176,7 @@
     // there are errors or the supporter doesn't exist.
     function main() {
         $util = initialize();
-        
+
         $supporter = read_supporter($util);
         // show("Supporter initial condition", $supporter);
         $needsWrite = update_supporter($util, $supporter);

@@ -39,22 +39,12 @@ seeJSON($du->getHeaders($du->getWebDevToken()));
 
 function pass5(){
 printf("Client, int token\n");
-seeJSON($du->getClient($du->getIntToken()));
+seeJSON($du->getClient("/api/integration/ext/v1/activities/search"));
 }
 
 function pass6(){
 printf("Client, dev token\n");
-seeJSON($du->getClient($du->getWebDevToken()));
-}
-
-function pass7(){
-printf("Client, Int direct\n");
-seeJSON($du->getIntClient());
-}
-
-function pass8() {
-printf("Client, WebDev direct\n");
-seeJSON($du->getWebDevClient());
+seeJSON($du->getClient("/api/developer/ext/v1/activities"));
 }
 
 function pass9() {

@@ -8,7 +8,7 @@
     // App to list email blasts and their external IDs.  This app only outputs
     // COMPLETED blasts that have an external URL.  The remainder are blisfully ignored.
     //
-    // Note that this example uses the Engage developer API.  
+    // Note that this example uses the Engage developer API.
     // See https://help.salsalabs.com/hc/en-us/articles/360001220174-Email-Blasts-List
     //
     //
@@ -64,8 +64,8 @@
     // Mainline that does the work.
     function main() {
         $util = initialize();
-    
-        
+
+
         // The Engage token goes into HTTP headers.
         $headers = [
             'authToken' => $util['token'],
@@ -79,7 +79,7 @@
         // &criteria=blast1
         // &sortFIeld=description
         // &sortOrder=ASCENDING
-        // &count=20       
+        // &count=20
         // &offset=40
         $params = [
             'query' => [
@@ -92,11 +92,7 @@
          ];
         $method = 'GET';
         $endpoint = '/api/developer/ext/v1/blasts';
-
-        $client = new GuzzleHttp\Client([
-            'base_uri' => $util['host'],
-            'headers'  => $headers
-        ]);
+        $client = $util->getClient($endpoint);
 
         $csv = fopen("email_blast_info.csv", "w");
         $first = true;

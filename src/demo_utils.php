@@ -151,44 +151,39 @@ class DemoUtils {
         }
 
     /**
-     * Return a GuzzleHTTPClient for the specified token.
-     * Automatically creates the headers.
+     * Return a GuzzleHTTPClient for the specified endpoint.
+     * endpoints contain the token type as part of the endpoint URL.
+     * Throws an exception if the endpoint is egregiously malformed.
+     * (Bet you never got a change to put "egrigiously" in to a comment...)
      * @param string $token     API token
      * @return object           GuzzleHTTPClient object
+     * @throws Exception        Throws an exception for a malformed endpoint
+     *                          Throws an exception if the Integration Token is null
+     *                          Throws an exception if the Web Development Token is null
      * @access public
      */
-     public function getClient($token) {
-         $base_uri = $this->getAPIHost();
-         $headers = $this->getHeaders($token);
+     public function getClient($endpoint) {
+         if(strpos($endpoint, "integration") !== false) {
+             $token = $this->getIntToken();
+             if (is_null($token)) {
+                 throw new Exception("Integration API Token is null");
+             }
+         } else {
+             if (strpos($endpoint, "developer") !== false) {
+                     $token = $this->getWebDevToken();
+                     if (is_null($token)) {
+                         throw new Exception("Web Developer API Token is null");
+                     }
+            } else {
+                throw new Exception("Malformed endpoint, ''" . $endpoint . "'");
+             }
+         }
          $client =  new \GuzzleHttp\Client([
-                        'base_uri' => $base_uri,
-                        'headers'  => $headers
+                        'base_uri' => $this->getAPIHost(),
+                        'headers'  => $this->getHeaders($token)
         ]);
         return $client;
      }
-
- /**
-  * Convenience method to return a GuzzleHTTPClient for the
-  * Integration API. Calls `getClient()`.
-  * @return object           GuzzleHTTPClient object
-  * @access public
-  */
-  public function getIntClient() {
-      $token = $this->getIntToken();
-      return $this->getClient($token);
-  }
-
-  /**
-   * Convenience method to return  a GuzzleHTTPClient for the
-   * Web Development API.  Calls `getClient()`.
-   * @return object           GuzzleHTTPClient object
-   * @access public
-   */
-   public function getWebDevClient() {
-       $token = $this->getWebDevToken();
-       return $this->getClient($token);
-   }
-
 
    /* Returns the stashed metrics.  If the metrics have not been retrieved
     * yet, then calls updateMetrics().  Raises an exception if the metrics
@@ -196,7 +191,10 @@ class DemoUtils {
     *
     * Metrics change with every API call.  Monitoring the metrics can help
     * you avoid unwanted terminations and slowdowns.
-    * See https://help.salsalabs.com/hc/en-us/articles/224531208-General-Use
+    *
+    * See
+    *
+    * https://help.salsalabs.com/hc/en-us/articles/224531208-General-Use
     *
     * Note:
     *
@@ -228,7 +226,7 @@ class DemoUtils {
         if (isset($this->apiHost) && (isset($this->intToken))) {
             $method = 'GET';
             $endpoint = '/api/integration/ext/v1/metrics';
-            $client = $this->getIntClient();
+            $client = $this->getClient($endpoint);
             $response = $client->request($method, $endpoint);
             $data = json_decode($response -> getBody());
             $this->metrics = $data->payload;

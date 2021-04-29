@@ -41,7 +41,7 @@
             $x = $endpoint . "?" . $queries;
             //printf("Command: %s\n", $x);
             try {
-                $client = $util->getWebDevClient();
+                $client = $util->getClient($endpoint);
                 $response = $client->request($method, $x);
                 $data = json_decode($response -> getBody());
                 // echo json_encode($data, JSON_PRETTY_PRINT);
@@ -71,7 +71,7 @@
         ];
         $method = 'GET';
         $endpoint = '/api/developer/ext/v1/activities/'.$id.'/metadata';
-        $client = $util->getWebDevClient();
+        $client = $util->getClient($endpoint);
         try {
             $response = $client->request($method, $endpoint, [
                 'json'     => $payload
@@ -89,8 +89,7 @@
      * data and metadata.  Output goes to the console.
      * @param array $util  Populated nstance of DemoUtils.
      */
-    function seeForms($util) {
-        $forms = fetchForms($util);
+    function seeForms($util, $forms) {
         $format = "%-36s %-70s %-24s %-10s %s\n";
         printf($format,
             "ID",
@@ -117,7 +116,9 @@
     function main() {
         $util =  new \DemoUtils\DemoUtils();
         $util->appInit();
-        seeForms($util);
+        $forms = fetchForms($util);
+        seeForms($util, $forms);
     }
+
     main()
 ?>

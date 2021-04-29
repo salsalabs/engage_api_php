@@ -70,17 +70,13 @@
         $method = 'POST';
         $host = "http://api.salsalabs.org";
         $endpoint = '/api/integration/ext/v1/activities/search';
-         $payload = [
+        $client = $util->getClient($endpoint);
+        $payload = [
             'activityIds' => $util["activityIds"],
             'count' => $util->getMetrics()->maxBatchSize,
             'offset' => 0
         ];
 
-        $client = new GuzzleHttp\Client([
-            'base_uri' => $host,
-            'headers'  => $headers
-        ]);
-    
         $forms = array();
         $count = 0;
         do {

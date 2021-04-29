@@ -25,7 +25,7 @@
         sourceID: incredibly-long-id
         targetID: incredibly-long-id
     */
-    // Output is the payload and the result, both in JSON. 
+    // Output is the payload and the result, both in JSON.
 
     // Retrieve the runtime parameters and validate them.
     function initialize()
@@ -71,7 +71,7 @@
         // Show the credentials.
         $t = json_encode($util, JSON_PRETTY_PRINT);
         printf("\nCredentials\n%s\n", $t);
-    
+
         // The Engage token goes into HTTP headers.
         $headers = [
             'authToken' => $util['token'],
@@ -91,18 +91,14 @@
         ];
 
         $method = 'POST';
-        $uri = $util['host'];
+
         $endpoint = '/api/integration/ext/v1/supporters/merge';
+        $client = $util->getClient($endpoint);
 
         // Show the payload.
         $t = json_encode($payload, JSON_PRETTY_PRINT);
         printf("\nPayload\n%s\n", $t);
 
-        // Make the call to Engage.
-        $client = new GuzzleHttp\Client([
-            'base_uri' => $uri,
-            'headers'  => $headers
-        ]);
         try {
             $response = $client->request($method, $endpoint, [
                 'json'     => $payload

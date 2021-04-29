@@ -103,12 +103,9 @@
         ];
 
         $method = 'POST';
-        $uri = 'https://' . $util['host'];
+
         $endpoint = '/api/integration/ext/v1/activities/search';
-        $client = new GuzzleHttp\Client([
-            'base_uri' => $uri,
-            'headers' => $headers,
-        ]);
+        $client = $util->getClient($endpoint);
 
         try {
             $response = $client->request($method, $endpoint, [

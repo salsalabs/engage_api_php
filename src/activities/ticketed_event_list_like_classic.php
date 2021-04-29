@@ -71,18 +71,14 @@
             'Content-Type' => 'application/json',
         ];
         $method = 'GET';
-        $uri = 'http://api.salsalabs.org';
+
         $endpoint = '/api/developer/ext/v1/activities';
+        $client = $util->getClient($endpoint);
         $params = [
             'types' => "TICKETED_EVENT",
             'count' => $util->getMetrics()->maxBatchSize,
             'offset' => 0
         ];
-
-        $client = new GuzzleHttp\Client([
-            'base_uri' => $uri,
-            'headers'  => $headers
-        ]);
 
         $forms = array();
         $count = 0;
@@ -123,12 +119,9 @@
             ]
         ];
         $method = 'GET';
-        $uri = 'http://api.salsalabs.org';
+
         $endpoint = '/api/developer/ext/v1/activities/'.$id.'/metadata';
-        $client = new GuzzleHttp\Client([
-            'base_uri' => $uri,
-            'headers'  => $headers
-        ]);
+        $client = $util->getClient($endpoint);
 
         try {
             $response = $client->request($method, $endpoint, [

@@ -76,8 +76,9 @@
             'Content-Type' => 'application/json',
         ];
         $method = 'GET';
-        $uri = $util["devHost"];
+
         $endpoint = '/api/developer/ext/v1/activities';
+        $client = $util->getClient($endpoint);
         $params = [
             'types' => "P2P_EVENT,TICKETED_EVENT",
             'sortField' => "name",
@@ -86,11 +87,6 @@
             'count' => $util->getMetrics()->maxBatchSize,
             'offset' => 0
         ];
-
-        $client = new GuzzleHttp\Client([
-            'base_uri' => $uri,
-            'headers'  => $headers
-        ]);
 
         $forms = array();
         $count = 0;
@@ -131,12 +127,9 @@
             ]
         ];
         $method = 'GET';
-        $uri = $util["devHost"];
+
         $endpoint = '/api/developer/ext/v1/activities/'.$id.'/metadata';
-        $client = new GuzzleHttp\Client([
-            'base_uri' => $uri,
-            'headers'  => $headers
-        ]);
+        $client = $util->getClient($endpoint);
 
         try {
             $response = $client->request($method, $endpoint, [
@@ -163,13 +156,9 @@
             ]
         ];
         $method = 'GET';
-        $uri = $util["devHost"];
+
         $endpoint = '/api/developer/ext/v1/activities/teams/'.$id;
-        https://api.salsalabs.org/api/developer/ext/v1/activities/teams/{uuid}
-        $client = new GuzzleHttp\Client([
-            'base_uri' => $uri,
-            'headers'  => $headers
-        ]);
+        $client = $util->getClient($endpoint);
 
         try {
             printf("getTeams: command is %s\n", $endpoint);
@@ -229,7 +218,7 @@
                 $status,
                 $goal,
                 $goalValue);
- 
+
             printf("\nTeams\n");
             $teams = fetchTeams($util, $r->id);
             if (empty($teams)) {

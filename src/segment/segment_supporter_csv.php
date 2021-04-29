@@ -71,12 +71,10 @@ function getSegments($util, $offset, $count)
         ],
     ];
     $method = 'POST';
-    $uri = $util['host'];
+
     $endpoint = '/api/integration/ext/v1/segments/search';
-    $client = new GuzzleHttp\Client([
-        'base_uri' => $uri,
-        'headers' => $headers,
-    ]);
+    $client = $util->getClient($endpoint);
+
    try {
         $response = $client->request($method, $endpoint, [
             'json' => $payload,
@@ -136,10 +134,7 @@ function getMetrics($util) {
     ];
     $method = 'GET';
     $endpoint = '/api/integration/ext/v1/metrics';
-    $client = new GuzzleHttp\Client([
-        'base_uri' => $util['host'],
-        'headers'  => $headers
-    ]);
+    $client = $util->getClient($endpoint);
     $response = $client->request($method, $endpoint);
     $data = json_decode($response -> getBody());
     return $data->payload;
@@ -199,12 +194,9 @@ function getSupportersForSegment($util, $metrics, $segment) {
         'Content-Type' => 'application/json',
     ];
     $endpoint = '/api/integration/ext/v1/segments/members/search';
+    $client = $util->getClient($endpoint);
     $method = 'POST';
-    $uri = $util["host"];
-    $client = new GuzzleHttp\Client([
-        'base_uri' => $uri,
-        'headers' => $headers,
-    ]);
+
     $all = [];
     while ($count > 0) {
         $payload = [

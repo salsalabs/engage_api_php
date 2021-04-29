@@ -7,7 +7,7 @@
     // App to look up a supporter by email.  Once found, then
     // update a custom field with a value.
     // Example contents:
-    /*         
+    /*
         email: someone@whatever.biz
         token: Your-incredibly-long-Engage-token-here
         fieldName: custom field name.
@@ -30,7 +30,7 @@
          validateCredentials($util, $filename);
          return $util;
      }
- 
+
      // Validate the contents of the provided credential file.
      // All fields are required.  Exits on errors.
      function validateCredentials($util, $filename) {
@@ -52,7 +52,7 @@
              exit("Too many errors, terminating.\n");
          }
      }
- 
+
     // Return the supporter record for the email in the credentials.
     // @param array  $util  Contents of YAML credentials file
     //
@@ -75,13 +75,10 @@
         // printf("Payload:\n%s\n", json_encode($payload, JSON_PRETTY_PRINT));
 
         $method = 'POST';
-        $uri = 'https://api.salsalabs.org';
-        $uri = 'https://hq.uat.igniteaction.net';
+
+
         $endpoint = '/api/integration/ext/v1/supporters/search';
-        $client = new GuzzleHttp\Client([
-            'base_uri' => $uri,
-            'headers'  => $headers
-        ]);
+        $client = $util->getClient($endpoint);
         $response = $client->request($method, $endpoint, [
             'json'     => $payload
         ]);
@@ -127,7 +124,7 @@
         ];
 
         // Search for the custom field and change its value.
-        
+
         foreach ($supporter->customFieldValues as $cf) {
             if ($cf -> name == $util["fieldName"]) {
                 $cf -> value = $util["fieldValue"];
@@ -151,13 +148,10 @@
         // echo "\n";
 
         $method = 'PUT';
-        $uri = 'https://api.salsalabs.org';
-        $uri = 'https://hq.uat.igniteaction.net';
+
+
         $endpoint = '/api/integration/ext/v1/supporters';
-        $client = new GuzzleHttp\Client([
-            'base_uri' => $uri,
-            'headers'  => $headers
-        ]);
+        $client = $util->getClient($endpoint);
         $response = $client->request($method, $endpoint, [
             'json'     => $payload
         ]);
@@ -173,9 +167,9 @@
                 seeCustomField($cf);
             }
        }
-    }           
-    
-    
+    }
+
+
     // Main app.  Does the work.
     function main() {
         $util = initialize();
@@ -198,7 +192,7 @@
         // Update to Engage.
         update($util, $supporter);
 
-        // Show what Engage returns.  Note that custom field values have an 
+        // Show what Engage returns.  Note that custom field values have an
         // optional "errors" field that will describe any errors.
         echo("\nAfter:\n");
         $supporter = getSupporter($util);

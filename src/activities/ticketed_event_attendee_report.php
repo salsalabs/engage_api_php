@@ -67,16 +67,12 @@ function fetchAttendees($util)
     $endpoint = 'https://api.salsalabs.org/api/developer/ext/v1/activities/'
         . $util["eventId"]
         . '/summary/registrations';
+    $client = $util->getClient($endpoint);
 
     $params = [
         'count' => $util->getMetrics()->maxBatchSize,
         'offset' => 0,
     ];
-
-    $client = new GuzzleHttp\Client([
-        'base_uri' => $endpoint,
-        'headers' => $headers,
-    ]);
 
     $attendees = array();
     $count = 0;

@@ -52,7 +52,7 @@
     // Mainline that does the work.
     function main() {
         $util = initialize();
-    
+
         // The Engage token goes into HTTP headers.
         $headers = [
             'authToken' => $util['token'],
@@ -70,11 +70,7 @@
         ];
         $method = 'POST';
         $endpoint = '/api/integration/ext/v1/supporters/search';
-
-        $client = new GuzzleHttp\Client([
-            'base_uri' => $util['host'],
-            'headers'  => $headers
-        ]);
+        $client = $util->getClient($endpoint);
     
         // Do until end of data or utter boredom.  Read 20 records
         // from the current offset.

@@ -119,13 +119,10 @@
         echo "\n=========   P A Y L O A D ==========\n";
         echo json_encode($payload, JSON_PRETTY_PRINT)."\n";
         $method = 'POST';
-        $uri = 'https://api.salsalabs.org';
-        $uri = 'https://hq.uat.igniteaction.net';
+
+
         $endpoint = '/api/integration/ext/v1/offlineDonations';
-        $client = new GuzzleHttp\Client([
-            'base_uri' => $uri,
-            'headers' => $headers,
-        ]);
+        $client = $util->getClient($endpoint);
 
         try {
             $response = $client->request($method, $endpoint, [

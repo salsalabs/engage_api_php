@@ -67,12 +67,10 @@ function getSegment($util)
         ],
     ];
     $method = 'POST';
-    $uri = $util["host"];
+
     $endpoint = '/api/integration/ext/v1/segments/search';
-    $client = new GuzzleHttp\Client([
-        'base_uri' => $uri,
-        'headers' => $headers,
-    ]);
+    $client = $util->getClient($endpoint);
+
     try {
         $response = $client->request($method, $endpoint, [
             'json' => $payload,
@@ -100,6 +98,7 @@ function search($util, $offset, $count)
         'Content-Type' => 'application/json',
     ];
     $endpoint = '/api/integration/ext/v1/segments/members/search';
+    $client = $util->getClient($endpoint);
     $payload = [
         'payload' => [
             'count' => $count,
@@ -108,11 +107,7 @@ function search($util, $offset, $count)
         ],
     ];
     $method = 'POST';
-    $uri = $util["host"];
-    $client = new GuzzleHttp\Client([
-        'base_uri' => $uri,
-        'headers' => $headers,
-    ]);
+
 
     try {
         $response = $client->request($method, $endpoint, [

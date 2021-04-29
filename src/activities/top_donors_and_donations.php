@@ -71,8 +71,9 @@
             'Content-Type' => 'application/json',
         ];
         $method = 'GET';
-        $uri = $util["devHost"];
+
         $endpoint = '/api/developer/ext/v1/activities';
+        $client = $util->getClient($endpoint);
         $params = [
             'types' => "FUNDRAISE,",
             'sortField' => "name",
@@ -80,11 +81,6 @@
             'count' => $util->getMetrics()->maxBatchSize,
             'offset' => 0
         ];
-
-        $client = new GuzzleHttp\Client([
-            'base_uri' => $uri,
-            'headers'  => $headers
-        ]);
 
         $forms = array();
         $count = 0;
@@ -130,12 +126,10 @@
         ];
         //echo json_encode($payload, JSON_PRETTY_PRINT);
         $method = 'POST';
-        $uri = $util['intHost'];
+
         $endpoint = '/api/integration/ext/v1/activities/search';
-        $client = new GuzzleHttp\Client([
-            'base_uri' => $uri,
-            'headers' => $headers,
-        ]);
+        $client = $util->getClient($endpoint);
+
         $forms = array();
         $count = 0;
         do {
@@ -182,12 +176,10 @@
         ];
         //echo json_encode($payload, JSON_PRETTY_PRINT);
         $method = 'POST';
-        $uri = $util['intHost'];
+
         $endpoint = '/api/integration/ext/v1/supporters/search';
-        $client = new GuzzleHttp\Client([
-            'base_uri' => $uri,
-            'headers' => $headers,
-        ]);
+        $client = $util->getClient($endpoint);
+
         $forms = array();
         $count = 0;
         try {

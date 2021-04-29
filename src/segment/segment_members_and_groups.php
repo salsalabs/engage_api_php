@@ -75,20 +75,6 @@ function getMetrics($util)
     return $data->payload;
 }
 
-// Return a Guzzle client for HTTP operations.
-function getClient($util)
-{
-    $headers = [
-        'authToken' => $util['token'],
-        'Content-Type' => 'application/json',
-    ];
-    $client = new GuzzleHttp\Client([
-        'base_uri' => $util["host"],
-        'headers' => $headers
-    ]);
-    return $client;
-}
-
 // Finds an email address for a supporter.  Returns an empty
 // string if an email can't be found.
 function getEmail($supporter)
@@ -121,7 +107,7 @@ function getGroupsPayload($util, $metrics, $supporterIds)
     ];
     $method = 'POST';
     $endpoint = '/api/integration/ext/v1/supporters/groups';
-    $client = getClient($util);
+    $client = $util->getClient($endpoint);
 
     try {
         $response = $client->request($method, $endpoint, [
@@ -140,7 +126,7 @@ function getGroupsPayload($util, $metrics, $supporterIds)
 function getSegment($util, $metrics, $segmentId)
 {
     $method = 'POST';
-    $uri = $util["host"];
+
     $endpoint = '/api/integration/ext/v1/segments/search';
     $payload = [
         'payload' => [
@@ -214,17 +200,17 @@ function processGroupsForSupporters($util, $metrics, $csv, $supporters)
                         $firstName,
                         $lastName,
                         $email,
-                        $groupString 
+                        $groupString
                     ];
                     fputcsv($csv, $line, $delimiter="\t");
                 }
                 printf("%-36s %5d groups\n", $supporter->supporterId, count($groups));
             }
-        }   
+        }
     }
 }
 
-// Run retrieves supporters using the segmentID provided in the 
+// Run retrieves supporters using the segmentID provided in the
 // credentials file.  Those supporters are used to retrieve the groups
 // that each supporer belongs to.  Supporters with groups are written
 // to a tab-delimited file("all_supporter_groups.txt"). Supporters

@@ -14,7 +14,7 @@ use Symfony\Component\Yaml\Yaml;
 // * Comma-delimited file of groups
 //
 // Supporters that are not in groups are not used.
-// Supporters whose first email address is not opted-in 
+// Supporters whose first email address is not opted-in
 // (i.e. supporter.contact.status is not "OPT_IN") are not used.
 //
 // Note: This app provides data that can't be retrieved
@@ -88,24 +88,10 @@ function getMetrics($util)
 {
     $method = 'GET';
     $endpoint = '/api/integration/ext/v1/metrics';
-    $client = getClient($util);
+    $client = $util->getClient($endpoint);
     $response = $client->request($method, $endpoint);
     $data = json_decode($response -> getBody());
     return $data->payload;
-}
-
-// Return a Guzzle client for HTTP operations.
-function getClient($util)
-{
-    $headers = [
-        'authToken' => $util['token'],
-        'Content-Type' => 'application/json',
-    ];
-    $client = new GuzzleHttp\Client([
-        'base_uri' => $util["host"],
-        'headers' => $headers
-    ]);
-    return $client;
 }
 
 // Finds the first email address for a supporter.  Returns an empty
@@ -154,7 +140,7 @@ function getGroupsPayload($util, $metrics, $supporterIds)
     ];
     $method = 'POST';
     $endpoint = '/api/integration/ext/v1/supporters/groups';
-    $client = getClient($util);
+    $client = $util->getClient($endpoint);
 
     try {
         $response = $client->request($method, $endpoint, [
@@ -217,14 +203,14 @@ function processGroupsForSupporters($util, $metrics, $csv, $supporters)
                             $lastName,
                             $status,
                             $email,
-                            $groupString 
+                            $groupString
                         ];
                         fputcsv($csv, $line, $delimiter="\t");
                     }
                 }
                 printf("%-36s %5d groups\n", $supporter->supporterId, count($groups));
             }
-        }   
+        }
     }
 }
 
@@ -242,7 +228,6 @@ function run($util, $metrics)
     ];
     $method = 'POST';
     $endpoint = '/api/integration/ext/v1/supporters/search';
-    $client = getClient($util);
 
     $csv = fopen("all_supporter_groups.csv", "w");
     $headers = [

@@ -65,12 +65,9 @@
             'Content-Type' => 'application/json',
         ];
         $method = 'GET';
-        //$endpoint = '/api/development/ext/v1/callMetrics';
         $endpoint = '/api/integration/ext/v1/metrics';
-        $client = new GuzzleHttp\Client([
-            'base_uri' => $util['intHost'],
-            'headers'  => $headers
-        ]);
+        $client = $util->getClient($endpoint);
+
         $response = $client->request($method, $endpoint);
         $data = json_decode($response -> getBody());
         return $data->payload;
@@ -97,10 +94,7 @@
         //printf("\n%s Payload\n", $type);
         //$text = json_encode($payload, JSON_PRETTY_PRINT);
         //printf("%s\n", $text);
-        $client = new GuzzleHttp\Client([
-            'base_uri' => $util["devHost"],
-            'headers'  => $headers
-        ]);
+        $client = $util->getClient($endpoint);
 
         $submissions = array();
         $count = 0;
@@ -165,14 +159,14 @@
         //$text = json_encode($metrics, JSON_PRETTY_PRINT);
         //printf("Metrics:\n%s\n", $text);
         $types = [
-            "SUBSCRIPTION_MANAGEMENT", 
-            "SUBSCRIBE", 
-            "FUNDRAISE", 
-            "PETITION", 
-            "TARGETED_LETTER", 
-            "REGULATION_COMMENTS", 
-            "TICKETED_EVENT", 
-            "P2P_EVENT", 
+            "SUBSCRIPTION_MANAGEMENT",
+            "SUBSCRIBE",
+            "FUNDRAISE",
+            "PETITION",
+            "TARGETED_LETTER",
+            "REGULATION_COMMENTS",
+            "TICKETED_EVENT",
+            "P2P_EVENT",
             "P2P_REGISTRATIONS"];
         foreach ($types as $type) {
             printf("\n%s\n", $type);

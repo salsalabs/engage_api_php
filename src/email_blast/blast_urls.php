@@ -5,7 +5,7 @@
     use Symfony\Component\Console\Descriptor\ApplicationDescription;
     use Symfony\Component\Yaml\Yaml;
 
-    // App to show email blasts.  Note that this example uses the Engage developer API.  
+    // App to show email blasts.  Note that this example uses the Engage developer API.
     // See https://help.salsalabs.com/hc/en-us/articles/360001220174-Email-Blasts-List
     //
     // Criteria is all blasts.  Filtered to the ones that have a blast URL.
@@ -63,8 +63,8 @@
     // Mainline that does the work.
     function main() {
         $util = initialize();
-    
-        
+
+
         // The Engage token goes into HTTP headers.
         $headers = [
             'authToken' => $util['token'],
@@ -78,7 +78,7 @@
         // &criteria=blast1
         // &sortFIeld=description
         // &sortOrder=ASCENDING
-        // &count=20       
+        // &count=20
         // &offset=40
         $params = [
             'query' => [
@@ -91,11 +91,7 @@
          ];
         $method = 'GET';
         $endpoint = '/api/developer/ext/v1/blasts';
-
-        $client = new GuzzleHttp\Client([
-            'base_uri' => $util['host'],
-            'headers'  => $headers
-        ]);
+        $client = $util->getClient($endpoint);
 
         // Do until end of data or utter boredom.  Read 20 records
         // from the current offset.

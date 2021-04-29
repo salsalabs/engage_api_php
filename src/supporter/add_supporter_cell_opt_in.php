@@ -13,7 +13,7 @@
         lastName:  a name
         email: an email address
     */
-    // Output is the payload and the result, both in JSON. 
+    // Output is the payload and the result, both in JSON.
 
     // Retrieve the runtime parameters and validate them.
     function initialize()
@@ -58,14 +58,14 @@
     // Mainline that does the work.
     function main() {
         $util = initialize();
-    
+
         // The Engage token goes into HTTP headers.
         $headers = [
             'authToken' => $util['token'],
             'Content-Type' => 'application/json'
         ];
 
-        // The payload contains the supporter to add to Engage. 
+        // The payload contains the supporter to add to Engage.
         $payload = [ 'payload' => [
                 'supporters' => [
                     [
@@ -88,18 +88,14 @@
             ]
         ];
         $method = 'PUT';
-        $uri = $util['host'];
+
         $endpoint = '/api/integration/ext/v1/supporters';
+        $client = $util->getClient($endpoint);
 
         // Show the payload.
         $t = json_encode($payload, JSON_PRETTY_PRINT);
         printf("\nPayload\n%s\n", $t);
 
-        // Make the call to Engage.
-        $client = new GuzzleHttp\Client([
-            'base_uri' => $uri,
-            'headers'  => $headers
-        ]);
         try {
             $response = $client->request($method, $endpoint, [
                 'json'     => $payload

@@ -2,18 +2,15 @@
     // Uses Composer.
     require 'vendor/autoload.php';
     use GuzzleHttp\Client;
-    
+
     $headers = [
             'authToken' => 'YOUR-INCREDIBLY-LONG-API-TOKEN',
             'Content-Type' => 'application/json'
     ];
     $method = 'GET';
-    $uri = 'https://api.salsalabs.org';
+
     $endpoint = '/api/integration/ext/v1/metrics';
-    $client = new GuzzleHttp\Client([
-        'base_uri' => $uri,
-        'headers'  => $headers
-    ]);
+    $client = $util->getClient($endpoint);
     $response = $client->request($method, $endpoint);
 
     // not valid, substituting standard JSON parse

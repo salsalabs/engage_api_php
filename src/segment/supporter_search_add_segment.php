@@ -8,9 +8,9 @@
     // then the supporter is added to a segment.  The YAML file contains
     // information about the supporter and segment.
     // Example contents:
-    /*         
+    /*
         identifierType: EMAIL_ADDRESS
-        identifiers: 
+        identifiers:
             - someone@whatever.biz
         token: Your-incredibly-long-Engage-token-here
         segmentId:
@@ -78,12 +78,10 @@
             ]
         ];
         $method = 'POST';
-        $uri = $util['host'];
+
         $endpoint = '/api/integration/ext/v1/supporters/search';
-        $client = new GuzzleHttp\Client([
-            'base_uri' => $uri,
-            'headers'  => $headers
-        ]);
+        $client = $util->getClient($endpoint);
+
         $response = $client->request($method, $endpoint, [
             'json'     => $payload
         ]);
@@ -122,12 +120,9 @@
         printf("\nPayload\n%s\n", $text);
 
         $method = 'POST';
-        $uri = $util['host'];
+
         $endpoint = '/api/integration/ext/v1/segments/search';
-        $client = new GuzzleHttp\Client([
-            'base_uri' => $uri,
-            'headers'  => $headers
-        ]);
+        $client = $util->getClient($endpoint);
         $response = $client->request($method, $endpoint, [
             'json'     => $payload
         ]);
@@ -168,12 +163,9 @@
         ];
 
         $method = 'PUT';
-        $uri = $util['host'];
+
         $endpoint = '/api/integration/ext/v1/segments/members';
-        $client = new GuzzleHttp\Client([
-            'base_uri' => $uri,
-            'headers'  => $headers
-        ]);
+        $client = $util->getClient($endpoint);
         $response = $client->request($method, $endpoint, [
             'json'     => $payload
         ]);
