@@ -24,20 +24,18 @@
  *
  * This app requires two values to run.
  *
- * - identifierType:  The kind of activity to search.
- * - modifiedFrom:
-
- an field named 'supporterId' in the YAML configuration file.
- * Engage wants a list of supporterIds.  We'll do that by coding our one ID into
- * a YAML array.
+ * - identifierType:  The kind of activity to search. See the request payload in the doc.
+ * - modifiedFrom: "2021-04-01T12:34:56.000Z"  All times are UTC.
+ *
+ * The fields are supplied in `config.yaml`.  Here's an example.
  *
  * +-- column 1
  * |
  * v
- * supporterId:
- *  - "83bxx9o-auix-w9p6-n-kk3r25hy9hayyco"
+ * identifierType: FUNDRAISING
+ * modifiedFrom: "2021-04-01T12:34:56.000Z"
  *
- */ */
+ */
 
 // Uses DemoUtils.
 require 'vendor/autoload.php';
@@ -46,28 +44,20 @@ require 'src/demo_utils.php';
 // Retrieve transactions and display the applicable ones.
 function getTransactions($util, $offset, $count)
 {
-    $headers = [
-        'authToken' => $util['token'],
-        'Content-Type' => 'application/json',
-    ];
     $payload = [
         'payload' => [
-            'type' => $util["identifierType"],
-            'modifiedFrom' => $util['modifiedFrom'],
+            'type' =>         $util->getEnvironment()["identifierType"],
+            'modifiedFrom' => $util->getEnvironment()["modifiedFrom"],
             //'modidifedTo' => $util['modifiedTo'],
-            'offset' => $offset,
-            'count' => $count
+            'offset' =>       $offset,
+            'count' =>        $count
         ],
     ];
     $method = 'POST';
-    $uri = $util['host'];
-    $command = '/api/integration/ext/v1/activities/search';
-    $client = new GuzzleHttp\Client([
-        'base_uri' => $uri,
-        'headers' => $headers,
-    ]);
+    $endpoint = '/api/integration/ext/v1/activities/search';
+    $client = $util->GetClient($endpoint);
     try {
-        $response = $client->request($method, $command, [
+        $response = $client->request($method, $endpoint, [
             'json' => $payload,
         ]);
         $data = json_decode($response->getBody());
@@ -90,39 +80,35 @@ function getTransactions($util, $offset, $count)
     }
 }
 
-function main()
-{
-    $util = initialize();
+// Application starts here.
+function main() {
+    $util =  new \DemoUtils\DemoUtils();
+    $util->appInit();
     $offset = 0;
-    $count = 20;
-    while ($count > 0) {
+    $count = $util->getMetrics()->maxBatchSize;
+    while ($count == $util->getMetrics()->maxBatchSize) {
         $activities = getTransactions($util, $offset, $count);
         if (is_null($activities)) {
             $count = 0;
         } else {
             $count = count($activities);
-            $i = 1;
             foreach ($activities as $s) {
-                if (!property_exists($s, 'activityFormId')
-                    || !property_exists($s, 'personName')
-                    || !property_exists($s, 'personEmail')) {
-                    seeActivity($s, ($offset + $i));
-                    //seeTransactions($s);
+                    seeActivity($s);
+                    seeTransactions($s);
                     $i++;
                 }
             }
         }
         $offset += $count;
-    }
+
 }
 
 // Function to see an activity.
-function seeActivity($s, $serialNumber)
+function seeActivity($s)
 {
     fprintf(
         STDOUT,
-        "%6d: %s %s %-30s %-30s %-20s %s %s %s imported? %s apiImported? %s %s\n",
-        ($serialNumber),
+        "%s %s %-30s %-30s %-20s %s %s %s imported? %s apiImported? %s %s\n",
         $s->activityId,
         property_exists($s, 'activityFormId') ? $s->activityFormId : "-- Undefined --",
         $s->supporterId,
@@ -141,16 +127,18 @@ function seeActivity($s, $serialNumber)
 //See transactions for an activity.
 function seeTransactions($s)
 {
-    foreach ($s->transactions as $t) {
-        fprintf(
-            STDOUT,
-            "        %s %s %s %s %s\n",
-            $t->transactionId,
-            $t->type,
-            $t->reason,
-            $t->date,
-            $t->amount
-        );
+    if (sizeof($s->transactions) > 1) {
+        foreach ($s->transactions as $t) {
+            fprintf(
+                STDOUT,
+                "        %s %s %s %s %s\n",
+                $t->transactionId,
+                $t->type,
+                $t->reason,
+                $t->date,
+                $t->amount
+            );
+        }
     }
 }
 
