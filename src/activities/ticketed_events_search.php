@@ -103,7 +103,8 @@
 
     // Ubiquitous main function.
     function main() {
-        $util = initialize();
+        $util =  new \DemoUtils\DemoUtils();
+        $util->appInit();
         $forms = fetchForms($util);
         printf("%s\n", json_encode($forms, JSON_PRETTY_PRINT));
     }

@@ -220,7 +220,9 @@
 
     // Ubiquitous main function.
     function main() {
-        $util = initialize();
+        $util =  new \DemoUtils\DemoUtils();
+        $util->appInit();
+
         // -----------------------------------------------------------
         // Enumerate fundraising forms.
         // -----------------------------------------------------------

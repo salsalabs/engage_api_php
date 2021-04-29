@@ -255,7 +255,8 @@ function writeSegments($util, $metrics, $segments) {
 
 function main()
 {
-    $util = initialize();
+    $util =  new \DemoUtils\DemoUtils();
+    $util->appInit();
     $metrics = getMetrics($util);
     $all = getAllSegments($util, $metrics);
     $customSegments = array_filter($all, "isCustom");

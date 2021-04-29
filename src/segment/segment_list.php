@@ -103,7 +103,8 @@ function getMetrics($util) {
 
 function main()
 {
-    $util = initialize();
+    $util =  new \DemoUtils\DemoUtils();
+    $util->appInit();
     $metrics = getMetrics($util);
     $offset = 0;
     $count = $metrics -> maxBatchSize;

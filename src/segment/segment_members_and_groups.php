@@ -20,7 +20,8 @@ segmentId: incredibly-long-segment-id
 // Standard application entry point.
 function main()
 {
-    $util = initialize();
+    $util =  new \DemoUtils\DemoUtils();
+    $util->appInit();
     $metrics = getMetrics($util);
     run($util, $metrics);
 }

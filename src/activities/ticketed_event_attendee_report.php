@@ -99,7 +99,8 @@ function fetchAttendees($util)
 // Ubiquitous main function.
 function main()
 {
-    $util = initialize();
+    $util =  new \DemoUtils\DemoUtils();
+    $util->appInit();
     $attendees = fetchAttendees($util);
     $json = json_encode($attendees, JSON_PRETTY_PRINT);
     printf("%s\n", $json);

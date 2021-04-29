@@ -53,11 +53,8 @@ function validateCredentials($util, $filename)
 
 function main()
 {
-    $util = initialize();
-    $headers = [
-        'authToken' => $util['token'],
-        'Content-Type' => 'application/json',
-    ];
+    $util =  new \DemoUtils\DemoUtils();
+    $util->appInit();
 
     $payload = ['payload' => [
         'count' => $util->getMetrics()->maxBatchSize,

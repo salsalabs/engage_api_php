@@ -67,7 +67,8 @@
 
     // Mainline that does the work.
     function main() {
-        $util = initialize();
+        $util =  new \DemoUtils\DemoUtils();
+        $util->appInit();
         // Show the credentials.
         $t = json_encode($util, JSON_PRETTY_PRINT);
         printf("\nCredentials\n%s\n", $t);

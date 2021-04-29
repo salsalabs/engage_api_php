@@ -63,14 +63,8 @@
 
     // Mainline that does the work.
     function main() {
-        $util = initialize();
-
-
-        // The Engage token goes into HTTP headers.
-        $headers = [
-            'authToken' => $util['token'],
-            'Content-Type' => 'application/json'
-        ];
+        $util =  new \DemoUtils\DemoUtils();
+        $util->appInit();
 
         // Example criteria from the doc.
         // https://api.salsalabs.org/api/developer/ext/v1/blasts

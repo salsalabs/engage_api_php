@@ -178,7 +178,8 @@
     }
 
     function main() {
-        $util = initialize();
+        $util =  new \DemoUtils\DemoUtils();
+        $util->appInit();
         $supporter = getSupporter($util);
         if (is_null($supporter)) {
             echo ("Sorry, can't find supporter for ID.\n");

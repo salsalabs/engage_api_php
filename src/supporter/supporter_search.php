@@ -122,7 +122,8 @@ function run($util)
 
 function main()
 {
-    $util = initialize();
+    $util =  new \DemoUtils\DemoUtils();
+    $util->appInit();
     run($util);
 }
 

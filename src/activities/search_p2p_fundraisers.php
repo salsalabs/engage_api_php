@@ -28,7 +28,7 @@
     // Fetch fundraisers for an activity form.
     // Returns an array of fundraisers.
     function getFundraisers($util) {
-        $client = $util->getClient($endpoint)
+        $client = $util->getClient($endpoint);
         $method = 'GET';
         $environment = $util->getEnvironment();
         $activityId = $environment["p2pActivityId"];

@@ -112,7 +112,8 @@
 
     function main()
     {
-        $util = initialize();
+        $util =  new \DemoUtils\DemoUtils();
+        $util->appInit();
         $offset = 0;
         $count = 20;
         while ($count > 0) {

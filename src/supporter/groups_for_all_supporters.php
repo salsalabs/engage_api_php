@@ -40,7 +40,8 @@ host: https://api.salsalabs.org
 // Standard application entry point.
 function main()
 {
-    $util = initialize();
+    $util =  new \DemoUtils\DemoUtils();
+    $util->appInit();
     $metrics = getMetrics($util);
     run($util, $metrics);
 }

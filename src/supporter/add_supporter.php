@@ -60,13 +60,8 @@
 
     // Mainline that does the work.
     function main() {
-        $util = initialize();
-
-        // The Engage token goes into HTTP headers.
-        $headers = [
-            'authToken' => $util['token'],
-            'Content-Type' => 'application/json'
-        ];
+        $util =  new \DemoUtils\DemoUtils();
+        $util->appInit();
 
         // The payload contains the information to add to Engage.  Note that the
         // contents are retrieved from the parameter file.   This is a test of

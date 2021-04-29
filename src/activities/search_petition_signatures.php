@@ -53,11 +53,8 @@ function see_signature($r) {
 }
 function main()
 {
-    $util = initialize();
-    $headers = [
-        'authToken' => $util["token"],
-        'Content-Type' => 'application/json',
-    ];
+    $util =  new \DemoUtils\DemoUtils();
+    $util->appInit();
 
     $payload = [
         'payload' => [

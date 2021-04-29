@@ -48,7 +48,7 @@ function main() {
     ];
     $method = 'POST';
     $endpoint = '/api/integration/ext/v1/activities/search';
-    $client = $util->getClient($endpoint)
+    $client = $util->getClient($endpoint);
 
     try {
         $response = $client->request($method, $endpoint, [

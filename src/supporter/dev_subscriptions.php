@@ -154,7 +154,8 @@
     }
     // Ubiquitous main function.
     function main() {
-        $util = initialize();
+        $util =  new \DemoUtils\DemoUtils();
+        $util->appInit();
         $metrics = getMetrics($util);
         //$text = json_encode($metrics, JSON_PRETTY_PRINT);
         //printf("Metrics:\n%s\n", $text);

@@ -172,7 +172,8 @@
 
     // Main app.  Does the work.
     function main() {
-        $util = initialize();
+        $util =  new \DemoUtils\DemoUtils();
+        $util->appInit();
         $supporter = getSupporter($util);
         if (is_null($supporter)) {
             printf("Sorry, can't find supporter for '%s'.\n", $util["email"]);

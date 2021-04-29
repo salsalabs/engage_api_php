@@ -175,7 +175,8 @@
     // Mainline that does the work.  Functions die messily if the
     // there are errors or the supporter doesn't exist.
     function main() {
-        $util = initialize();
+        $util =  new \DemoUtils\DemoUtils();
+        $util->appInit();
 
         $supporter = read_supporter($util);
         // show("Supporter initial condition", $supporter);

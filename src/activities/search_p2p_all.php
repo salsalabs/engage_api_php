@@ -73,7 +73,7 @@ function fetchMetadata($util, $id)
     ];
     $method = 'GET';
     $endpoint = '/api/developer/ext/v1/activities/' . $id . '/metadata';
-    $client = $util->getClient($endpoint)
+    $client = $util->getClient($endpoint);
 
     try {
         $response = $client->request($method, $endpoint, [
@@ -101,7 +101,7 @@ function fetchFundraisers($util, $id)
         'offset' => 0,
     ];
 
-    $client = $util->getClient($endpoint)
+    $client = $util->getClient($endpoint);
 
     $forms = array();
     $count = 0;
@@ -141,7 +141,7 @@ function fetchRegistrations($util, $id)
         'offset' => 0,
     ];
 
-    $client = $util->getClient($endpoint)
+    $client = $util->getClient($endpoint);
 
     $forms = array();
     $count = 0;
@@ -185,7 +185,7 @@ function fetchActivities($util, $id)
     ];
     $method = 'POST';
     $endpoint = '/api/integration/ext/v1/activities/search';
-    $client = $util->getClient($endpoint)
+    $client = $util->getClient($endpoint);
     $forms = array();
     $count = 0;
     do {
@@ -225,7 +225,7 @@ function fetchTeams($util, $id)
     ];
     $method = 'GET';
     $endpoint = '/api/developer/ext/v1/activities/teams/' . $id;
-    $client = $util->getClient($endpoint)
+    $client = $util->getClient($endpoint);
 
     try {
         $response = $client->request($method, $endpoint, [
@@ -382,7 +382,8 @@ function seeForms($util, $forms)
 // Ubiquitous main function.
 function main()
 {
-    $util = initialize();
+    $util =  new \DemoUtils\DemoUtils();
+    $util->appInit();
     $forms = fetchForms($util);
     seeForms($util, $forms);
 }

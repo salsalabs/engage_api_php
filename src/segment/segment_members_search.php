@@ -123,7 +123,8 @@ function search($util, $offset, $count)
 
 function main()
 {
-    $util = initialize();
+    $util =  new \DemoUtils\DemoUtils();
+    $util->appInit();
     $segment = getSegment($util);
     if (!is_null($segment)) {
         printf("\nSearching %s: %s for %d supporters.\n\n",

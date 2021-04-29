@@ -45,7 +45,8 @@ function validateCredentials($util, $filename)
 
 function main()
 {
-    $util = initialize();
+    $util =  new \DemoUtils\DemoUtils();
+    $util->appInit();
     $headers = [
         'authToken' => $util["token"],
         'Content-Type' => 'application/json',

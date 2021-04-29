@@ -294,7 +294,8 @@
 
     // Ubiquitous main function.
     function main() {
-        $util = initialize();
+        $util =  new \DemoUtils\DemoUtils();
+        $util->appInit();
         $forms = fetchForms($util);
         printf("\nEvent Summary\n\n");
         printf("\n%-24s %-36s %s\n",

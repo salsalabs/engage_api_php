@@ -27,7 +27,7 @@
             'count' => $util->getMetrics()->maxBatchSize,
             'offset' => 0
         ];
-        $client = $util->getClient($endpoint)
+        $client = $util->getClient($endpoint);
 
         $forms = array();
         $count = 0;
