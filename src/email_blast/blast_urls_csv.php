@@ -1,10 +1,4 @@
 <?php
-    // Uses Composer.
-    require 'vendor/autoload.php';
-    use GuzzleHttp\Client;
-    use Symfony\Component\Console\Descriptor\ApplicationDescription;
-    use Symfony\Component\Yaml\Yaml;
-
     // App to list email blasts and their external IDs.  This app only outputs
     // COMPLETED blasts that have an external URL.  The remainder are blisfully ignored.
     //
@@ -18,6 +12,10 @@
     host: https://api.salsalabs.org
     */
 
+    // Uses DemoUtils.
+    require 'vendor/autoload.php';
+    require 'src/demo_utils.php';
+
     //Return something for a null variable.
     function vacant($x) {
         if (is_null($x)) {
@@ -25,45 +23,10 @@
         }
         return $x;
     }
-    // Retrieve the runtime parameters and validate them.
-    function initialize()
-    {
-        $shortopts = "";
-        $longopts = array(
-            "login:"
-        );
-        $options = getopt($shortopts, $longopts);
-        if (false == array_key_exists('login', $options)) {
-            exit("\nYou must provide a parameter file with --login!\n");
-        }
-        $filename = $options['login'];
-        $util = Yaml::parseFile($filename);
-        validateCredentials($util, $filename);
-        return $util;
-    }
-
-    // Validate the contents of the provided credential file.
-    // All fields are required.  Exits on errors.
-    function validateCredentials($util, $filename) {
-        $errors = false;
-        $fields = array(
-            "token",
-            "host",
-        );
-        foreach ($fields as $f) {
-            if (false == array_key_exists($f, $util)) {
-                printf("Error: %s must contain a %s.\n", $filename, $f);
-                $errors = true;
-            }
-        }
-        if ($errors) {
-            exit("Too many errors, terminating.\n");
-        }
-    }
 
     // Mainline that does the work.
     function main() {
-        $util =  new \DemoUtils\DemoUtils();
+        $util = new \DemoUtils\DemoUtils();
         $util->appInit();
 
         // Example criteria from the doc.

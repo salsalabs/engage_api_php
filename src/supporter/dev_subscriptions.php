@@ -14,48 +14,9 @@
     devToken: your-web-developer-api-token-here
     devHost: "https://api.salsalabs.org"
     */
-    // Uses Composer.
+    // Uses DemoUtils.
     require 'vendor/autoload.php';
-    use GuzzleHttp\Client;
-    use Symfony\Component\Yaml\Yaml;
-
-    // Retrieve the runtime parameters and validate them.
-    function initialize()
-    {
-        $shortopts = "";
-        $longopts = array(
-            "login:"
-        );
-        $options = getopt($shortopts, $longopts);
-        if (false == array_key_exists('login', $options)) {
-            exit("\nYou must provide a parameter file with --login!\n");
-        }
-        $filename = $options['login'];
-        $util = Yaml::parseFile($filename);
-        validateCredentials($util, $filename);
-        return $util;
-    }
-
-    // Validate the contents of the provided credential file.
-    // All fields are required.  Exits on errors.
-    function validateCredentials($util, $filename) {
-        $errors = false;
-        $fields = array(
-            "devToken",
-            "devHost",
-            "intToken",
-            "intHost"
-        );
-        foreach ($fields as $f) {
-            if (false == array_key_exists($f, $util)) {
-                printf("Error: %s must contain a %s.\n", $filename, $f);
-                $errors = true;
-            }
-        }
-        if ($errors) {
-            exit("Too many errors, terminating.\n");
-        }
-    }
+    require 'src/demo_utils.php';
 
     // Retrieve the current metrics.
     // See https://help.salsalabs.com/hc/en-us/articles/224531208-General-Use
@@ -145,7 +106,7 @@
     }
     // Ubiquitous main function.
     function main() {
-        $util =  new \DemoUtils\DemoUtils();
+        $util = new \DemoUtils\DemoUtils();
         $util->appInit();
         $metrics = getMetrics($util);
         //$text = json_encode($metrics, JSON_PRETTY_PRINT);

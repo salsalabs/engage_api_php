@@ -82,7 +82,7 @@ function getTransactions($util, $offset, $count)
 
 // Application starts here.
 function main() {
-    $util =  new \DemoUtils\DemoUtils();
+    $util = new \DemoUtils\DemoUtils();
     $util->appInit();
     $offset = 0;
     $count = $util->getMetrics()->maxBatchSize;

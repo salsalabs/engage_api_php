@@ -17,47 +17,9 @@
       - ticketed-event-uuid_3
     */
 
-    // Uses Composer.
+    // Uses DemoUtils.
     require 'vendor/autoload.php';
-    use GuzzleHttp\Client;
-    use Symfony\Component\Yaml\Yaml;
-
-    // Retrieve the runtime parameters and validate them.
-    function initialize()
-    {
-        $shortopts = "";
-        $longopts = array(
-            "login:"
-        );
-        $options = getopt($shortopts, $longopts);
-        if (false == array_key_exists('login', $options)) {
-            exit("\nYou must provide a parameter file with --login!\n");
-        }
-        $filename = $options['login'];
-        $util = Yaml::parseFile($filename);
-        validateCredentials($util, $filename);
-        return $util;
-    }
-
-    // Validate the contents of the provided credential file.
-    // All fields are required.  Exits on errors.
-    function validateCredentials($util, $filename) {
-        $errors = false;
-        $fields = array(
-            "token",
-            "activityIds"
-        );
-        foreach ($fields as $f) {
-            if (false == array_key_exists($f, $util)) {
-                printf("Error: %s must contain a %s.\n", $filename, $f);
-                $errors = true;
-            }
-        }
-        if ($errors) {
-            exit("Too many errors, terminating.\n");
-        }
-    }
-
+    require 'src/demo_utils.php';
 
     // Use the provided credentials to locate all events matching 'eventType'.
     // See: https://help.salsalabs.com/hc/en-us/articles/360001206693-Activity-Form-List
@@ -98,7 +60,7 @@
 
     // Ubiquitous main function.
     function main() {
-        $util =  new \DemoUtils\DemoUtils();
+        $util = new \DemoUtils\DemoUtils();
         $util->appInit();
         $forms = fetchForms($util);
         printf("%s\n", json_encode($forms, JSON_PRETTY_PRINT));

@@ -1,9 +1,4 @@
 <?php
-// Uses Composer.
-require 'vendor/autoload.php';
-use GuzzleHttp\Client;
-use Symfony\Component\Yaml\Yaml;
-
 // App to show supporters and the groups that they belong to.
 // Output will be a tab-delimited file with these fields.
 // * supporterID
@@ -36,77 +31,17 @@ host: https://api.salsalabs.org
 // * supporterID: Show a list of groups for this supporter
 // * host: API host.  Parameterized to allow accounts from internal Engage servers.
 //
+// Uses DemoUtils.
+require 'vendor/autoload.php';
+require 'src/demo_utils.php';
 
 // Standard application entry point.
 function main()
 {
-    $util =  new \DemoUtils\DemoUtils();
+    $util = new \DemoUtils\DemoUtils();
     $util->appInit();
     $metrics = getMetrics($util);
     run($util, $metrics);
-}
-
-// Retrieve the runtime parameters and validate them.
-function initialize()
-{
-    $shortopts = "";
-    $longopts = array(
-        "login:",
-    );
-    $options = getopt($shortopts, $longopts);
-    if (false == array_key_exists('login', $options)) {
-        exit("\nYou must provide a parameter file with --login!\n");
-    }
-    $filename = $options['login'];
-    $util = Yaml::parseFile($filename);
-    validateCredentials($util, $filename);
-    return $util;
-}
-
-// Validate the contents of the provided credential file.
-// All fields are required.  Exits on errors.
-function validateCredentials($util, $filename)
-{
-    $errors = false;
-    $fields = array(
-        "token",
-        "host"
-    );
-    foreach ($fields as $f) {
-        if (false == array_key_exists($f, $util)) {
-            printf("Error: %s must contain a %s.\n", $filename, $f);
-            $errors = true;
-        }
-    }
-    if ($errors) {
-        exit("Too many errors, terminating.\n");
-    }
-}
-
-// Retrieve the current metrics.
-// See https://help.salsalabs.com/hc/en-us/articles/224531208-General-Use
-function getMetrics($util)
-{
-    $method = 'GET';
-    $endpoint = '/api/integration/ext/v1/metrics';
-    $client = $util->getClient($endpoint);
-    $response = $client->request($method, $endpoint);
-    $data = json_decode($response -> getBody());
-    return $data->payload;
-}
-
-// Finds the first email address for a supporter.  Returns an empty
-// string if an email can't be found.
-function getEmail($supporter)
-{
-    if (property_exists($supporter, "contacts") && count($supporter->contacts) > 0) {
-        foreach ($supporter->contacts as $contact) {
-            if ($contact -> type == "EMAIL") {
-                return $contact -> value;
-            }
-        }
-    }
-    return "";
 }
 
 // Finds the first email status for a supporter.  Returns an empty

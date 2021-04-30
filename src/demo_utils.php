@@ -178,7 +178,7 @@ class DemoUtils {
                 throw new Exception("Malformed endpoint, ''" . $endpoint . "'");
              }
          }
-         $client =  new \GuzzleHttp\Client([
+         $client = new \GuzzleHttp\Client([
                         'base_uri' => $this->getAPIHost(),
                         'headers'  => $this->getHeaders($token)
         ]);

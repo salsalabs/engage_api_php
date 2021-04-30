@@ -1,9 +1,4 @@
 <?php
-// Uses Composer.
-require 'vendor/autoload.php';
-use GuzzleHttp\Client;
-use Symfony\Component\Yaml\Yaml;
-
 // App to accept a supporter ID and show a list of groups to which
 // the supporter is a member.
 //
@@ -31,10 +26,14 @@ host: https://api.salsalabs.org
 //     * 28b496fd-f6bb-4eb2-a180-3cc5d92470c2 Has Never Signed a Petition
 //     * b9582c12-17d7-4563-8aeb-3c7d1f81bc73 Created in CRM
 
+// Uses DemoUtils.
+require 'vendor/autoload.php';
+require 'src/demo_utils.php';
+
 // Standard application entry point.
 function main()
 {
-    $util =  new \DemoUtils\DemoUtils();
+    $util = new \DemoUtils\DemoUtils();
     $util->appInit();
     $metrics = getMetrics($util);
     $groups = getGroups($util, $metrics);
@@ -49,44 +48,6 @@ function main()
         }
     }
  }
-
-// Retrieve the runtime parameters and validate them.
-function initialize()
-{
-    $shortopts = "";
-    $longopts = array(
-        "login:",
-    );
-    $options = getopt($shortopts, $longopts);
-    if (false == array_key_exists('login', $options)) {
-        exit("\nYou must provide a parameter file with --login!\n");
-    }
-    $filename = $options['login'];
-    $util = Yaml::parseFile($filename);
-    validateCredentials($util, $filename);
-    return $util;
-}
-
-// Validate the contents of the provided credential file.
-// All fields are required.  Exits on errors.
-function validateCredentials($util, $filename)
-{
-    $errors = false;
-    $fields = array(
-        "token",
-        "host",
-        "supporterID"
-    );
-    foreach ($fields as $f) {
-        if (false == array_key_exists($f, $util)) {
-            printf("Error: %s must contain a %s.\n", $filename, $f);
-            $errors = true;
-        }
-    }
-    if ($errors) {
-        exit("Too many errors, terminating.\n");
-    }
-}
 
 // Retrieve the current metrics.
 // See https://help.salsalabs.com/hc/en-us/articles/224531208-General-Use

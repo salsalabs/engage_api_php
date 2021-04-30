@@ -1,71 +1,11 @@
 <?php
-    // Uses Composer.
-    require 'vendor/autoload.php';
-    use GuzzleHttp\Client;
-    use Symfony\Component\Yaml\Yaml;
-
-    // App to
-    // * update a single donation to Engage
-    // * observe that the results show an invalid date.
-    //
-    // Usage:
-    //     php update_offline_donation.php --login config
-    //
-    // Where:
-    //     config is a YAML file.
-
-    /*
-    // Config file sample for Salsa's production server:
-
-    token: "your-incredibly-long-token"
-    host:  api.salsalabs.org
-
-    // Config file sample for Salsa's internal server:
-
-    token: "your-incredibly-long-token"
-    host:  hq.uat.igniteaction.net
-
-    */
-
-    // Retrieve the runtime parameters and validate them.
-    function initialize()
-    {
-        $shortopts = "";
-        $longopts = array(
-            "login:"
-        );
-        $options = getopt($shortopts, $longopts);
-        if (false == array_key_exists('login', $options)) {
-            exit("\nYou must provide a parameter file with --login!\n");
-        }
-        $filename = $options['login'];
-        $util =  Yaml::parseFile($filename);
-        validateCredentials($util, $filename);
-        return $util;
-    }
-
-    // Validate the contents of the provided credential file.
-    // All fields are required.  Exits on errors.
-    function validateCredentials($util, $filename) {
-        $errors = false;
-        $fields = array(
-            "token",
-            "host",
-        );
-        foreach ($fields as $f) {
-            if (false == array_key_exists($f, $util)) {
-                printf("Error: %s must contain a %s.\n", $filename, $f);
-                $errors = true;
-            }
-        }
-        if ($errors) {
-            exit("Too many errors, terminating.\n");
-        }
-    }
+// Uses DemoUtils.
+require 'vendor/autoload.php';
+require 'src/demo_utils.php';
 
     function main()
     {
-        $util =  new \DemoUtils\DemoUtils();
+        $util = new \DemoUtils\DemoUtils();
         $util->appInit();
 
         # This payload contains the donation to import.

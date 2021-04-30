@@ -1,9 +1,4 @@
 <?php
-// Uses Composer.
-require 'vendor/autoload.php';
-use GuzzleHttp\Client;
-use Symfony\Component\Yaml\Yaml;
-
 // App to look up a supporter by last modified time.  The YAML file contains
 // information about the modified time.
 // Example contents:
@@ -13,47 +8,13 @@ token: Your-incredibly-long-Engage-API-token
 host: api.salsalabs.org
  */
 
-// Retrieve the runtime parameters and validate them.
-function initialize()
-{
-    $shortopts = "";
-    $longopts = array(
-        "login:",
-    );
-    $options = getopt($shortopts, $longopts);
-    if (false == array_key_exists('login', $options)) {
-        exit("\nYou must provide a parameter file with --login!\n");
-    }
-    $filename = $options['login'];
-    $util = Yaml::parseFile($filename);
-    validateCredentials($util, $filename);
-    return $util;
-}
-
-// Validate the contents of the provided credential file.
-// All fields are required.  Exits on errors.
-function validateCredentials($util, $filename)
-{
-    $errors = false;
-    $fields = array(
-        "token",
-        "host",
-        "modifiedFrom",
-    );
-    foreach ($fields as $f) {
-        if (false == array_key_exists($f, $util)) {
-            printf("Error: %s must contain a %s.\n", $filename, $f);
-            $errors = true;
-        }
-    }
-    if ($errors) {
-        exit("Too many errors, terminating.\n");
-    }
-}
+ // Uses DemoUtils.
+ require 'vendor/autoload.php';
+ require 'src/demo_utils.php';
 
 function main()
 {
-    $util =  new \DemoUtils\DemoUtils();
+    $util = new \DemoUtils\DemoUtils();
     $util->appInit();
     $payload = [
         'payload' => [

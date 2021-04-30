@@ -80,7 +80,7 @@
     // Standard application entry point.
     function main()
     {
-        $util =  new \DemoUtils\DemoUtils();
+        $util = new \DemoUtils\DemoUtils();
         $util->appInit();
         $fundraisers = getFundraisers($util);
         processFundraisers($fundraisers);

@@ -1,7 +1,7 @@
 <?php
-    // Uses Composer.
-    require 'vendor/autoload.php';
-    use GuzzleHttp\Client;
+// Uses DemoUtils.
+require 'vendor/autoload.php';
+require 'src/demo_utils.php';
 
     $method = 'GET';
     $endpoint = '/api/integration/ext/v1/metrics';

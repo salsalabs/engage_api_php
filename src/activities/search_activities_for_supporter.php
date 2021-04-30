@@ -31,7 +31,7 @@ require 'src/demo_utils.php';
 
 // Application starts here.
 function main() {
-    $util =  new \DemoUtils\DemoUtils();
+    $util = new \DemoUtils\DemoUtils();
     $util->appInit();
 
     $environment = $util->getEnvironment();

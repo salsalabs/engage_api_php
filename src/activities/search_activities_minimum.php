@@ -72,7 +72,7 @@
 
     // Application starts here.
     function main() {
-        $util =  new \DemoUtils\DemoUtils();
+        $util = new \DemoUtils\DemoUtils();
         $util->appInit();
         $forms = fetchForms($util);
         seeForms($util, $forms);

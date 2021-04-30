@@ -1,9 +1,4 @@
 <?php
-    // Uses Composer.
-    require 'vendor/autoload.php';
-    use GuzzleHttp\Client;
-    use Symfony\Component\Yaml\Yaml;
-
     // App to change a custom fields for a supporter.  You provide the supporter
     // UUID, custom field name and custom field value.  The app adds/changes the
     // custom the custom field's value.
@@ -38,54 +33,9 @@
     // If you are adding a custom field value, then the supporter before-image
     // will not show the custom field.  The post-image will
 
-
-    // Function to retrieve parse the command line values, read and validate
-    // the YAML file, then return an object of the file's contents.
-    function initialize()
-    {
-        $shortopts = "";
-        $longopts = array(
-            "login:"
-        );
-        $options = getopt($shortopts, $longopts);
-        if (false == array_key_exists('login', $options)) {
-            exit("\nYou must provide a parameter file with --login!\n");
-        }
-        $filename = $options['login'];
-        $util = Yaml::parseFile($filename);
-        validateCredentials($util, $filename);
-
-         // Engage API headers for all calls.
-         $util['headers'] = [
-            'authToken' => $util['token'],
-            'Content-Type' => 'application/json'
-        ];
-       return $util;
-    }
-
-    // Validate the contents of the provided credential file.
-    // All fields are required.  Exits on errors.
-    function validateCredentials($util, $filename) {
-        $errors = false;
-        $fields = array(
-            "token",
-            "supporterId",
-            "customFieldName",
-            "customFieldValue"
-        );
-        foreach ($fields as $f) {
-            if (false == array_key_exists($f, $util)) {
-                printf("Error: %s must contain a %s.\n", $filename, $f);
-                $errors = true;
-            }
-        }
-        if ($errors) {
-            exit("Too many errors, terminating.\n");
-        }
-        if (false == array_key_exists("host", $util)) {
-            $util['host'] = "https://api.salsalabs.org";
-        }
-    }
+    // Uses DemoUtils.
+    require 'vendor/autoload.php';
+    require 'src/demo_utils.php';
 
     // Write a message and a JSON-encoded thing to the console.
     function show($msg, $thing) {
@@ -175,7 +125,7 @@
     // Mainline that does the work.  Functions die messily if the
     // there are errors or the supporter doesn't exist.
     function main() {
-        $util =  new \DemoUtils\DemoUtils();
+        $util = new \DemoUtils\DemoUtils();
         $util->appInit();
 
         $supporter = read_supporter($util);

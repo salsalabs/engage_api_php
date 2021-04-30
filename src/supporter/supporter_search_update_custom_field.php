@@ -1,9 +1,4 @@
 <?php
-    // Uses Composer.
-    require 'vendor/autoload.php';
-    use GuzzleHttp\Client;
-    use Symfony\Component\Yaml\Yaml;
-
     // App to look up a supporter by email.  Once found, then
     // update a custom field with a value.
     // Example contents:
@@ -14,44 +9,9 @@
         fieldValue: mew custom field value
     */
 
-     // Retrieve the runtime parameters and validate them.
-     function initialize()
-     {
-         $shortopts = "";
-         $longopts = array(
-             "login:"
-         );
-         $options = getopt($shortopts, $longopts);
-         if (false == array_key_exists('login', $options)) {
-             exit("\nYou must provide a parameter file with --login!\n");
-         }
-         $filename = $options['login'];
-         $util = Yaml::parseFile($filename);
-         validateCredentials($util, $filename);
-         return $util;
-     }
-
-     // Validate the contents of the provided credential file.
-     // All fields are required.  Exits on errors.
-     function validateCredentials($util, $filename) {
-         $errors = false;
-         $fields = array(
-             "token",
-             "host",
-             "email",
-             "fieldName",
-             "fieldValue"
-         );
-         foreach ($fields as $f) {
-             if (false == array_key_exists($f, $util)) {
-                 printf("Error: %s must contain a %s.\n", $filename, $f);
-                 $errors = true;
-             }
-         }
-         if ($errors) {
-             exit("Too many errors, terminating.\n");
-         }
-     }
+    // Uses DemoUtils.
+    require 'vendor/autoload.php';
+    require 'src/demo_utils.php';
 
     // Return the supporter record for the email in the credentials.
     // @param array  $util  Contents of YAML credentials file
@@ -163,7 +123,7 @@
 
     // Main app.  Does the work.
     function main() {
-        $util =  new \DemoUtils\DemoUtils();
+        $util = new \DemoUtils\DemoUtils();
         $util->appInit();
         $supporter = getSupporter($util);
         if (is_null($supporter)) {

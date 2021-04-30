@@ -12,47 +12,9 @@ devToken: your-web-developer-api-token-here
 eventId: The UUID for the event.  Can be retrieved via the API or from the UI.
  */
 
-// Uses Composer.
-require 'vendor/autoload.php';
-use GuzzleHttp\Client;
-use Symfony\Component\Yaml\Yaml;
-
-// Retrieve the runtime parameters and validate them.
-function initialize()
-{
-    $shortopts = "";
-    $longopts = array(
-        "login:",
-    );
-    $options = getopt($shortopts, $longopts);
-    if (false == array_key_exists('login', $options)) {
-        exit("\nYou must provide a parameter file with --login!\n");
-    }
-    $filename = $options['login'];
-    $util = Yaml::parseFile($filename);
-    validateCredentials($util, $filename);
-    return $util;
-}
-
-// Validate the contents of the provided credential file.
-// All fields are required.  Exits on errors.
-function validateCredentials($util, $filename)
-{
-    $errors = false;
-    $fields = array(
-        "devToken",
-        "eventId",
-    );
-    foreach ($fields as $f) {
-        if (false == array_key_exists($f, $util)) {
-            printf("Error: %s must contain a %s.\n", $filename, $f);
-            $errors = true;
-        }
-    }
-    if ($errors) {
-        exit("Too many errors, terminating.\n");
-    }
-}
+ // Uses DemoUtils.
+ require 'vendor/autoload.php';
+ require 'src/demo_utils.php';
 
 // Use the provided credentials to retrieve attendees for the
 // specified event.  Returns a list of attendees.
@@ -95,7 +57,7 @@ function fetchAttendees($util)
 // Ubiquitous main function.
 function main()
 {
-    $util =  new \DemoUtils\DemoUtils();
+    $util = new \DemoUtils\DemoUtils();
     $util->appInit();
     $attendees = fetchAttendees($util);
     $json = json_encode($attendees, JSON_PRETTY_PRINT);
