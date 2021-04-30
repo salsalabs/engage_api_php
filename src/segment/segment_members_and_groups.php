@@ -4,14 +4,16 @@
 // for the groups that each supporters belong to.  The combination
 // of supporter info and groups are written to a tab-delimited file.
 //
-// This app requires a YAML file of credentials *and* and segmentID.
-//
-// Example contents:
-/*
-token: Your-incredibly-long-Engage-token-here
-host: api.salsalabs.org
-segmentId: incredibly-long-segment-id
- */
+/* This app requires an field named 'segmentOd' in the YAML configuration file.
+* Engage wants a list of supporterIds.  We'll do that by coding our one ID into
+* a YAML array.
+*
+* +-- column 1
+* |
+* v
+* segmentId:
+*  - "83bxx9o-auix-w9p6-n-kk3r25hy9hayyco"
+*/
 
  // Uses DemoUtils.
  require 'vendor/autoload.php';
@@ -33,7 +35,7 @@ function getMetrics($util)
 {
     $method = 'GET';
     $endpoint = '/api/integration/ext/v1/metrics';
-    $client = getClient($util);
+    $client =$util->getClient($endpoint);
     $response = $client->request($method, $endpoint);
     $data = json_decode($response -> getBody());
     return $data->payload;
@@ -97,11 +99,11 @@ function getSegment($util, $metrics, $segmentId)
             'offset' => 0,
             'count' => $metrics->maxBatchSize,
             'identifierType' => 'SEGMENT_ID',
-            'identifiers' => array($segmentId),
+            'identifiers' => array($util->getEnvironment()["segmentId"]),
             'includeMemberCounts' => 'true'
         ],
     ];
-    $client = getClient($util);
+    $client =$util->getClient($endpoint);
     try {
         $response = $client->request($method, $endpoint, [
             'json' => $payload,
@@ -184,7 +186,7 @@ function run($util, $metrics)
 {
     // Show the segment in case the segment ID is not what the user
     // wanted...
-    $segmentId = $util["segmentId"];
+    $segmentId = $util->getEnvironment()["segmentId"];
     $segment = getSegment($util, $metrics, $segmentId);
     if (!is_null($segment)) {
         printf("Searching %s: (%s) for %d supporters.\n\n",
@@ -217,7 +219,7 @@ function run($util, $metrics)
     ];
     $method = 'POST';
     $endpoint = '/api/integration/ext/v1/segments/members/search';
-    $client = getClient($util);
+    $client =$util->getClient($endpoint);
 
     // Do until end of data. Read a number of supporters.
     // Find their groups.  Write to a CSV file.
