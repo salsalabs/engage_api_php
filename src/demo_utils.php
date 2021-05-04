@@ -166,16 +166,16 @@ class DemoUtils {
          if(strpos($endpoint, "integration") !== false) {
              $token = $this->getIntToken();
              if (is_null($token)) {
-                 throw new Exception("Integration API Token is null");
+                 throw new \Exception("Integration API Token is null");
              }
          } else {
              if (strpos($endpoint, "developer") !== false) {
                      $token = $this->getWebDevToken();
                      if (is_null($token)) {
-                         throw new Exception("Web Developer API Token is null");
+                         throw \new Exception("Web Developer API Token is null");
                      }
             } else {
-                throw new Exception("Malformed endpoint, ''" . $endpoint . "'");
+                throw new \Exception("Malformed endpoint, ''" . $endpoint . "'");
              }
          }
          $client = new \GuzzleHttp\Client([
