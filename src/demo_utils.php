@@ -104,7 +104,7 @@ class DemoUtils {
      * that need to paginate.
      *
      * @param  string $filename  YAML file to parse
-     * @throws Exceptions File access exceptions
+     * @throws Exceptions        File access exceptions
      * @access public
      */
     public function loadYAML($filename) {
