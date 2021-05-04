@@ -1,13 +1,20 @@
 <?php
-    // App to look up activities using the form ID used to create them.
-    // Example contents of YAML file.
-    /*
-    activityFormIds:
-        - "7de5910c-30ab-451b-b74c-a475c338"
-    modifiedFrom: "2016-05-26T11:49:24.905Z"
-    token: Your-Engage-API-token
-    host: https://api.salsalabs.org/
-    */
+    /* App to look up activities using the form ID used to create them.
+     *
+     * Endpoint
+     *
+     * '/api/integration/ext/v1/activities/search'
+     *
+     * The list of activityFormIds is provided in the configuration.yaml
+     * file.  Here's an example.
+     *
+     * +-- column 1
+     * |
+     * v
+     * activityFormIds:
+     *  - "83bxx9o-auix-w9p6-n-kk3r25hy9hayyco"
+     *  - "bunkc7p-u27k7-mmf-w-1ngxpng8o2fa5q2"
+     */
 
     // Uses DemoUtils.
     require 'vendor/autoload.php';
@@ -18,24 +25,22 @@
         $util = new \DemoUtils\DemoUtils();
         $util->appInit();
 
+        $method = 'POST';
+        $endpoint = '/api/integration/ext/v1/activities/search';
+        $client = $util->getClient($endpoint);
+
+        $env = $util->getEnvironment();
         $payload = [
             'payload' => [
-                'type' => 'FUNDRAISE',
-                'activityFormIds' => $util['activityFormIds'],
+                'activityFormIds' => $env['activityFormIds'],
                 'offset' => 0,
                 'count' => $util->getMetrics()->maxBatchSize
             ]
         ];
-        echo("\nPayload:\n" . json_encode($payload, JSON_PRETTY_PRINT) . "\n\n");
-
-        $method = 'POST';
-
-        $endpoint = '/api/integration/ext/v1/activities/search';
-        $client = $util->getClient($endpoint);
 
         try {
             $response = $client->request($method, $endpoint, [
-                'json'     => $payload
+                'json' => $payload
             ]);
             $data = json_decode($response -> getBody());
             //echo ("\nResults:\n");

@@ -379,7 +379,7 @@ function seeForms($util, $forms)
     }
 
 }
-// Ubiquitous main function.
+// Application starts here.
 function main()
 {
     $util = new \DemoUtils\DemoUtils();

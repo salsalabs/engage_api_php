@@ -227,7 +227,7 @@
         return $forms;
     }
 
-    // Ubiquitous main function.
+    // Application starts here.
     function main() {
         $util = new \DemoUtils\DemoUtils();
         $util->appInit();

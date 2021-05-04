@@ -1,30 +1,28 @@
 <?php
-    // App to search for donation records with dedications that were made in
-    // a timeframe that you choose.
-    //
-    // Usage:
-    //
-    //  php src/search_for_dedications.php -login config.yaml
-    //
-
-    // "config.yaml" is a YAML file.It contains these fields.
-    /*
-    token:          "your-incredibly-long-token"
-    identifierType: FUNDRAISE
-    modifiedFrom:   "2018-07-01T00:00:00.000Z"
-    modifiedTo:     "2018-07-31T23:59:59.999Z"
-
-    This is a sample of the output:
-
-    [  100: 3] d9f2d14f-d37e-4091-a4a6-d68c3c613cac   IN_HONOR_OF Milly the Swimming Mule
-
-    where:
-        100 is the current offset.
-        3 is the record number at the offset.
-        d9f2d14f-d37e-4091-a4a6-d68c3c613cac is the donation ID
-        IN_HONOR_OF is the dedication type
-        Milly the Swimming Mule is the dedication.
-    */
+    /** App to search for donation records with dedications that were made in
+     * a timeframe that you choose.
+     *
+     * Usage:
+     *
+     *  php src/activities/search_for_dedications.php -login config.yaml
+     *
+     * Endpoints:
+     *
+     * /api/integration/ext/v1/activities/search
+     *
+     * See:
+     *
+     * https://api.salsalabs.org/help/integration#operation/activitySearch
+     *
+     * This app requires a date range. The date range is specified in the
+     * configuration YAML file.  Here's an example.
+     *
+     * +-- column 1
+     * |
+     * v
+     * modifiedFrom: "2021-01-01T12:34:56.000Z"
+     * modifiedTo: "2021-01-31T12:34:56.000Z"
+     */
 
     // Uses DemoUtils.
     require 'vendor/autoload.php';
@@ -33,19 +31,23 @@
     // Retrieve transactions and display the applicable ones.
     function getTransactions($util, $offset, $count)
     {
+        $util = new \DemoUtils\DemoUtils();
+        $util->appInit();
+
+        $method = 'POST';
+        $endpoint = '/api/integration/ext/v1/activities/search';
+        $client = $util->getClient($endpoint);
+
+        $env = $util->getEnvironment();
         $payload = [
             'payload' => [
-                'type' => $util["identifierType"],
-                'modifiedFrom' => $util['modifiedFrom'],
-                'modidifedTo' => $util['modifiedTo'],
+                'type' => "FUNDRAISE",
+                'modifiedFrom' => $env['modifiedFrom'],
+                'modidifedTo' => $env['modifiedTo'],
                 'offset' => $offset,
                 'count' => $count
             ],
         ];
-        $method = 'POST';
-
-        $endpoint = '/api/integration/ext/v1/activities/search';
-        $client = $util->getClient($endpoint);
 
         try {
             $response = $client->request($method, $endpoint, [

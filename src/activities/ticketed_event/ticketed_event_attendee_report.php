@@ -54,7 +54,7 @@ function fetchAttendees($util)
     return $attendees;
 }
 
-// Ubiquitous main function.
+// Application starts here.
 function main()
 {
     $util = new \DemoUtils\DemoUtils();

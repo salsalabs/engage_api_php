@@ -1,29 +1,24 @@
 <?php
 
-    // Program to retrieve what can be retrieves from P2P pages.  Uses the
-    // Web Developer API to retrieve activity-related information.  Uses the
-    // Integration API to retrieve activities.
-    //
-    // This application requires a configuration file.
-    //
-    // Usage: php src/dev_p2p_goals.php --login CONFIGURATION_FILE.yaml.
-    //
-    // Sample YAML file.  All fields must start in column 1. Comments are for PHP.
-    //
-    /*
-    intToken: your-integration-api-token-here
-    intHost: "https://api.salsalabs.org"
-    devToken: your-web-developer-api-token-here
-    devHost: "https://api.salsalabs.org"
-    */
-    // No need to put quotes around the API keys.  Fields "intHost" and "devHost"
-    //are there to accomodate Engage clients that use sandbox accounts.
+    /* Program to retrieve details about the top donors and the largest
+     * donations.
+     *
+     * Endpoints:
+     *
+     * /api/developer/ext/v1/activities
+     * /api/integration/ext/v1/activities/search
+     *
+     * Usage:
+     *
+     *  php src/activities/donors_and_donations.php -login config.yaml
+     *
+     */
 
     // Uses DemoUtils.
     require 'vendor/autoload.php';
     require 'src/demo_utils.php';
 
-    // Use the provided credentials to locate all events matching 'eventType'.
+    // Use the provided credentials to locate all fundraising activities.
     // See: https://help.salsalabs.com/hc/en-us/articles/360001206693-Activity-Form-List
     function fetchForms($util) {
         $method = 'GET';
@@ -163,7 +158,7 @@
         return $fullName;
     }
 
-    // Ubiquitous main function.
+    // Application starts here.
     function main() {
         $util = new \DemoUtils\DemoUtils();
         $util->appInit();
@@ -330,7 +325,7 @@
                         $c = $c + count($a);
                 }
                 // -----------------------------------------------------------
-                // Donor detail, grand tootals.
+                // Donor detail, grand totals.
                 // -----------------------------------------------------------
                 printf("%-30s %-5s %10s\n",
                     str_repeat('-', 30),
