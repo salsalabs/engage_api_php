@@ -1,4 +1,19 @@
 <?php
+/** App to update a single donation to Engage.  Uses an existing
+ * gatewayTransactionId to tell Engage which record to update.
+ *
+ * Usage:
+ *
+ * php update_offline_donation.php --login config
+ *
+ * Endpoints:
+ *
+ * /api/integration/ext/v1/offlineDonations
+ *
+ * See:
+ *
+ * https://api.salsalabs.org/help/integration#operation/upsertOfflineDonations
+ */
 // Uses DemoUtils.
 require 'vendor/autoload.php';
 require 'src/demo_utils.php';
@@ -8,9 +23,14 @@ require 'src/demo_utils.php';
         $util = new \DemoUtils\DemoUtils();
         $util->appInit();
 
+        $method = 'POST';
+        $endpoint = '/api/integration/ext/v1/offlineDonations';
+        $client = $util->getClient($endpoint);
+
         # This payload contains the donation to import.
         # Some of the settings are specific to a Salsa internal Engage.
-        # YMMV.
+        # YMMV.  The gatewayTransactionId must match an existing donation
+        # for this to be an update.
         $payload = [
             "payload" => [
                 "donations" => [
@@ -28,7 +48,7 @@ require 'src/demo_utils.php';
                         "gatewayTransactionId" => "52353964189",
                         "type" => "CHARGE",
                         "supporter" => [
-                            "firstName" => 'Vwmsjjfzfkj',
+                            "firstName" => 'Hrforue2g86vmn',
                             "lastName" => 'Nzvrbaaxlxx',
                             "address" => [
                                 "addressLine1" => "8 Nzvrbaaxlxx Ct",
@@ -51,10 +71,6 @@ require 'src/demo_utils.php';
         ];
         echo "\n=========   P A Y L O A D ==========\n";
         echo json_encode($payload, JSON_PRETTY_PRINT)."\n";
-        $method = 'POST';
-
-        $endpoint = '/api/integration/ext/v1/offlineDonations';
-        $client = $util->getClient($endpoint);
 
         try {
             $response = $client->request($method, $endpoint, [

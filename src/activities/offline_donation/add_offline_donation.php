@@ -1,25 +1,21 @@
 <?php
-    // App to add a single donation to Engage.  Uses dates and
-    // random numbers to pupulate the donation record.
-    //
-    // Usage:
-    //     php update_offline_donation.php --login config
-    //
-    // Where:
-    //     config is a YAML file.
-
-    /*
-    // Config file sample for Salsa's production server:
-
-    token: "your-incredibly-long-token"
-    host:  api.salsalabs.org
-
-    // Config file sample for Salsa's internal server:
-
-    token: "your-incredibly-long-token"
-    host:  hq.uat.igniteaction.net
-
-    */
+    /** App to add a single donation to Engage.  Uses dates and random
+     * numbers to pupulate the donation record.  Note that the value
+     * of the gatewayTransactionId is composed of date parts.  That means
+     * that it should be unique, which will create a new record.
+     *
+     * Usage:
+     *
+     * php update_offline_donation.php --login config
+     *
+     * Endpoints:
+     *
+     * /api/integration/ext/v1/offlineDonations
+     *
+     * See:
+     *
+     * https://api.salsalabs.org/help/integration#operation/upsertOfflineDonations
+     */
 
     // Uses DemoUtils.
     require 'vendor/autoload.php';
@@ -29,6 +25,10 @@
     {
         $util = new \DemoUtils\DemoUtils();
         $util->appInit();
+
+        $method = 'POST';
+        $endpoint = '/api/integration/ext/v1/offlineDonations';
+        $client = $util->getClient($endpoint);
 
         # This payload contains the donation to import.
         # Some of the settings are specific to a Salsa internal Engage.
@@ -78,11 +78,6 @@
         ];
         echo "\n=========   P A Y L O A D ==========\n";
         echo json_encode($payload, JSON_PRETTY_PRINT)."\n";
-        $method = 'POST';
-
-
-        $endpoint = '/api/integration/ext/v1/offlineDonations';
-        $client = $util->getClient($endpoint);
 
         try {
             $response = $client->request($method, $endpoint, [
@@ -91,6 +86,7 @@
             $data = json_decode($response->getBody());
             echo "\n=========   R E S P O N S E ==========\n";
             echo json_encode($data, JSON_PRETTY_PRINT)."\n";
+
         } catch (Exception $e) {
             echo 'Caught exception: ', $e->getMessage(), "\n";
             // var_dump($e);
