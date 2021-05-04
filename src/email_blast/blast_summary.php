@@ -1,16 +1,19 @@
 <?php
-    // App to list email blasts and their external IDs.  This app only outputs
-    // COMPLETED blasts that have an external URL.  The remainder are blisfully ignored.
-    //
-    // Note that this example uses the Engage developer API.
-    // See https://help.salsalabs.com/hc/en-us/articles/360001220174-Email-Blasts-List
-    //
-    //
-    // Your Engage token is read from a YAML file.  Here's an example:
-    /*
-    token: Your-incredibly-long-Engage-API-token
-    host: https://api.salsalabs.org
-    */
+    /** App to show information about all email blasts with URLs.
+     *
+     * Usage:
+     *
+     *  php src/activities/email_blast/blast_summary.php -login config.yaml
+     *
+     * Endpoint:
+     *
+     * /api/developer/ext/v1/blasts
+     *
+     * See:
+     *
+     *https: *help.salsalabs.com/hc/en-us/articles/360001220174-Email-Blasts-List
+     *
+     */
 
     // Uses DemoUtils.
     require 'vendor/autoload.php';
@@ -29,32 +32,21 @@
         $util = new \DemoUtils\DemoUtils();
         $util->appInit();
 
-        // Example criteria from the doc.
-        // https://api.salsalabs.org/api/developer/ext/v1/blasts
-        // ?endDate=2018-02-06T23:01:18.999Z
-        // &startDate=2018-01-08T23:01:18.000Z
-        // &criteria=blast1
-        // &sortFIeld=description
-        // &sortOrder=ASCENDING
-        // &count=20
-        // &offset=40
+        $method = 'GET';
+        $endpoint = '/api/developer/ext/v1/blasts';
+        $client = $util->getClient($endpoint);
+
         $params = [
             'query' => [
                 'startDate' => '2000-01-01T00:00:00.000Z',
-                'sortFIeld'=> 'description',
+                'sortField'=> 'description',
                 'sortOrder'=> 'ASCENDING',
                 'count'=> 20,
                 'offset'=> 0,
         ]
          ];
-        $method = 'GET';
-        $endpoint = '/api/developer/ext/v1/blasts';
-        $client = $util->getClient($endpoint);
 
-        $csv = fopen("email_blast_info.csv", "w");
-        $first = true;
-        // Do until end of data or utter boredom.  Read 20 records
-        // from the current offset.
+        // Do until end of data Read and display a batch of email blasts.
         do {
             try {
                 $response = $client->request($method, $endpoint, $params);
@@ -66,8 +58,6 @@
 
                     //Only interested in completed emails.
                     if ($b->status == 'COMPLETED') {
-                        //$text = json_encode($b, JSON_PRETTY_PRINT);
-                        //printf("Body JSON: %s\n", $text);
 
                         // Engage does not provide fields in an object if they do not have values...
                         $publishDate = (true == array_key_exists('publishDate', $b)) ? $b->publishDate : "";
@@ -76,29 +66,14 @@
                         foreach ($b->content as $c) {
                             $webVersionEnabled = (true == array_key_exists('webVersionEnabled', $c)) ? $c->webVersionEnabled : false;
                             if ($webVersionEnabled) {
-                                // $text = json_encode($c, JSON_PRETTY_PRINT);
-                                // printf("Content JSON: %s\n", $text);
-                                if ($first) {
-                                    $headers = [
-                                        "ID",
-                                        "Status",
-                                        "PublishDate",
-                                        "ScheduleDate",
-                                        "PageTitle",
-                                        "PageURL"
-                                    ];
-                                    fputcsv($csv, $headers);
-                                    $first = false;
-                                }
-                                $line = [
+                                printf("ID: %s\nstatus: %s\npublishDate: %s\nscheduleDate: %s\nsubject: %s\npageTitle: %s\npageUrl: %s\n\n",
                                     $b->id,
                                     $b->status,
                                     $publishDate,
                                     $scheduleDate,
+                                    $c->subject,
                                     $c->pageTitle,
-                                    $c->pageUrl
-                                ];
-                                fputcsv($csv, $line);
+                                    $c->pageUrl);
                             }
                         }
                     }
@@ -110,7 +85,6 @@
                 break;
             }
         } while ($count > 0);
-        fclose($csv);
     }
 
     main();

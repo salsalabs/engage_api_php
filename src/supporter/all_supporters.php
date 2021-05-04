@@ -30,8 +30,7 @@
         $endpoint = '/api/integration/ext/v1/supporters/search';
         $client = $util->getClient($endpoint);
 
-        // Do until end of data or utter boredom.  Read 20 records
-        // from the current offset.
+        // Do until end of data read and display records.
         do {
             try {
                 $response = $client->request($method, $endpoint, [
