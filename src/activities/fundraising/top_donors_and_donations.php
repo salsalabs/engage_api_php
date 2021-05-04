@@ -3,14 +3,21 @@
     /* Program to retrieve details about the top donors and the largest
      * donations.
      *
+     * Usage:
+     *
+     *  php src/activities/donors_and_donations.php -login config.yaml
+     *
      * Endpoints:
      *
      * /api/developer/ext/v1/activities
      * /api/integration/ext/v1/activities/search
+     * /api/integration/ext/v1/supporters/search
      *
-     * Usage:
+     * See:
      *
-     *  php src/activities/donors_and_donations.php -login config.yaml
+     * See: https://help.salsalabs.com/hc/en-us/articles/360001206693-Activity-Form-List
+     * https://api.salsalabs.org/help/integration#operation/activitySearch
+     * https://api.salsalabs.org/help/integration#operation/supporterSearch
      *
      */
 

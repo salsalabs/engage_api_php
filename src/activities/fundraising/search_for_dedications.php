@@ -31,9 +31,6 @@
     // Retrieve transactions and display the applicable ones.
     function getTransactions($util, $offset, $count)
     {
-        $util = new \DemoUtils\DemoUtils();
-        $util->appInit();
-
         $method = 'POST';
         $endpoint = '/api/integration/ext/v1/activities/search';
         $client = $util->getClient($endpoint);

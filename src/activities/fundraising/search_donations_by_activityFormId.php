@@ -1,13 +1,17 @@
 <?php
-    /* App to look up activities using the form ID used to create them.
+    /** App to look up activities using the form ID used to create them.
      *
      * Usage:
      *
      *  php src/activities/search_donations_by_activityFormId.php -login config.yaml
      *
-     * Endpoint
+     * Endpoints:
      *
-     * '/api/integration/ext/v1/activities/search'
+     * /api/integration/ext/v1/activities/search
+     *
+     * See:
+     *
+     * https://api.salsalabs.org/help/integration#operation/activitySearch
      *
      * The list of activityFormIds is provided in the configuration.yaml
      * file.  Here's an example.
