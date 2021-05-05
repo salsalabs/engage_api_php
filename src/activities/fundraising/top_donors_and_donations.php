@@ -15,7 +15,7 @@
      *
      * See:
      *
-     * See: https://help.salsalabs.com/hc/en-us/articles/360001206693-Activity-Form-List
+     * https://help.salsalabs.com/hc/en-us/articles/360001206693-Activity-Form-List
      * https://api.salsalabs.org/help/integration#operation/activitySearch
      * https://api.salsalabs.org/help/integration#operation/supporterSearch
      *
