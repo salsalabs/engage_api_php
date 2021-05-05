@@ -172,7 +172,7 @@ class DemoUtils {
              if (strpos($endpoint, "developer") !== false) {
                      $token = $this->getWebDevToken();
                      if (is_null($token)) {
-                         throw \new Exception("Web Developer API Token is null");
+                         throw new Exception("Web Developer API Token is null");
                      }
             } else {
                 throw new \Exception("Malformed endpoint, ''" . $endpoint . "'");
