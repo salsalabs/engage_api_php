@@ -1,6 +1,6 @@
 <?php
-/** Read donations for one supporter.
- *
+/** Read donations for one supporter.  
+ * 
  * See: https: *api.salsalabs.org/help/integration#operation/activitySearch
  *
  * Endpoints:
@@ -11,19 +11,19 @@
  *
  * php src/actvities/search_activities_for_supporter.php --login credentials.yaml
  *
- * Note:
- *
- * This app requires an field named 'supporterId' in the YAML configuration file.
- * Engage wants a list of supporterIds.  We'll do that by coding our one ID into
- * a YAML array.
- *
- * +-- column 1
- * |
- * v
- * supporterId:
- *  - "83bxx9o-auix-w9p6-n-kk3r25hy9hayyco"
- *
- */
+* Note:
+*
+* This app requires an field named 'supporterId' in the YAML configuration file.
+* Engage wants a list of supporterIds.  We'll do that by coding our one ID into
+* a YAML array.
+*
+* +-- column 1
+* |
+* v
+* supporterIds:
+*  - "83bxx9o-auix-w9p6-n-kk3r25hy9hayyco"
+*
+*/
 
 // Uses DemoUtils.
 require 'vendor/autoload.php';
@@ -31,11 +31,11 @@ require 'src/demo_utils.php';
 
 // Application starts here.
 function main() {
-    $util = new \DemoUtils\DemoUtils();
+    $util =  new \DemoUtils\DemoUtils();
     $util->appInit();
 
     $environment = $util->getEnvironment();
-    $supporterIds = $environment["supporterIds"];
+    $supporterId = $environment["supporterId"];
     $payload = [
         'payload' => [
             'modifiedFrom' => '2017-09-01T11:49:24.905Z',
@@ -43,15 +43,15 @@ function main() {
             'offset' => 0,
             'type' => 'FUNDRAISE',
             'identifierType' => 'SUPPORTER_ID',
-            'supporterIDs' => [ $supporterIds ]
+            'supporterIDs' => [ $supporerId ]
         ],
     ];
     $method = 'POST';
-    $endpoint = '/api/integration/ext/v1/activities/search';
-    $client = $util->getClient($endpoint);
+    $command = '/api/integration/ext/v1/activities/search';
+    $client = $util->getInitClient();
 
     try {
-        $response = $client->request($method, $endpoint, [
+        $response = $client->request($method, $command, [
             'json' => $payload,
         ]);
         $data = json_decode($response->getBody());
