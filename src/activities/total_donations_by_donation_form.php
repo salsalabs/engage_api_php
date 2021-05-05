@@ -1,6 +1,6 @@
 <?php
 
-// Program to retrieve what can be retrieves from P2P pages.  Uses the
+// Program to display all fundraising pages with total donations. Uses the
 // Web Developer API to retrieve activity-related information.  Uses the
 // Integration API to retrieve activities.
 //
@@ -127,7 +127,7 @@ function fetchActivities($cred, $id)
         'payload' => [
             "offset" => 0,
             "count" => 20,
-            "type" => "P2P_EVENT",
+            "type" => "FUNDRAISE",
             'activityFormIds' => [$id],
         ],
     ];
