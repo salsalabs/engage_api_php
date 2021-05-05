@@ -231,6 +231,7 @@
     function main() {
         $util = new \DemoUtils\DemoUtils();
         $util->appInit();
+        $env = $util->getEnvironment();
         $forms = fetchForms($util);
         printf("\nEvent Summary\n\n");
         printf("\n%-24s %-36s %s\n",
@@ -244,10 +245,10 @@
                 $r->id,
                 $r->name);
         }
-        if (!$util['summary']) {
+        if (!$env['summary']) {
             printf("\nEvent MetaData\n\n");
             foreach ($forms as $r) {
-                if (!$util["summary"]) {
+                if (!$env["summary"]) {
                     printf("\n%-24s %-36s %-20s %-10s %-10s %-10s\n",
                         "Type",
                         "ID",
@@ -299,17 +300,17 @@
                 } else {
                     printf("\nRegistrations\n");
                     printf("%-20s %-20s %-10s %-10s %-10s %-20s\n",
-                        "First Name",
-                        "Last Name",
+                        "Purchased By",
+                        "",
                         "Goal",
                         "Count",
                         "Current",
                         "Most Recent");
                     foreach ($registrations as $fr) {
-                        //var_dump($fr);
+                        // var_dump($fr);
                         printf("%-20s %-20s %10d %10d %10d %20s\n",
-                            $fr->firstName,
-                            $fr->lastName,
+                            $fr->purchasedBy,
+                            "",
                             $fr->fundraiserGoal,
                             $fr->totalDonationsCount,
                             $fr->totalDonationsAmount,

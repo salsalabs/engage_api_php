@@ -105,11 +105,9 @@
         ];
 
         try {
-            printf("getTeams: command is %s\n", $endpoint);
             $response = $client->request($method, $endpoint, [
                 'json'     => $payload
             ]);
-            printf("getTeams: body is \n%s\n", json_encode($response->getBody(), JSON_PRETTY_PRINT));
             $data = json_decode($response -> getBody());
             return $data->payload;
         }
@@ -170,7 +168,7 @@
                 printf("\nNo teams...\n");
             } else {
                 printf("\nTeams\n");
-                printf("\n%s\n", var_dump($teams));
+                printf("\n%s\n", json_encode($teams, JSON_PRETTY_PRINT));
             }
         }
     }

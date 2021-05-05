@@ -11,7 +11,7 @@
   *
   * See:
   *
-  *https: *api.salsalabs.org/help/web-dev#operation/getP2PFundraisers
+  * https://api.salsalabs.org/help/web-dev#operation/getP2PFundraisers
   *
   * Note:
   *
@@ -28,11 +28,52 @@
   require 'vendor/autoload.php';
   require 'src/demo_utils.php';
 
+/** Use the provided credentials to locate all P2P events.
+ * @param  $util  DemoUtil object
+ * @return array  List of P2P event objects
+ * @see    https://help.salsalabs.com/hc/en-us/articles/360001206693-Activity-Form-List
+ */
+function fetchForms($util)
+{
+    $method = 'GET';
+    $endpoint = '/api/developer/ext/v1/activities';
+    $client = $util->getClient($endpoint);
+
+    $params = [
+        'types' => "P2P_EVENT",
+        'sortField' => "name",
+        'sortOrder' => "ASCENDING",
+        'count' => $util->getMetrics()->maxBatchSize,
+        'offset' => 0,
+    ];
+
+    $forms = array();
+    $count = 0;
+    do {
+        $queries = http_build_query($params);
+        $x = $endpoint . "?" . $queries;
+        try {
+            $response = $client->request($method, $x);
+            $data = json_decode($response->getBody());
+            $count = $data->payload->count;
+            if ($count > 0) {
+                foreach ($data->payload->results as $r) {
+                    array_push($forms, $r);
+                }
+                $params["offset"] = $params["offset"] + $count;
+            }
+        } catch (Exception $e) {
+            echo 'Caught exception: ', $e->getMessage(), "\n";
+            return $forms;
+        }
+    } while ($count == $params['count']);
+    return $forms;
+}
     // Fetch fundraisers for an activity form.
     // Returns an array of fundraisers.
-    function getFundraisers($util) {
+    function getFundraisers($util, $id) {
         $method = 'GET';
-        $endpoint = '/api/developer/ext/v1/activities/' . $activityId . '/summary/fundraisers';
+        $endpoint = '/api/developer/ext/v1/activities/' . $id . '/summary/fundraisers';
         $client = $util->getClient($endpoint);
         $environment = $util->getEnvironment();
 
@@ -68,15 +109,21 @@
     function processFundraisers($fundraisers) {
         foreach($fundraisers as $f) {
             // printf("%s\n", json_encode($f, JSON_PRETTY_PRINT));
+            $addressLine1 = (property_exists($f, 'addressLine1')) ? $f->addressLine1 : "";
+            $city = (property_exists($f, 'city')) ? $f->city : "";
+            $stateCode = (property_exists($f, 'stateCode')) ? $f->stateCode : "";
+            $zipCode = (property_exists($f, 'zipCode')) ? $f->zipCode : "";
+            $countryCode = (property_exists($f, 'zipCode')) ? $f->countryCode : "";
+
             printf("Page: %s\nGoal: %5d\nURL: %s\nAddress: %s\nCity: %s\nState: %s\nZip: %s\nCountry: %s\n\n",
                 $f->fundraiserPageName,
                 $f->goal,
                 $f->fundraiserUrl,
-                $f->addressLine1,
-                $f->city,
-                $f->stateCode,
-                $f->zipCode,
-                $f->countryCode);
+                $addressLine1,
+                $city,
+                $stateCode,
+                $zipCode,
+                $countryCode);
         }
     }
 
@@ -86,9 +133,13 @@
     {
         $util = new \DemoUtils\DemoUtils();
         $util->appInit();
-        $fundraisers = getFundraisers($util);
-        processFundraisers($fundraisers);
-    }
+        $forms = fetchForms($util);
+        foreach ($forms as $f) {
+            $id = $f->id;
+            $fundraisers = getFundraisers($util, $id);
+            processFundraisers($fundraisers);
+        }
+   }
 
     main()
 ?>

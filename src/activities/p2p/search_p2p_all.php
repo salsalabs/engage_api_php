@@ -35,7 +35,7 @@ function fetchForms($util)
     $client = $util->getClient($endpoint);
 
     $params = [
-        'types' => "TICKETED_EVENT",
+        'types' => "P2P_EVENT",
         'sortField' => "name",
         'sortOrder' => "ASCENDING",
         'count' => $util->getMetrics()->maxBatchSize,
@@ -114,6 +114,7 @@ function fetchFundraisers($util, $id)
                 $count = $data->payload->count;
                 if ($count > 0) {
                     foreach ($data->payload->results as $r) {
+                        printf("%s\n", seeJSON($r));
                         array_push($forms, $r);
                     }
                     $params["offset"] = $params["offset"] + $count;
@@ -251,13 +252,12 @@ function seeForms($util, $forms)
         "Name");
     foreach ($forms as $key => $r) {
         printf("%s\n", json_encode($r, JSON_PRETTY_PRINT));
-        printf("%-2d %-9s %-9s %-36s %-52s %s\n",
+        printf("%-2d %-9s %-9s %-36s %s\n",
             ($key + 1),
             $r->type,
             $r->status,
             $r->id,
-            $r->name,
-            $r->pageUrl);
+            $r->name);
     }
     printf("\nEvent MetaData\n\n");
     foreach ($forms as $r) {
@@ -320,10 +320,9 @@ function seeForms($util, $forms)
                 "Current",
                 "Most Recent");
             foreach ($registrations as $fr) {
-                //var_dump($fr);
                 printf("%-20s %-20s %10d %10d %10d %20s\n",
-                    $fr->firstName,
-                    $fr->lastName,
+                    $fr->purchasedBy,
+                    "",
                     $fr->fundraiserGoal,
                     $fr->totalDonationsCount,
                     $fr->totalDonationsAmount,
