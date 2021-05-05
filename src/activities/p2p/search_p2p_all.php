@@ -4,7 +4,9 @@
  * Web Developer API to retrieve activity-related information.  Uses the
  * Integration API to retrieve activities.
  *
- * Endpoints.
+ * Usage: php src/dev_p2p_goals.php --login CONFIGURATION_FILE.yaml.
+ *
+ * Endpoints:
  *
  * /api/developer/ext/v1/activities
  * /api/developer/ext/v1/activities/{uuid}/metadata
@@ -12,12 +14,13 @@
  * /api/developer/ext/v1/activities/{uuid}/summary/registrations
  * /api/developer/ext/v1/activities/teams/{uuid}
  *
- * Usage: php src/dev_p2p_goals.php --login CONFIGURATION_FILE.yaml.
+ * See:
+ *
+ * https://api.salsalabs.org/help/web-dev#tag/Activity-Form-Summary
  */
 
-// Use true in summary to just see the activity summary.  Use false for detailed report.
-// No need to put quotes around the API keys.  Fields "intHost" and "devHost"
-//are there to accomodate Engage clients that use sandbox accounts.
+// Use true in summary to just see the activity summary.  Use false for detailed
+// report.
 
 // Uses DemoUtils.
 require 'vendor/autoload.php';
@@ -27,9 +30,10 @@ require 'src/demo_utils.php';
 // See: https://help.salsalabs.com/hc/en-us/articles/360001206693-Activity-Form-List
 function fetchForms($util)
 {
-    //var_dump($util);
     $method = 'GET';
     $endpoint = '/api/developer/ext/v1/activities';
+    $client = $util->getClient($endpoint);
+
     $params = [
         'types' => "TICKETED_EVENT",
         'sortField' => "name",
@@ -67,18 +71,12 @@ function fetchForms($util)
 // different contents based on the activity form type.
 function fetchMetadata($util, $id)
 {
-    $payload = [
-        'payload' => [
-        ],
-    ];
     $method = 'GET';
     $endpoint = '/api/developer/ext/v1/activities/' . $id . '/metadata';
     $client = $util->getClient($endpoint);
 
     try {
-        $response = $client->request($method, $endpoint, [
-            'json' => $payload,
-        ]);
+        $response = $client->request($method, $endpoint);
         $data = json_decode($response->getBody());
         return $data->payload;
     } catch (Exception $e) {
@@ -96,12 +94,13 @@ function fetchFundraisers($util, $id)
 {
     $method = 'GET';
     $endpoint = '/api/developer/ext/v1/activities/' . $id . "/summary/fundraisers";
+    $client = $util->getClient($endpoint);
+
     $params = [
         'count' => $util->getMetrics()->maxBatchSize,
         'offset' => 0,
     ];
 
-    $client = $util->getClient($endpoint);
 
     $forms = array();
     $count = 0;
@@ -136,12 +135,12 @@ function fetchRegistrations($util, $id)
 {
     $method = 'GET';
     $endpoint = '/api/developer/ext/v1/activities/' . $id . "/summary/registrations";
+    $client = $util->getClient($endpoint);
+
     $params = [
         'count' => $util->getMetrics()->maxBatchSize,
         'offset' => 0,
     ];
-
-    $client = $util->getClient($endpoint);
 
     $forms = array();
     $count = 0;
@@ -176,6 +175,10 @@ function fetchRegistrations($util, $id)
 // See https://help.salsalabs.com/hc/en-us/articles/224470267-Engage-API-Activity-Data
 function fetchActivities($util, $id)
 {
+    $method = 'POST';
+    $endpoint = '/api/integration/ext/v1/activities/search';
+    $client = $util->getClient($endpoint);
+
     $payload = [
         'payload' => [
             "offset" => 0,
@@ -183,9 +186,7 @@ function fetchActivities($util, $id)
             'activityFormIds' => [$id],
         ],
     ];
-    $method = 'POST';
-    $endpoint = '/api/integration/ext/v1/activities/search';
-    $client = $util->getClient($endpoint);
+
     $forms = array();
     $count = 0;
     do {
@@ -258,126 +259,122 @@ function seeForms($util, $forms)
             $r->name,
             $r->pageUrl);
     }
-    if (!$util['summary']) {
-        printf("\nEvent MetaData\n\n");
-        foreach ($forms as $r) {
-            if (!$util["summary"]) {
-                printf("\n%-24s %-36s %-20s %-10s %-10s %-10s %s\n",
-                    "Type",
-                    "ID",
-                    "Name",
-                    "Status",
-                    "Has Goal",
-                    "Goal Amount",
-                    "PageURL");
-            }
-            $meta = fetchMetadata($util, $r->id);
-            $goal = empty($meta->hasEventLevelFundraisingGoal) ? "--" : $meta->hasEventLevelFundraisingGoal;
-            $goalValue = empty($meta->hasEventLevelFundraisingGoalValue) ? "--" : $meta->hasEventLevelFundraisingGoal;
-            $status = empty($meta->status) ? "--" : $meta->status;
-            $pageUrl = empty($meta->pageUrl) ? "--" : $meta->pageUrl;
-            printf("%-24s %-36s %-70s %-10s %10s %10d %s\n",
-                $r->type,
-                $r->id,
-                $r->name,
-                $status,
-                $goal,
-                $goalValue,
-                $pageUrl);
+    printf("\nEvent MetaData\n\n");
+    foreach ($forms as $r) {
+        printf("\n%-24s %-36s %-20s %-10s %-10s %-10s %s\n",
+            "Type",
+            "ID",
+            "Name",
+            "Status",
+            "Has Goal",
+            "Goal Amount",
+            "PageURL");
 
-            $fundraisers = fetchFundRaisers($util, $meta->id);
-            if (empty($fundraisers)) {
-                printf("\nNo fundraisers...\n");
+        $meta = fetchMetadata($util, $r->id);
+        $goal = empty($meta->hasEventLevelFundraisingGoal) ? "--" : $meta->hasEventLevelFundraisingGoal;
+        $goalValue = empty($meta->hasEventLevelFundraisingGoalValue) ? "--" : $meta->hasEventLevelFundraisingGoal;
+        $status = empty($meta->status) ? "--" : $meta->status;
+        $pageUrl = empty($meta->pageUrl) ? "--" : $meta->pageUrl;
+        printf("%-24s %-36s %-70s %-10s %10s %10d %s\n",
+            $r->type,
+            $r->id,
+            $r->name,
+            $status,
+            $goal,
+            $goalValue,
+            $pageUrl);
+
+        $fundraisers = fetchFundRaisers($util, $meta->id);
+        if (empty($fundraisers)) {
+            printf("\nNo fundraisers...\n");
+        } else {
+            printf("\nFundraisers\n");
+            printf("%-20s %-20s %-10s %-10s %-10s %-20s\n",
+                "First Name",
+                "Last Name",
+                "Goal",
+                "Count",
+                "Current",
+                "Most Recent");
+            foreach ($fundraisers as $fr) {
+                printf("%-20s %-20s %10d %10d %10d %20s\n",
+                    $fr->firstName,
+                    $fr->lastName,
+                    $fr->fundraiserGoal,
+                    $fr->totalDonationsCount,
+                    $fr->totalDonationsAmount,
+                    $fr->lastTransactionDate);
+            }
+        }
+
+        $registrations = fetchRegistrations($util, $meta->id);
+        if (empty($registrations)) {
+            printf("\nNo registrations...\n");
+        } else {
+            printf("\nRegistrations\n");
+            printf("%-20s %-20s %-10s %-10s %-10s %-20s\n",
+                "First Name",
+                "Last Name",
+                "Goal",
+                "Count",
+                "Current",
+                "Most Recent");
+            foreach ($registrations as $fr) {
+                //var_dump($fr);
+                printf("%-20s %-20s %10d %10d %10d %20s\n",
+                    $fr->firstName,
+                    $fr->lastName,
+                    $fr->fundraiserGoal,
+                    $fr->totalDonationsCount,
+                    $fr->totalDonationsAmount,
+                    "N/A");
+            }
+        }
+
+        $activities = fetchActivities($util, $meta->id);
+        if (empty($activities)) {
+            printf("\nNo activities...\n");
+        } else {
+            printf("\nActivities\n");
+            printf("%-36s %-20s %-36s %-20s %-16s %-10s\n",
+                "ActivityID",
+                "Form Name",
+                "Form ID",
+                "Type",
+                "Activity Result",
+                "Amount");
+            foreach ($activities as $d) {
+                $amount = null;
+                $result = empty($d->activityResult) ? "" : $d->activityResult;
+                switch ($result) {
+                    case "DONATION_ONLY":
+                        $amount = $d->transactions[0]->amount;
+                        break;
+                    case "TICKETS_ONLY":
+                        $amount = $d->tickets[0]->ticketCost;
+                    default:
+                        $amount = "N/A";
+                }
+                printf("%-36s %-20s %-36s %-20s %-16s %10d\n",
+                    $d->activityId,
+                    $d->activityFormName,
+                    $d->activityFormId,
+                    $d->activityType,
+                    $result,
+                    $amount);
+            }
+        }
+
+        if ($r->type == "P2P_EVENT" && $r->status == "PUBLISHED") {
+            $teams = fetchTeams($util, $meta->id);
+            if (empty($teams)) {
+                printf("\nNo teams...\n");
             } else {
-                printf("\nFundraisers\n");
-                printf("%-20s %-20s %-10s %-10s %-10s %-20s\n",
-                    "First Name",
-                    "Last Name",
-                    "Goal",
-                    "Count",
-                    "Current",
-                    "Most Recent");
-                foreach ($fundraisers as $fr) {
-                    printf("%-20s %-20s %10d %10d %10d %20s\n",
-                        $fr->firstName,
-                        $fr->lastName,
-                        $fr->fundraiserGoal,
-                        $fr->totalDonationsCount,
-                        $fr->totalDonationsAmount,
-                        $fr->lastTransactionDate);
-                }
-            }
-
-            $registrations = fetchRegistrations($util, $meta->id);
-            if (empty($registrations)) {
-                printf("\nNo registrations...\n");
-            } else {
-                printf("\nRegistrations\n");
-                printf("%-20s %-20s %-10s %-10s %-10s %-20s\n",
-                    "First Name",
-                    "Last Name",
-                    "Goal",
-                    "Count",
-                    "Current",
-                    "Most Recent");
-                foreach ($registrations as $fr) {
-                    //var_dump($fr);
-                    printf("%-20s %-20s %10d %10d %10d %20s\n",
-                        $fr->firstName,
-                        $fr->lastName,
-                        $fr->fundraiserGoal,
-                        $fr->totalDonationsCount,
-                        $fr->totalDonationsAmount,
-                        "N/A");
-                }
-            }
-
-            $activities = fetchActivities($util, $meta->id);
-            if (empty($activities)) {
-                printf("\nNo activities...\n");
-            } else {
-                printf("\nActivities\n");
-                printf("%-36s %-20s %-36s %-20s %-16s %-10s\n",
-                    "ActivityID",
-                    "Form Name",
-                    "Form ID",
-                    "Type",
-                    "Activity Result",
-                    "Amount");
-                foreach ($activities as $d) {
-                    $amount = null;
-                    $result = empty($d->activityResult) ? "" : $d->activityResult;
-                    switch ($result) {
-                        case "DONATION_ONLY":
-                            $amount = $d->transactions[0]->amount;
-                            break;
-                        case "TICKETS_ONLY":
-                            $amount = $d->tickets[0]->ticketCost;
-                        default:
-                            $amount = "N/A";
-                    }
-                    printf("%-36s %-20s %-36s %-20s %-16s %10d\n",
-                        $d->activityId,
-                        $d->activityFormName,
-                        $d->activityFormId,
-                        $d->activityType,
-                        $result,
-                        $amount);
-                }
-            }
-
-            if ($r->type == "P2P_EVENT" && $r->status == "PUBLISHED") {
-                $teams = fetchTeams($util, $meta->id);
-                if (empty($teams)) {
-                    printf("\nNo teams...\n");
-                } else {
-                    printf("\nTeams\n");
-                    printf("\n%s\n", var_dump($teams));
-                }
+                printf("\nTeams\n");
+                printf("\n%s\n", var_dump($teams));
             }
         }
     }
-
 }
 // Application starts here.
 function main()

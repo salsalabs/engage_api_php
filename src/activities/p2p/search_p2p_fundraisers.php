@@ -2,13 +2,16 @@
 
  /** Program to retrieve information about p2p fundraisers using the
   * Engage Developer API.
-  * see https: *api.salsalabs.org/help/web-dev#operation/getP2PFundraisers
+  *
+  * Usage: php src/dev_p2p_goals.php --login CONFIGURATION_FILE.yaml.
   *
   * Endpoints.
   *
   * /api/developer/ext/v1/activities/{uuid}/summary/fundraisers
   *
-  * Usage: php src/dev_p2p_goals.php --login CONFIGURATION_FILE.yaml.
+  * See:
+  *
+  *https: *api.salsalabs.org/help/web-dev#operation/getP2PFundraisers
   *
   * Note:
   *
@@ -28,11 +31,12 @@
     // Fetch fundraisers for an activity form.
     // Returns an array of fundraisers.
     function getFundraisers($util) {
-        $client = $util->getClient($endpoint);
         $method = 'GET';
-        $environment = $util->getEnvironment();
-        $activityId = $environment["p2pActivityId"];
         $endpoint = '/api/developer/ext/v1/activities/' . $activityId . '/summary/fundraisers';
+        $client = $util->getClient($endpoint);
+        $environment = $util->getEnvironment();
+
+        $activityId = $environment["p2pActivityId"];
         $fundraisers = array();
         $count = $util->getMetrics()->maxBatchSize;
         do {

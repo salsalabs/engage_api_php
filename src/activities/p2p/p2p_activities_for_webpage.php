@@ -1,30 +1,34 @@
 <?php
 
-    /* Program to retrieve information about Engage activities that would be useful
+    /** Program to retrieve information about Engage activities that would be useful
      * for listing the activities on a web page.  Output is freeform, but could be
      * a CSV or HTML fairly easily enough.
+     *
+     * Usage: php src/dev_activities_and_details.php --login CONFIGURATION_FILE.yaml.
      *
      * Endpoints:
      *
      * /api/developer/ext/v1/activities
      * /api/developer/ext/v1/activities/{uuid}}/metadata
      *
-     * Usage: php src/dev_activities_and_details.php --login CONFIGURATION_FILE.yaml.
-    */
+     * See:
+     *
+     * https://help.salsalabs.com/hc/en-us/articles/360001206693-Activity-Form-List
+     * https://api.salsalabs.org/help/web-dev#operation/getActivityFormMetadata
+     *
+     */
 
     // Uses DemoUtils.
     require 'vendor/autoload.php';
     require 'src/demo_utils.php';
 
-    // Use the provided credentials to locate all events matching 'eventType'.
-    // See: https://help.salsalabs.com/hc/en-us/articles/360001206693-Activity-Form-List
+    // Create a list of P2P activities.
     function fetchForms($util) {
         //var_dump($util);
         $method = 'GET';
         $endpoint = '/api/developer/ext/v1/activities';
 
-        $types = "SUBSCRIPTION_MANAGEMENT,SUBSCRIBE,FUNDRAISE,PETITION,TARGETED_LETTER,REGULATION_COMMENTS,TICKETED_EVENT,P2P_EVENT,FACEBOOK_AD";
-        // metrics are a PHP object(stdClass)...
+        $types = "P2P_EVENT";
         $count = $util->getMetrics()->maxBatchSize;
         $params = [
             'types' => $types,
@@ -87,7 +91,7 @@
 
     /* Function to retrieve and view forms.  Output contains both form
      * data and metadata.  Output goes to the console.
-     * @param array $util  Populated nstance of DemoUtils.
+     * @param array $util  Populated instance of DemoUtils.
      */
     function seeForms($util, $forms) {
         $format = "%-36s %-70s %-24s %-10s %s\n";
