@@ -1,30 +1,32 @@
 <?php
 
-// Program to retrieve what can be retrieves from P2P pages.  Uses the
-// Web Developer API to retrieve activity-related information.  Uses the
-// Integration API to retrieve activities.
-//
-// This application requires a configuration file.
-//
-// Usage: php src/dev_p2p_goals.php --login CONFIGURATION_FILE.yaml.
-//
-// Sample YAML file.  All fields must start in column 1. Comments are for PHP.
-//
-/*
-intToken: your-integration-api-token-here
-intHost: "https://api.salsalabs.org"
-devToken: your-web-developer-api-token-here
-devHost: "https://api.salsalabs.org"
+/** Program to display all fundraising pages with total donations. Uses the
+ * Web Developer API to retrieve activity-related information.  Uses the
+ * Integration API to retrieve activities.
+ *
+ * This application requires a configuration file.
+ *
+ * Usage: php src/dev_p2p_goals.php --login CONFIGURATION_FILE.yaml.
+ *
+ * Sample YAML file.
+ *
+ * + Text starts in column 1.
+ * |
+ * v 
+ * intToken: your-integration-api-token-here
+ * intHost: "https://api.salsalabs.org"
+ * devToken: your-web-developer-api-token-here
+ * devHost: "https://api.salsalabs.org"
  */
-// No need to put quotes around the API keys.  Fields "intHost" and "devHost"
-//are there to accomodate Engage clients that use sandbox accounts.
 
 // Uses Composer.
 require 'vendor/autoload.php';
 use GuzzleHttp\Client;
 use Symfony\Component\Yaml\Yaml;
 
-// Retrieve the runtime parameters and validate them.
+/** Retrieve the runtime parameters and validate them.
+ * Errors are fatal.
+ */
 function initialize()
 {
     $shortopts = "";
@@ -41,8 +43,13 @@ function initialize()
     return $cred;
 }
 
-// Validate the contents of the provided credential file.
-// All fields are required.  Exits on errors.
+/** Validate the contents of the provided credential file.
+ * Errors are fatal.
+ *
+ * @param $cred     object  Credentials imported from the YAML file
+ * @param $filename string  YAML filename
+ */
+
 function validateCredentials($cred, $filename)
 {
     $errors = false;
@@ -63,11 +70,15 @@ function validateCredentials($cred, $filename)
     }
 }
 
-// Use the provided credentials to locate all events matching 'eventType'.
-// See: https://help.salsalabs.com/hc/en-us/articles/360001206693-Activity-Form-List
+/** Retrieve info for each fundraising form.
+ *
+ * @param $cred object       Login credentials from the YAML file
+ * @return array of objects  List of fundraising forms.
+ * @see https://help.salsalabs.com/hc/en-us/articles/360001206693-Activity-Form-List
+ */
+
 function fetchForms($cred)
 {
-    //var_dump($cred);
     $headers = [
         'authToken' => $cred["devToken"],
         'Content-Type' => 'application/json',
@@ -97,7 +108,6 @@ function fetchForms($cred)
         try {
             $response = $client->request($method, $x);
             $data = json_decode($response->getBody());
-            // echo json_encode($data, JSON_PRETTY_PRINT);
             $count = $data->payload->count;
             if ($count > 0) {
                 foreach ($data->payload->results as $r) {
@@ -113,12 +123,17 @@ function fetchForms($cred)
     return $forms;
 }
 
-// Fetch activities for an activity form.  Note that this operation requires
-// the integration API.  Returns a list of activities.
-// See https://help.salsalabs.com/hc/en-us/articles/224470267-Engage-API-Activity-Data
+/** Retrieve fundraising activities for the specified activity
+ * formID.  Returns a list of actvities.
+ *
+ * @param $cred object  Credentials object
+ * @param $id   string  Activity form ID of interest
+ * @return array        List of activities made with the specified activity
+ * @see https://help.salsalabs.com/hc/en-us/articles/224470267-Engage-API-Activity-Data
+ */
+
 function fetchActivities($cred, $id)
 {
-    //var_dump($cred);
     $headers = [
         'authToken' => $cred["intToken"],
         'Content-Type' => 'application/json',
@@ -131,7 +146,6 @@ function fetchActivities($cred, $id)
             'activityFormIds' => [$id],
         ],
     ];
-    //echo json_encode($payload, JSON_PRETTY_PRINT);
     $method = 'POST';
     $uri = $cred['intHost'];
     $command = '/api/integration/ext/v1/activities/search';
@@ -148,7 +162,6 @@ function fetchActivities($cred, $id)
                 'json' => $payload,
             ]);
             $data = json_decode($response->getBody());
-            //echo json_encode($data, JSON_PRETTY_PRINT);
             if (property_exists($data->payload, 'count')) {
                 $count = $data->payload->count;
                 if ($count > 0) {
@@ -168,14 +181,17 @@ function fetchActivities($cred, $id)
     return $forms;
 }
 
-// Ubiquitous main function.
+/** Application starts here. A list of forms is collected.
+ *  Next, activities are retrieved and totaled and a detail line is written.
+ *  A total line is written at the end of data.
+ */
 function main()
 {
     $cred = initialize();
     // -----------------------------------------------------------
     // Enumerate fundraising forms.
     // -----------------------------------------------------------
-    $forms = fetchForms($cred);
+    $forms = fetchForms($util);
 
     // -----------------------------------------------------------
     // Do for all fundraising forms...
@@ -193,7 +209,7 @@ function main()
         // -----------------------------------------------------------
         // Total and count donations.
         // -----------------------------------------------------------
-        $activities = fetchActivities($cred, $r->id);
+        $activities = fetchActivities($util, $r->id);
         $total = 0;
         foreach ($activities as $d) {
             $total += $d->totalReceivedAmount;
