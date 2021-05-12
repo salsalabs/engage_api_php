@@ -11,6 +11,7 @@ function see($du, $topic) {
     printf("devToken is '%s'\n", $du->getWebDevToken());
     printf("environment is\n%s\n", seeJSON($du->getEnvironment()));
     printf("metrics are\n%s\n", seeJSON($du->getMetrics()));
+    printf("maxBatchSize is \n%d\n", $du->getMetrics()->maxBatchSize);
 }
 
 function pass1(){
