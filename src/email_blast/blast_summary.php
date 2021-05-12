@@ -11,7 +11,7 @@
      *
      * See:
      *
-     *https: *help.salsalabs.com/hc/en-us/articles/360001220174-Email-Blasts-List
+     * https://help.salsalabs.com/hc/en-us/articles/360001220174-Email-Blasts-List
      *
      */
 

@@ -1,29 +1,37 @@
 <?php
 
-// Program to retrieve and list the attendee for an event.
-//
-// This application requires a configuration file.
-//
-// Usage: php src/ticketed_event_list_like_classic.php --login CONFIGURATION_FILE.yaml.
-//
-// Sample YAML file.  All fields must start in column 1. Comments are for PHP.
-/*
-devToken: your-web-developer-api-token-here
-eventId: The UUID for the event.  Can be retrieved via the API or from the UI.
+/** Program to retrieve and list the attendee for an event.
+ *
+ * Endpoint:
+ *
+ * https://api.salsalabs.org/api/developer/ext/v1/activities/'
+ *
+ * Usage: php src/ticketed_event_list_like_classic.php --login configuration.yaml.
+ *
+ * This application requires an eventId in configuration.yaml.
+ *
+ * +-- column 1
+ * |
+ * v
+ * eventId: "83bxx9o-auix-w9p6-n-kk3r25hy9hayyco"
  */
 
- // Uses DemoUtils.
- require 'vendor/autoload.php';
- require 'src/demo_utils.php';
+// Uses DemoUtils.
+require 'vendor/autoload.php';
+require 'src/demo_utils.php';
 
-// Use the provided credentials to retrieve attendees for the
-// specified event.  Returns a list of attendees.
-// See: https://api.salsalabs.org/help/web-dev#operation/getEventAttendees
-function fetchAttendees($util)
-{
+/** Retrieve attendees for the `eventId` in the utils object.
+ * specified event.  Returns a list of attendees.
+ * @param  $util object  DemoUtils object
+ * @return array         List of attendees
+ * @see https://api.salsalabs.org/help/web-dev#operation/getEventAttendees
+ */
+
+function fetchAttendees($util) {
     $method = 'GET';
+    $env = $util->getEnvironment();
     $endpoint = 'https://api.salsalabs.org/api/developer/ext/v1/activities/'
-        . $util["eventId"]
+        . $env["eventId"]
         . '/summary/registrations';
     $client = $util->getClient($endpoint);
 
@@ -37,7 +45,6 @@ function fetchAttendees($util)
     do {
         $queries = http_build_query($params);
         $x = $endpoint . "?" . $queries;
-        printf("Endpoint: %s\n", $x);
         try {
             $response = $client->request($method, $x);
             $data = json_decode($response->getBody());
@@ -50,19 +57,14 @@ function fetchAttendees($util)
             return $attendees;
         }
     } while ($count > 0);
-    printf("fetchAttendees: returning %d attendees\n", count($attendees));
     return $attendees;
 }
 
-// Application starts here.
-function main()
-{
-    $util = new \DemoUtils\DemoUtils();
-    $util->appInit();
-    $attendees = fetchAttendees($util);
-    $json = json_encode($attendees, JSON_PRETTY_PRINT);
-    printf("%s\n", $json);
+/** See the attendees for the specified event.
+ * @param  $attendees  List of attendees
+ */
 
+function seeAttendees($attendees) {
     printf("%-36s %-20s %-20s %-40s %-6s %-30s\n",
         "SupporterId",
         "First Name",
@@ -92,6 +94,15 @@ function main()
             $host,
             $status);
     }
+}
+
+// Application starts here.
+function main()
+{
+    $util = new \DemoUtils\DemoUtils();
+    $util->appInit();
+    $attendees = fetchAttendees($util);
+    seeAttendees($attendees);
 }
 
 main()

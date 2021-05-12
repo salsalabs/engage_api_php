@@ -18,17 +18,18 @@ function main()
 {
     $util = new \DemoUtils\DemoUtils();
     $util->appInit();
-
+    var_dump($util);
+    $metrics = $util->getMetrics();
+    $mbs = $metrics["maxBatchSize"];
     $payload = [
         'payload' => [
-            'modifiedFrom' => '2021-01-01T00:00:00.000Z',
+            'modifiedFrom' => '2020-01-01T00:00:00.000Z',
             'count' => $util->getMetrics()->maxBatchSize,
             'offset' => 0,
             'type' => 'PETITION'
         ],
     ];
     $method = 'POST';
-
     $endpoint = '/api/integration/ext/v1/activities/search';
     $client = $util->getClient($endpoint);
 
@@ -51,7 +52,6 @@ function main()
             }
         } catch (Exception $e) {
             echo 'Caught exception: ', $e->getMessage(), "\n";
-            return $forms;
         }
     } while ($count > 0);
 }

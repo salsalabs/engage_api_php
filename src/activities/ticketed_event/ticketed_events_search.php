@@ -1,21 +1,26 @@
 <?php
 
-    // Program to retrieve info about a ticketed event.
-    //
-    // This application requires a configuration file.
-    //
-    // Usage: php src/dev_p2p_goals.php --login CONFIGURATION_FILE.yaml.
-    //
-    // Sample YAML file.  All fields must start in column 1. Comments are for PHP.
-    // Note that this APP uses the Engage Web Developer API, not the standard Engage API.
-    // See https://help.salsalabs.com/hc/en-us/sections/360000258473-API-Web-Developer
-    /*
-    token: your-integration-api-token-here
-    activityIds:
-      - ticketed-event-uuid_1
-      - ticketed-event-uuid_2
-      - ticketed-event-uuid_3
-    */
+/** Program to retrieve ticketed events using an list of activityIds in
+ * the coniguration file.  Input is Engage via the Web Developer API.
+ * Output is the information that would be useful in a list of events.
+ *
+ * Endpoints:
+ *
+ * /api/developer/ext/v1/activities
+ *
+ * Usage: php src/ticketed_events_search.php --login CONFIGURATION_FILE.yaml.
+ *
+ * The list of activityIds is provided in the configuration.yaml
+ * file.  Here's an example.
+ *
+ * +-- column 1
+ * |
+ * v
+ * activityIds:
+ *  - "83bxx9o-auix-w9p6-n-kk3r25hy9hayyco"
+ *  - "bunkc7p-u27k7-mmf-w-1ngxpng8o2fa5q2"
+ */
+
 
     // Uses DemoUtils.
     require 'vendor/autoload.php';
@@ -28,8 +33,10 @@
         $host = "http://api.salsalabs.org";
         $endpoint = '/api/integration/ext/v1/activities/search';
         $client = $util->getClient($endpoint);
+        $env = $util->getEnvironment();
+
         $payload = [
-            'activityIds' => $util["activityIds"],
+            // 'activityIds' => $env["activityIds"],
             'count' => $util->getMetrics()->maxBatchSize,
             'offset' => 0
         ];
