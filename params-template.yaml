@@ -1,15 +1,10 @@
-# Use this as a template for creating parameter files.
-# Parameter files are used to provide the Engage API token
-# and runtime data to the example apps.  Except for `token`,
-# all of the data is app-specific.
-#
-# Here's an example of the YAML file for supporter_search.php.
-# App will use this kind of search.
-identifierType: EMAIL_ADDRESS
-# App will be looking for these supporters.
-identifiers: 
-  - aleonard@salsalabs.com
-  - cannonball@red.biz
-  - totally@bogus.biz
-# App will use this Engage API token.
-token: Incredibly-long-Engage-API-token-goes-here
+# Use this template as a guide for creating the YAML file
+# used by `DemoUtils`.
+
+# intToken is required when you are making  Engage Integration API calls.
+intToken: your-integration-api-token-here
+
+# devToken is required when you are making Engage Web Developer API calls.
+devToken: your-web-developement-api-token here.
+
+# Everyting else is stored in the `DemoUtil's` environment hash.
