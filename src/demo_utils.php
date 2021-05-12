@@ -27,10 +27,10 @@ class DemoUtils {
      *  Build a new instance using default and null values.
      */
         function __constructor() {
-            $this->setAPIHost(
-            );
+            $this->setAPIHost('https://api.salsalabs.org/');
             $this->intToken = null;
             $this->devToken = null;
+            $this->metrics = null;
         }
 
     /**
