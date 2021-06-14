@@ -10,17 +10,19 @@ host: https://api.salsalabs.org
  require 'vendor/autoload.php';
  require 'src/demo_utils.php';
 
-// Retrieve the Engage info for segments.
+// Retrieve the Engage info for segments modified in the 
+// last 15 days.
 function getSegments($util, $offset, $count)
 {
     $method = 'POST';
     $endpoint = '/api/integration/ext/v1/segments/search';
     $client = $util->getClient($endpoint);
+
     $payload = [
         'payload' => [
-            'offset' => $offset,
-            'count' => $count,
-            'includeMemberCounts' => 'true',
+            'offset'              => $offset,
+            'count'               => $count,
+            'includeMemberCounts' => 'true'
         ],
     ];
 
