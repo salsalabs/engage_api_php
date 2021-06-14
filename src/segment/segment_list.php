@@ -10,8 +10,7 @@ host: https://api.salsalabs.org
  require 'vendor/autoload.php';
  require 'src/demo_utils.php';
 
-// Retrieve the Engage info for segments modified in the 
-// last 15 days.
+// Retrieve the Engage info for segments.
 function getSegments($util, $offset, $count)
 {
     $method = 'POST';
