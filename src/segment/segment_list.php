@@ -10,7 +10,7 @@ host: https://api.salsalabs.org
  require 'vendor/autoload.php';
  require 'src/demo_utils.php';
 
-// Retrieve the Engage info for the segment ID.
+// Retrieve the Engage info for segments.
 function getSegments($util, $offset, $count)
 {
     $method = 'POST';
@@ -43,22 +43,11 @@ function getSegments($util, $offset, $count)
 
 }
 
-// Retrieve the current metrics.
-// See https://help.salsalabs.com/hc/en-us/articles/224531208-General-Use
-function getMetrics($util) {
-    $method = 'GET';
-    $endpoint = '/api/integration/ext/v1/metrics';
-    $client = $util->getClient($endpoint);
-    $response = $client->request($method, $endpoint);
-    $data = json_decode($response -> getBody());
-    return $data->payload;
-}
-
 function main()
 {
     $util = new \DemoUtils\DemoUtils();
     $util->appInit();
-    $metrics = getMetrics($util);
+    $metrics = $util->getMetrics();
     $offset = 0;
     $count = $metrics -> maxBatchSize;
     while ($count > 0) {
