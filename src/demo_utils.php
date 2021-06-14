@@ -26,8 +26,8 @@ class DemoUtils {
     /**
      *  Build a new instance using default and null values.
      */
-        function __constructor() {
-            $this->setAPIHost('https://api.salsalabs.org/');
+        function __construct() {
+            $this->apiHost = 'https://api.salsalabs.org/';
             $this->intToken = null;
             $this->devToken = null;
             $this->metrics = null;
@@ -258,6 +258,7 @@ class DemoUtils {
       }
       $filename = $options['login'];
       $this->loadYAML($filename);
+      $this->updateMetrics();
       return $this;
   }
 }
