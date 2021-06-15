@@ -17,20 +17,24 @@ use Symfony\Component\Yaml\Yaml;
  */
 
 class DemoUtils {
+    private $yamlFilename;
     private $apiHost;
     private $intToken;
     private $devToken;
     private $environment;
     private $metrics;
+    private $extraArgs;
 
     /**
      *  Build a new instance using default and null values.
      */
         function __construct() {
+            $this->yamlFilename;
             $this->apiHost = 'https://api.salsalabs.org/';
             $this->intToken = null;
             $this->devToken = null;
             $this->metrics = null;
+            $this->extraArgs = [];
         }
 
     /**
@@ -94,6 +98,28 @@ class DemoUtils {
     public function getEnvironment() {
         return $this->environment;
     }
+/**
+     * Return an extra argument from the YAML file.  Returns
+     * null if the argument is missing.
+     * @param  string  argument name
+     * @return string  argument value or null
+     * @access public
+     */
+    public function getExtraArg($name) {
+        if (property_exists($this->extraArgs, $name)) {
+            return $this->extraArgs[$name];
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * Return the YAML filename for this instance.
+     * @return string YAML filename
+     */
+    public function getYAMLFilename() {
+        return $this->yamlFilename;
+    }
 
     /**
      *  Load a YAML file and set the standard fields.  Errors are noisy
@@ -125,7 +151,7 @@ class DemoUtils {
                         $this->devToken = $env[$f];
                         break;
                     default:
-                        printf("Warning: unknown YAML parameter '%s'\n", $f);
+                        $this->extraArgs[$f] = $env[$f];
                         break;
                 }
             }
@@ -137,9 +163,9 @@ class DemoUtils {
     /**
      * Return the headers that Engage needs: authToken and Content-Type
      * in an object ready to send.
-     * @param  string  token  API token
+     * @param  string  token       API token
      * @param  boolean integration True if the headers need the integration
-     *                            API Token.
+     *                             API Token.
      * @return object  Object containing the required tokens
      */
      public function getHeaders($token) {
@@ -256,8 +282,8 @@ class DemoUtils {
       if (false == array_key_exists('login', $options)) {
           exit("\nYou must provide a parameter file with --login!\n");
       }
-      $filename = $options['login'];
-      $this->loadYAML($filename);
+      $this->yamlFilename = $options['login'];
+      $this->loadYAML($this->yamlFilename);
       $this->updateMetrics();
       return $this;
   }
