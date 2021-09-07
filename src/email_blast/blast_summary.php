@@ -51,7 +51,10 @@
             try {
                 $response = $client->request($method, $endpoint, $params);
                 $data = json_decode($response -> getBody());
-                if (false == array_key_exists('results', $data->payload)) {
+
+                printf("\nDATA:\n%s\n", json_encode($data, JSON_PRETTY_PRINT));
+
+                if (false == property_exists($data->payload, 'results')) {
                     break;
                 }
                 foreach ( $data -> payload -> results as $b) {
@@ -60,11 +63,11 @@
                     if ($b->status == 'COMPLETED') {
 
                         // Engage does not provide fields in an object if they do not have values...
-                        $publishDate = (true == array_key_exists('publishDate', $b)) ? $b->publishDate : "";
-                        $scheduleDate = (true == array_key_exists('scheduleDate', $b)) ? $b->scheduleDate : "";
+                        $publishDate = (true == property_exists($b, 'publishDate')) ? $b->publishDate : "";
+                        $scheduleDate = (true == property_exists($b, 'scheduleDate')) ? $b->scheduleDate : "";
 
                         foreach ($b->content as $c) {
-                            $webVersionEnabled = (true == array_key_exists('webVersionEnabled', $c)) ? $c->webVersionEnabled : false;
+                            $webVersionEnabled = (true == property_exists($c, 'webVersionEnabled')) ? $c->webVersionEnabled : false;
                             if ($webVersionEnabled) {
                                 printf("ID: %s\nstatus: %s\npublishDate: %s\nscheduleDate: %s\nsubject: %s\npageTitle: %s\npageUrl: %s\n\n",
                                     $b->id,
