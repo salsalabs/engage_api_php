@@ -5,7 +5,7 @@
 
     // Your Engage token is read from a YAML file.  Here's an example:
     /*
-    token: Your-incredibly-long-Engage-API-token
+    intToken: Your-incredibly-long-Engage-API-token
     */
 
     // Uses DemoUtils.
