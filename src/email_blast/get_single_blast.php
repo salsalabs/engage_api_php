@@ -57,46 +57,48 @@
         $method = "POST";
         $cursor = NULL;
 
-        // Request payload. 
-        $params = [
-            'payload' => [
-                'id'        => $id,
-                'type'      => 'EMAIL',
-                'startDate' => '2000-01-01T00:00:00.000Z',
-                'cursor'    => $cursor
-            ]
-        ];
-        printf("Cursor: %s\n", $cursor);
+        do {
+            // Request payload. 
+            $params = [
+                'payload' => [
+                    'id'        => $id,
+                    'type'      => 'EMAIL',
+                    'startDate' => '2000-01-01T00:00:00.000Z',
+                    'cursor'    => $cursor
+                ]
+            ];
+            printf("Cursor: %s\n", $cursor);
 
-        $client = $util->getClient($endpoint);
-        $response = $client->request($method, $endpoint, ['json' => $params]);
-        $data = json_decode($response -> getBody());
-        $payload = $data -> payload;
+            $client = $util->getClient($endpoint);
+            $response = $client->request($method, $endpoint, ['json' => $params]);
+            $data = json_decode($response -> getBody());
+            $payload = $data -> payload;
 
-        // printf("\nDATA:\n%s\n", json_encode($data, JSON_PRETTY_PRINT));
+            // printf("\nDATA:\n%s\n", json_encode($data, JSON_PRETTY_PRINT));
 
-         printf("\nBlast ID: %s\n", $id);
-         // BUG:  Doc says that these are in the response, but they are not.
-        //  printf("Total: %d\n", $payload -> total);
-        //  printf("Offset: %d\n", $payload-> offset);
-        //  printf("Count: %d\n", $payload -> count);
-        if (property_exists($payload, 'errors')) {
-            $errorCount = count($data -> response -> errors);
-            printf("Errors: %d\n", $errorCount);
-            foreach (data -> response -> errors as $e) {
-                oneError($e);
+            printf("\nBlast ID: %s\n", $id);
+            // BUG:  Doc says that these are in the response, but they are not.
+            //  printf("Total: %d\n", $payload -> total);
+            //  printf("Offset: %d\n", $payload-> offset);
+            //  printf("Count: %d\n", $payload -> count);
+            if (property_exists($payload, 'errors')) {
+                $errorCount = count($data -> response -> errors);
+                printf("Errors: %d\n", $errorCount);
+                foreach (data -> response -> errors as $e) {
+                    oneError($e);
+                }
             }
-        }
 
-         if (false == property_exists($payload, 'individualEmailActivityData')) {
-             return $payload;
-         }
-         $count = count($payload -> individualEmailActivityData);
-         printf("IndividualEamilActivityData: %s\n", $count);
-         foreach ( $payload -> individualEmailActivityData as $i) {
-            oneEmailActivity($i);
-            $cursor = $i -> cursor;
-         }
+            if (false == property_exists($payload, 'individualEmailActivityData')) {
+                return $payload;
+            }
+            $count = count($payload -> individualEmailActivityData);
+            printf("IndividualEmailActivityData: %s\n", $count);
+            foreach ($payload -> individualEmailActivityData as $i) {
+                oneEmailActivity($i);
+                $cursor = $i -> cursor;
+            }
+        } while (!is_null($cursor));
          return $payload;
     }
 
@@ -131,12 +133,12 @@
      * @param  object r  recipient object
      * @return object r  recipient object
      */
-
      function oneRecipient($r) {
         printf("oneRecipient: %s\n", json_encode($r, JSON_PRETTY_PRINT));
      }
 
-    /** Application entry point. */
+    /** Application entry point.
+     */
     function main() {
         $util = new \DemoUtils\DemoUtils();
         $util->appInit();
