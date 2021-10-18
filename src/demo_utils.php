@@ -98,7 +98,8 @@ class DemoUtils {
     public function getEnvironment() {
         return $this->environment;
     }
-/**
+
+    /**
      * Return an extra argument from the YAML file.  Returns
      * null if the argument is missing.
      * @param  string  argument name
@@ -106,7 +107,7 @@ class DemoUtils {
      * @access public
      */
     public function getExtraArg($name) {
-        if (property_exists($this->extraArgs, $name)) {
+        if (array_key_exists($name, $this->extraArgs)) {
             return $this->extraArgs[$name];
         } else {
             return null;
@@ -135,10 +136,7 @@ class DemoUtils {
      */
     public function loadYAML($filename) {
          $env = Yaml::parseFile($filename);
-         $fields = [ "apiHost",
-                     "intToken",
-                     "devToken"];
-         foreach ($fields as $f) {
+         foreach (array_keys($env) as $f) {
              if (array_key_exists($f, $env)) {
                 switch ($f) {
                     case "apiHost":
@@ -198,7 +196,7 @@ class DemoUtils {
              if (strpos($endpoint, "developer") !== false) {
                      $token = $this->getWebDevToken();
                      if (is_null($token)) {
-                         throw new Exception("Web Developer API Token is null");
+                         throw new \Exception("Web Developer API Token is null");
                      }
             } else {
                 throw new \Exception("Malformed endpoint, ''" . $endpoint . "'");
