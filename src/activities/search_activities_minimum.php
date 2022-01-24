@@ -20,7 +20,7 @@
         $method = 'GET';
         $endpoint = '/api/developer/ext/v1/activities';
         $params = [
-            'types' => "P2P_EVENT,TICKETED_EVENT",
+            'types' => "PETITION,TARGETED_LETTER",
             'sortField' => "name",
             'sortOrder' => "ASCENDING",
             'status' => "PUBLISHED",
