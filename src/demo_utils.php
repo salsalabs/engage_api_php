@@ -145,7 +145,7 @@ class DemoUtils {
                     case "intToken":
                         $this->intToken = $env[$f];
                         break;
-                    case "devToken":
+                    case "webToken":
                         $this->devToken = $env[$f];
                         break;
                     default:
