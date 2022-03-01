@@ -16,7 +16,8 @@ zd_jira/*
 vendor
 
 # No data files.
-*.csv
-*.yaml
-*.txt
 *.bash
+*.csv
+*.html
+*.txt
+*.yaml
