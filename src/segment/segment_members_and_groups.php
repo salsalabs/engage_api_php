@@ -4,41 +4,26 @@
 // for the groups that each supporters belong to.  The combination
 // of supporter info and groups are written to a tab-delimited file.
 //
-/* This app requires an field named 'segmentOd' in the YAML configuration file.
-* Engage wants a list of supporterIds.  We'll do that by coding our one ID into
-* a YAML array.
-*
-* +-- column 1
-* |
-* v
-* segmentId:
-*  - "83bxx9o-auix-w9p6-n-kk3r25hy9hayyco"
-*/
+/* This app requires an field named 'segmentId' in the YAML configuration
+ * file.
+ * 
+ * +-- column 1
+ * |
+ * v
+ * segmentId:
+ *  - "83bxx9o-auix-w9p6-n-kk3r25hy9hayyco"
+ */
 
  // Uses DemoUtils.
  require 'vendor/autoload.php';
  require 'src/demo_utils.php';
-
 
 // Standard application entry point.
 function main()
 {
     $util = new \DemoUtils\DemoUtils();
     $util->appInit();
-    $metrics = getMetrics($util);
-    run($util, $metrics);
-}
-
-// Retrieve the current metrics.
-// See https://help.salsalabs.com/hc/en-us/articles/224531208-General-Use
-function getMetrics($util)
-{
-    $method = 'GET';
-    $endpoint = '/api/integration/ext/v1/metrics';
-    $client =$util->getClient($endpoint);
-    $response = $client->request($method, $endpoint);
-    $data = json_decode($response -> getBody());
-    return $data->payload;
+    run($util);
 }
 
 // Finds an email address for a supporter.  Returns an empty
@@ -51,7 +36,7 @@ function getEmail($supporter)
                 return $contact -> value;
             }
         }
-    }
+  }
     return "";
 }
 
@@ -60,12 +45,12 @@ function getEmail($supporter)
 // using the provided supporterIds.
 // See: https://api.salsalabs.org/help/integration#operation/getGroupsForSupporters
 
-function getGroupsPayload($util, $metrics, $supporterIds)
+function getGroupsPayload($util, $supporterIds)
 {
     $payload = [
         'payload' => [
             'offset' => 0,
-            'count' => $metrics->maxBatchSize,
+            'count' => $util->getMetrics()->maxBatchSize,
             'identifiers' => $supporterIds,
             'identifierType' => "SUPPORTER_ID",
             "modifiedFrom" => "2005-05-26T11:49:24.905Z"
@@ -89,7 +74,7 @@ function getGroupsPayload($util, $metrics, $supporterIds)
 }
 
 // Retrieve the segument record for the provided segment ID.
-function getSegment($util, $metrics, $segmentId)
+function getSegment($util, $segmentId)
 {
     $method = 'POST';
 
@@ -97,7 +82,7 @@ function getSegment($util, $metrics, $segmentId)
     $payload = [
         'payload' => [
             'offset' => 0,
-            'count' => $metrics->maxBatchSize,
+            'count' => $util->getMetrics()->maxBatchSize,
             'identifierType' => 'SEGMENT_ID',
             'identifiers' => array($util->getEnvironment()["segmentId"]),
             'includeMemberCounts' => 'true'
@@ -125,7 +110,7 @@ function getSegment($util, $metrics, $segmentId)
 
 // Process groups for a list of supporters.  Writes supproter info
 // and a comma-delimited list of groups to the output file.
-function processGroupsForSupporters($util, $metrics, $csv, $supporters)
+function processGroupsForSupporters($util, $csv, $supporters)
 {
     // Create list if supporter IDs to send to Engage *and*
     // a hash of supporter IDs and supporter records. We'll
@@ -138,7 +123,7 @@ function processGroupsForSupporters($util, $metrics, $csv, $supporters)
         $hash[$s->supporterId] = $s;
     }
 
-    $p = getGroupsPayload($util, $metrics, $ids);
+    $p = getGroupsPayload($util, $ids);
 
     // Iterate through payload results. Each result item
     // has a supporter_ID and a list of groups.  We'll use
@@ -182,12 +167,12 @@ function processGroupsForSupporters($util, $metrics, $csv, $supporters)
 // to a tab-delimited file("all_supporter_groups.txt"). Supporters
 // without groups are ignored.
 
-function run($util, $metrics)
+function run($util)
 {
     // Show the segment in case the segment ID is not what the user
     // wanted...
     $segmentId = $util->getEnvironment()["segmentId"];
-    $segment = getSegment($util, $metrics, $segmentId);
+    $segment = getSegment($util, $segmentId);
     if (!is_null($segment)) {
         printf("Searching %s: (%s) for %d supporters.\n\n",
             $segment->name,
@@ -213,8 +198,8 @@ function run($util, $metrics)
     $payload = [
         'payload' => [
             'offset' => 0,
-            'count' => $metrics->maxBatchSize,
-            'segmentId' => $util['segmentId'],
+            'count' => $util->getMetrics()->maxBatchSize,
+            'segmentId' => $util->getEnvironment()['segmentId'],
         ],
     ];
     $method = 'POST';
@@ -232,7 +217,7 @@ function run($util, $metrics)
             $data = json_decode($response -> getBody());
             $count = $data -> payload -> count;
             if ($count > 0) {
-                processGroupsForSupporters($util, $metrics, $csv, $data ->payload->supporters);
+                processGroupsForSupporters($util, $csv, $data ->payload->supporters);
             }
             $payload["payload"]["offset"] = $payload["payload"]["offset"] + $count;
         } catch (Exception $e) {
