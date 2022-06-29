@@ -1,11 +1,12 @@
 # engage_api_php
+
 Examples of accessing Engage via the API with PHP. 
 
 This repository contains demonstrations of using the Salsa Engage API with PHP.
 
 These demos were *not* written by a PHP developer.  Please feel free to make a pull request if you'd like to improve them.
 
-# Dependencies
+## Dependencies
 
 These apps depend upon these tools and libraries.
 
@@ -14,7 +15,7 @@ These apps depend upon these tools and libraries.
 * [Symfony YAML](http://symfony.com/doc/current/components/yaml.html)
 * [Salsa Engage API Doc](https://help.salsalabs.com/hc/en-us/articles/115000341773)
 
-# Installation (brief)
+## Installation (brief)
 
 Use these steps to install and equip this repository.
 
@@ -27,11 +28,11 @@ composer require symfony/yaml
 composer upgrade
 ```
 
-# License
+## License
 
 Please read the LICENSE file.
 
-# Authentication
+## Authentication
 
 All of the demo apps use a common utility class called `DemoUtils`. DemoUtils
 provides a standard set of tools for retrieving API tokens and parameters.
@@ -40,11 +41,11 @@ DemoUtils also provides some basic services to make the demos easier to read.
 Apps do not have to manage the interface to GuzzleHTTP, for example.  They can
 simply start reading.
 
-## Token storage
+### Token storage
 
 Tokens and parameters are stored in a YAML file.  DemoUtils parses that YAML
 file and stores the tokens in class accessors.  DemoUtil also stores the full
-contents of the YAML file as an object. 
+contents of the YAML file as an object.
 
 Here's a YAML file example.
 
@@ -69,14 +70,12 @@ activityIds:
 
 If you need a sample file to copy, then see  `params-template.yaml`.
 
-# Usage:
+## Usage
 
 The examples are stored in a directory structure quite a lot line the one
 used in the [Integration API](https://api.salsalabs.org/help/integration) documentation.
 For example, you can find calls that affect activities in `src/activities`, a way to 
 find segment members in `src/segments`, and info about email blasts in `src/email_blast`.
-
-
 
 ```bash
 php src/actities/fundraising/search_donations_by_date.php
@@ -115,7 +114,7 @@ Activity ID                          Transaction ID                       Transa
 
 ```
 
-# Questions? Issues?
+## Questions? Issues?
 
 Please direct any questions or comments to [Salsa Support](mailto:support@salsalabs.com).
 We'll be glad to help.
