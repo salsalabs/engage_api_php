@@ -34,7 +34,7 @@ function getSegment($util)
             'json' => $payload,
         ]);
         $data = json_decode($response->getBody());
-         $payload = $data->payload;
+        $payload = $data->payload;
         $count = $payload->count;
         if ($count == 0) {
             return null;
