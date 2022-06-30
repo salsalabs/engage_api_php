@@ -69,7 +69,7 @@ function main()
         }
         $offset += $count;
     }
-    $message = sprintf("getSegment: not a valid group name '%s'\n", $groupName);
+    $message = sprintf("Not a valid group name '%s'\n", $groupName);
     $exception = new Exception($message);
     throw $exception;
  }
