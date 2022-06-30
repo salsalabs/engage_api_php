@@ -214,7 +214,7 @@ function getSupporter($util, $email) {
  * 1. Get the supporter for the provided email.
  * 2. Get the group for the provided groupName.
  * 3. Add the supporter to the group.
- * 4. Provide proof via the response payload in JSON.
+ * 4. Provide proof that the add was successful.
  * 
  *  Parameters:
  * 
@@ -245,15 +245,12 @@ function run($util)
         exit(1);
     }
 
-    // Add the supporter to the group.  Proof is the contents
-    // of the response payload.
+    // Add the supporter to the group.  Proof is the result from
+    // the API call.
 
     $respPayload = segmentAddSupporter($util, $segment, $supporter);
     $result = $respPayload->supporters[0]->result;
-    printf("Adding %s to %s returned %s\n",
-        $email,
-        $groupName,
-        $result);
+    printf("Adding %s to %s returned %s\n", $email, $groupName, $result);
 
     // Debug noise.
     // printf("run: response payload from SegmentAddSupporter\n");
@@ -304,7 +301,7 @@ function run($util)
         throw $exception;
     }
 
-    // End of data when Engage returns no segments.
+    // End of data returns no segments.
     
     $count = $payload->count;
     if ($count == 0) {
@@ -364,7 +361,6 @@ function showWarnings($wrapper) {
     }
     return 0;
 }
-
 
 main()
 
